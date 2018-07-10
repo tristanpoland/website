@@ -1,0 +1,58 @@
+url: /index.html
+template: main.tt
+
+copy:
+  getstarted: |
+    Genesis helps you build your cloud, leveraging our best practices for
+    BOSH, credentials storage, Cloud Foundry, services, and more.  It takes
+    the guesswork out of deployments and upgrades, and gives you advanced
+    automation workflows on top of that.
+
+  enterprise: |
+    Stark & Wayne is the leading cloud technology consulting firm, offering
+    design, implementation, and operations services, enabling enterprises to
+    operate highly available and extensible platforms on their
+    infrastructure.
+
+cards:
+  - title: Flexible
+    icon:  loop
+    blurb: |
+      Leveraging Spruce, Genesis affords you and your operations team unprecedented flexibility in tailoring environment-specific configuration, while still being able to rely on a base of best practices.
+  - title: Cloud-Native
+    icon:  cloud-upload
+    blurb: |
+      Genesis grew up on The Cloud™ and knows how things work in this new world order. It comes with templates for deploying BOSH, Cloud Foundry, Diego, CF Service Brokers and more.
+  - title: Automated
+    icon:  plane
+    blurb: |
+      Using Concourse, Genesis can build automation workflows and pipelines to deploy configuration changes and security patches to all of your environments, in a controlled and tested fashion.
+
+systems:
+  - title: BOSH
+    image: /img/bosh.svg
+    link:  "#bosh"
+    blurb: |
+      Cloud software deployment, at whatever scale you need.
+  - title: Vault
+    image: /img/vault.svg
+    link:  "#vault"
+    blurb: |
+      The best secrets management system available today.
+  - title: Cloud Foundry
+    image: /img/cf.svg
+    link:  "#cf"
+    blurb: |
+      Build, test, deploy, and scale your apps, faster and easier.
+  - title: Blacksmith
+    image: /img/blacksmith.png
+    link:  "#blacksmith"
+    blurb: |
+      On-demand Cloud Foundry Services, built on BOSH.
+  - title: SHIELD
+    image: /img/shield.svg
+    link:  "#shield"
+    blurb: |
+      Enterprise-class Data Protection, for a modern cloud.
+
+--- |-
