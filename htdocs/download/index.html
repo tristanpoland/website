@@ -64,7 +64,7 @@ h2 > span { padding-left: 0.5ex; }
     <div class="row">
       <div class="col-md-3 toc">
         <ul>
-          <li><a href="#latest">Latest Release ()</a></li>
+          <li><a href="#latest">Latest Release (2.6.5)</a></li>
           <li><a href="#source">Build From Source</a></li>
           <li><a href="#older">Older Releases</a>
             <ul>
@@ -75,8 +75,23 @@ h2 > span { padding-left: 0.5ex; }
       </div>
       <div class="col-md-8 col-md-push-1">
         <div class="content">
-          <span id="v"></span>
-          <h1 id="latest">Genesis v</h1>
+          <span id="v2.6.5"></span>
+          <h1 id="latest">Genesis v2.6.5</h1>
+          
+            <h3>Improvements</h3>
+
+<ul>
+<li>Improved lookup command to be able to handle accessing array elements by
+index or by element hash match (ie <code>myarray[somekey=specific-value]</code>)</li>
+</ul>
+
+<h3>Bug Fixes</h3>
+
+<ul>
+<li>Restored <code>vaulted()</code> subroutine: fixes error in <code>vault_path</code> and 
+<code>vault_path_and_key</code>  validation.</li>
+</ul>
+            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.5" target="_blank">Download v2.6.5 from Github</a>
           
 
           <h1>Build From Source</h1>
