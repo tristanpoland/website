@@ -20,7 +20,7 @@ if [[ "$CURRENT_VERSION" != "$VERSION" ]]; then
 	header "Getting New Release Notes for Genesis v$VERSION"
 	cat releases/body
 	(
-		spruce json $REPO_ROOT/data/releases | jq -r '{"all":.all}' | spruce merge -
+		spruce json $REPO_ROOT/data/releases | jq -r '{"all":.all}' | spruce merge - | sed -e '1s/all: \[\]/all:/'
 		echo "- notes: |"
 		cat releases/body | sed -e 's/^/    /'
 		echo
@@ -29,6 +29,14 @@ if [[ "$CURRENT_VERSION" != "$VERSION" ]]; then
 		echo "latest:  $VERSION"
 	) | spruce json | jq -r . > $REPO_ROOT/data/releases.tmp
 	mv $REPO_ROOT/data/releases.tmp $REPO_ROOT/data/releases
+	echo ; echo
+	echo "======================================"
+	cat $REPO_ROOT/data/releases
+	echo "======================================"
+	echo
+	jq -r <$REPO_ROOT/data/releases
+	echo
+	echo "======================================"
 fi
 
 header "Re-building Website Static Assets"
