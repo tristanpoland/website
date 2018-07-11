@@ -2,13 +2,13 @@
 meta:
   github:
     website:
-      uri: git@github.com:shieldproject/website
+      uri: git@github.com:genesis-community/website
       branch: master
-      private_key:  (( vault "secret/pipelines/shared/shield-bot/github:private" ))
-      access_token: (( vault "secret/pipelines/shared/shield-bot/github:access_token" ))
+      private_key:  (( vault "secret/pipelines/shared/github/genesis-bot:private" ))
+      access_token: (( vault "secret/pipelines/shared/github/genesis-bot:access_token" ))
 
     starkandwayne:
-      access_token: (( vault "secret/pipelines/shared/shield-bot/github:access_token" ))
+      access_token: (( vault "secret/pipelines/shared/github/genesis-bot:access_token" ))
 
   slack:
     webhook: (( vault "secret/slack/botspam:webhook" ))
@@ -45,7 +45,7 @@ jobs:
             CF_USERNAME: (( vault "secret/pivotal/bot:username" ))
             CF_PASSWORD: (( vault "secret/pivotal/bot:password" ))
             CF_ORG:      starkandwayne
-            CF_SPACE:    shieldproject
+            CF_SPACE:    genesis
             REPO_ROOT:   changes
             REPO_OUT:    pushme
             BRANCH:      (( grab meta.github.website.branch ))
@@ -55,7 +55,7 @@ jobs:
             channel:  (( grab meta.slack.channel ))
             username: (( grab meta.slack.username ))
             icon_url: (( grab meta.slack.icon ))
-            text:     'Failed to build shieldproject.io. <https://pipes.starkandwayne.com/teams/main/pipelines/shieldproject.io|(view details)>'
+            text:     'Failed to build genesisproject.io. <https://pipes.starkandwayne.com/teams/main/pipelines/genesisproject.io|(view details)>'
       - put: code
         params:
           rebase: true
@@ -84,7 +84,7 @@ jobs:
             CF_USERNAME: (( vault "secret/pivotal/bot:username" ))
             CF_PASSWORD: (( vault "secret/pivotal/bot:password" ))
             CF_ORG:      starkandwayne
-            CF_SPACE:    shieldproject
+            CF_SPACE:    genesis
             MANIFEST:    manifest-stage.yml
             REPO_ROOT:   code
         on_failure:
@@ -93,14 +93,14 @@ jobs:
             channel:  (( grab meta.slack.channel ))
             username: (( grab meta.slack.username ))
             icon_url: (( grab meta.slack.icon ))
-            text:     'Failed to deploy the shieldproject.io website to staging. <https://pipes.starkandwayne.com/teams/main/pipelines/shieldproject.io|(view details)>'
+            text:     'Failed to deploy the genesisproject.io website to staging. <https://pipes.starkandwayne.com/teams/main/pipelines/genesisproject.io|(view details)>'
         on_success:
           put: notify
           params:
             channel:  (( grab meta.slack.channel ))
             username: (( grab meta.slack.username ))
             icon_url: (( grab meta.slack.icon ))
-            text:     'Staged changes at <http://staging.shieldproject.io>.  After review, you can <https://pipes.starkandwayne.com/teams/main/pipelines/shieldproject.io|publish them (to production).>'
+            text:     'Staged changes at <http://staging.genesisproject.io>.  After review, you can <https://pipes.starkandwayne.com/teams/main/pipelines/genesisproject.io|publish them (to production).>'
   - name: prod
     plan:
       - aggregate:
@@ -123,7 +123,7 @@ jobs:
             CF_USERNAME: (( vault "secret/pivotal/bot:username" ))
             CF_PASSWORD: (( vault "secret/pivotal/bot:password" ))
             CF_ORG:      starkandwayne
-            CF_SPACE:    shieldproject
+            CF_SPACE:    genesis
             MANIFEST:    manifest.yml
             REPO_ROOT:   code
         on_failure:
@@ -132,14 +132,14 @@ jobs:
             channel:  (( grab meta.slack.channel ))
             username: (( grab meta.slack.username ))
             icon_url: (( grab meta.slack.icon ))
-            text:     'Failed to deploy the shieldproject.io website to production. <https://pipes.starkandwayne.com/teams/main/pipelines/shieldproject.io|(view details)>'
+            text:     'Failed to deploy the genesisproject.io website to production. <https://pipes.starkandwayne.com/teams/main/pipelines/genesisproject.io|(view details)>'
         on_success:
           put: notify
           params:
             channel:  (( grab meta.slack.channel ))
             username: (( grab meta.slack.username ))
             icon_url: (( grab meta.slack.icon ))
-            text:     'Successfully published <http://shieldproject.io>'
+            text:     'Successfully published <http://genesisproject.io>'
 
 
 resource_types:
@@ -176,7 +176,7 @@ resources:
   type: github-release
   source:
     user:         starkandwayne
-    repository:   shield
+    repository:   genesis
     access_token: (( grab meta.github.starkandwayne.access_token ))
 
 - name: notify
