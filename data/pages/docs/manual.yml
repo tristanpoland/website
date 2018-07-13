@@ -1,10 +1,12 @@
 ---
 # vim:ft=markdown:tw=76
-title:  SHIELD Operator's Manual
+title:  The Genesis Way
 url:    /docs/manual/index.html
 format: markdown
 toplinks: yes
 --- |-
+
+(please ignore all references to SHIELD, thanks.)
 
 Hello, and welcome to the **SHIELD Operator's Manual**, an in-depth look at
 all things SHIELD.  This guide aims to be an exhaustive guide to the
