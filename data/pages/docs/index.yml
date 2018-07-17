@@ -1,7 +1,7 @@
 ---
 # vim:ft=markdown:tw=76
-title:  SHIELD Documentation
-url:    /docs//index.html
+title:  Genesis Documentation
+url:    /docs/index.html
 format: markdown
 --- |-
 - [Getting Started](/docs/getting-started)

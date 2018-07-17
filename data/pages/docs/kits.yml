@@ -1,0 +1,17 @@
+---
+# vim:ft=markdown:tw=76
+title:  Available Genesis Kits
+url:    /docs/kits/index.html
+format: markdown
+--- |-
+
+# BOSH
+# Blacksmith
+# Cloud Foundry
+# Concourse
+# Jumpbox
+# Minio
+# Prometheus
+# SHIELD
+# Squid Proxy
+# Vault
