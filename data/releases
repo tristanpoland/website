@@ -4,7 +4,12 @@
       "notes": "# Improvements\n\n* Improved lookup command to be able to handle accessing array elements by\n  index or by element hash match (ie `myarray[somekey=specific-value]`)\n\n# Bug Fixes\n\n* Restored `vaulted()` subroutine: fixes error in `vault_path` and \n  `vault_path_and_key`  validation.\n",
       "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.5",
       "version": "2.6.5"
+    },
+    {
+      "notes": "# Bug Fixes\n\n* Fixed bug with some older kits validating against vault paths and keys.\n\n* `genesis do ...` message of \"Running <addon> addon for <env>\" now prints to\n  STDERR so addon output can be safely piped to other commands.\n",
+      "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.6",
+      "version": "2.6.6"
     }
   ],
-  "latest": "2.6.5"
+  "latest": "2.6.6"
 }
