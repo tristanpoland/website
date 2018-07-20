@@ -9,7 +9,12 @@
       "notes": "# Bug Fixes\n\n* Fixed bug with some older kits validating against vault paths and keys.\n\n* `genesis do ...` message of \"Running <addon> addon for <env>\" now prints to\n  STDERR so addon output can be safely piped to other commands.\n",
       "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.6",
       "version": "2.6.6"
+    },
+    {
+      "notes": "# Bug Fixes\n\n- Handle proxy-injected headers when downloading assets via curl.\n  Some proxies will give back provisional, non-3xx responses to\n  indicate that they are connecting to the requested resource.\n  This no longer confounds genesis.\n",
+      "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.7",
+      "version": "2.6.7"
     }
   ],
-  "latest": "2.6.6"
+  "latest": "2.6.7"
 }
