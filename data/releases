@@ -14,7 +14,12 @@
       "notes": "# Bug Fixes\n\n- Handle proxy-injected headers when downloading assets via curl.\n  Some proxies will give back provisional, non-3xx responses to\n  indicate that they are connecting to the requested resource.\n  This no longer confounds genesis.\n",
       "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.7",
       "version": "2.6.7"
+    },
+    {
+      "notes": "# Improvements\n\n- Certificates in kit.yml can now have subject alt names that\n  are optional, using the new `${maybe:params.name}` syntax.\n  If `params.name` isn't found in the environment file(s) then\n  that SAN entry will be skipped entirely.\n\n  This allows Kit Authors to generate certificates with\n  user-provided external domains, optionally.\n",
+      "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.8",
+      "version": "2.6.8"
     }
   ],
-  "latest": "2.6.7"
+  "latest": "2.6.8"
 }

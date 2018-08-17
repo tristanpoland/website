@@ -61,10 +61,12 @@
     <div class="row">
       <div class="col-md-3 toc">
         <ul>
-          <li><a href="#latest">Latest Release (2.6.7)</a></li>
+          <li><a href="#latest">Latest Release (2.6.8)</a></li>
           <li><a href="#source">Build From Source</a></li>
           <li><a href="#older">Older Releases</a>
             <ul>
+              
+              <li><a href="#v2.6.7">2.6.7</a></li>
               
               <li><a href="#v2.6.6">2.6.6</a></li>
               
@@ -76,18 +78,21 @@
       </div>
       <div class="col-md-8 col-md-push-1">
         <div class="content">
-          <span id="v2.6.7"></span>
-          <h1 id="latest">Genesis v2.6.7</h1>
+          <span id="v2.6.8"></span>
+          <h1 id="latest">Genesis v2.6.8</h1>
           
-            <h3>Bug Fixes</h3>
+            <h3>Improvements</h3>
 
 <ul>
-<li>Handle proxy-injected headers when downloading assets via curl.
-Some proxies will give back provisional, non-3xx responses to
-indicate that they are connecting to the requested resource.
-This no longer confounds genesis.</li>
+<li><p>Certificates in kit.yml can now have subject alt names that
+are optional, using the new <code>${maybe:params.name}</code> syntax.
+If <code>params.name</code> isn't found in the environment file(s) then
+that SAN entry will be skipped entirely.</p>
+
+<p>This allows Kit Authors to generate certificates with
+user-provided external domains, optionally.</p></li>
 </ul>
-            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.7" target="_blank">Download v2.6.7 from Github</a>
+            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.8" target="_blank">Download v2.6.8 from Github</a>
           
 
           <h1>Build From Source</h1>
@@ -95,6 +100,17 @@ This no longer confounds genesis.</li>
           <p>... we're still working on this one ... <!-- FIXME --></p>
 
           <h1 id="older">Older Genesis Releases</h1>
+          
+          <h2 id="v2.6.7">SHIELD v2.6.7</h2>
+          <h3>Bug Fixes</h3>
+
+<ul>
+<li>Handle proxy-injected headers when downloading assets via curl.
+Some proxies will give back provisional, non-3xx responses to
+indicate that they are connecting to the requested resource.
+This no longer confounds genesis.</li>
+</ul>
+          <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.7" target="_blank">Download v2.6.7 from Github</a>
           
           <h2 id="v2.6.6">SHIELD v2.6.6</h2>
           <h3>Bug Fixes</h3>
