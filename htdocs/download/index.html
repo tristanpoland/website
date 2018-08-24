@@ -61,10 +61,12 @@
     <div class="row">
       <div class="col-md-3 toc">
         <ul>
-          <li><a href="#latest">Latest Release (2.6.8)</a></li>
+          <li><a href="#latest">Latest Release (2.6.9)</a></li>
           <li><a href="#source">Build From Source</a></li>
           <li><a href="#older">Older Releases</a>
             <ul>
+              
+              <li><a href="#v2.6.8">2.6.8</a></li>
               
               <li><a href="#v2.6.7">2.6.7</a></li>
               
@@ -78,10 +80,31 @@
       </div>
       <div class="col-md-8 col-md-push-1">
         <div class="content">
-          <span id="v2.6.8"></span>
-          <h1 id="latest">Genesis v2.6.8</h1>
+          <span id="v2.6.9"></span>
+          <h1 id="latest">Genesis v2.6.9</h1>
           
-            <h3>Improvements</h3>
+            <h3>Bug Fixes</h3>
+
+<ul>
+<li><p><code>genesis embed</code> now properly handles packed (2.6+) genesis
+distributions, and instead of just copying the extracted driver
+script, now embeds the packed archive binary.  This makes the
+pipelines a lot happier.</p></li>
+<li><p><code>genesis repipe</code> now properly hides / unhides pipelines per
+configuration.  All this talk of pipelines and we misspelled
+piepline.</p></li>
+</ul>
+            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.9" target="_blank">Download v2.6.9 from Github</a>
+          
+
+          <h1>Build From Source</h1>
+
+          <p>... we're still working on this one ... <!-- FIXME --></p>
+
+          <h1 id="older">Older Genesis Releases</h1>
+          
+          <h2 id="v2.6.8">SHIELD v2.6.8</h2>
+          <h3>Improvements</h3>
 
 <ul>
 <li><p>Certificates in kit.yml can now have subject alt names that
@@ -92,14 +115,7 @@ that SAN entry will be skipped entirely.</p>
 <p>This allows Kit Authors to generate certificates with
 user-provided external domains, optionally.</p></li>
 </ul>
-            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.8" target="_blank">Download v2.6.8 from Github</a>
-          
-
-          <h1>Build From Source</h1>
-
-          <p>... we're still working on this one ... <!-- FIXME --></p>
-
-          <h1 id="older">Older Genesis Releases</h1>
+          <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.8" target="_blank">Download v2.6.8 from Github</a>
           
           <h2 id="v2.6.7">SHIELD v2.6.7</h2>
           <h3>Bug Fixes</h3>

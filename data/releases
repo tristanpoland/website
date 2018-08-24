@@ -19,7 +19,12 @@
       "notes": "# Improvements\n\n- Certificates in kit.yml can now have subject alt names that\n  are optional, using the new `${maybe:params.name}` syntax.\n  If `params.name` isn't found in the environment file(s) then\n  that SAN entry will be skipped entirely.\n\n  This allows Kit Authors to generate certificates with\n  user-provided external domains, optionally.\n",
       "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.8",
       "version": "2.6.8"
+    },
+    {
+      "notes": "# Bug Fixes\n\n- `genesis embed` now properly handles packed (2.6+) genesis\n  distributions, and instead of just copying the extracted driver\n  script, now embeds the packed archive binary.  This makes the\n  pipelines a lot happier.\n\n- `genesis repipe` now properly hides / unhides pipelines per\n  configuration.  All this talk of pipelines and we misspelled\n  piepline.\n",
+      "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.9",
+      "version": "2.6.9"
     }
   ],
-  "latest": "2.6.8"
+  "latest": "2.6.9"
 }
