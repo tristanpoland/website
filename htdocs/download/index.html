@@ -61,10 +61,12 @@
     <div class="row">
       <div class="col-md-3 toc">
         <ul>
-          <li><a href="#latest">Latest Release (2.6.9)</a></li>
+          <li><a href="#latest">Latest Release (2.6.10)</a></li>
           <li><a href="#source">Build From Source</a></li>
           <li><a href="#older">Older Releases</a>
             <ul>
+              
+              <li><a href="#v2.6.9">2.6.9</a></li>
               
               <li><a href="#v2.6.8">2.6.8</a></li>
               
@@ -80,10 +82,31 @@
       </div>
       <div class="col-md-8 col-md-push-1">
         <div class="content">
-          <span id="v2.6.9"></span>
-          <h1 id="latest">Genesis v2.6.9</h1>
+          <span id="v2.6.10"></span>
+          <h1 id="latest">Genesis v2.6.10</h1>
           
             <h3>Bug Fixes</h3>
+
+<ul>
+<li><p>Accessing a Vault over HTTP/2 now works. Previously our regex was strictly
+checking for HTTP/x.x connections. We've losened it to look for HTTP/x.x or
+HTTP/x.</p></li>
+<li><p>Genesis concourse pipelines now downloads the cloud configuration from the
+bosh director. Previously, pipelines would fail to deploy because the deploy
+didn't have a cloud-config to base spruce merges off of.</p></li>
+<li><p>Genesis now ensures that <code>GENESIS_CALLBACK_BIN</code> is a fully-qualified path.</p></li>
+</ul>
+            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.10" target="_blank">Download v2.6.10 from Github</a>
+          
+
+          <h1>Build From Source</h1>
+
+          <p>... we're still working on this one ... <!-- FIXME --></p>
+
+          <h1 id="older">Older Genesis Releases</h1>
+          
+          <h2 id="v2.6.9">SHIELD v2.6.9</h2>
+          <h3>Bug Fixes</h3>
 
 <ul>
 <li><p><code>genesis embed</code> now properly handles packed (2.6+) genesis
@@ -94,14 +117,7 @@ pipelines a lot happier.</p></li>
 configuration.  All this talk of pipelines and we misspelled
 piepline.</p></li>
 </ul>
-            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.9" target="_blank">Download v2.6.9 from Github</a>
-          
-
-          <h1>Build From Source</h1>
-
-          <p>... we're still working on this one ... <!-- FIXME --></p>
-
-          <h1 id="older">Older Genesis Releases</h1>
+          <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.9" target="_blank">Download v2.6.9 from Github</a>
           
           <h2 id="v2.6.8">SHIELD v2.6.8</h2>
           <h3>Improvements</h3>

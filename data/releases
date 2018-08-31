@@ -24,7 +24,12 @@
       "notes": "# Bug Fixes\n\n- `genesis embed` now properly handles packed (2.6+) genesis\n  distributions, and instead of just copying the extracted driver\n  script, now embeds the packed archive binary.  This makes the\n  pipelines a lot happier.\n\n- `genesis repipe` now properly hides / unhides pipelines per\n  configuration.  All this talk of pipelines and we misspelled\n  piepline.\n",
       "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.9",
       "version": "2.6.9"
+    },
+    {
+      "notes": "# Bug Fixes\n\n- Accessing a Vault over HTTP/2 now works. Previously our regex was strictly\n  checking for HTTP/x.x connections. We've losened it to look for HTTP/x.x or\n  HTTP/x.\n\n- Genesis concourse pipelines now downloads the cloud configuration from the\n  bosh director. Previously, pipelines would fail to deploy because the deploy\n  didn't have a cloud-config to base spruce merges off of.\n\n- Genesis now ensures that `GENESIS_CALLBACK_BIN` is a fully-qualified path.\n",
+      "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.10",
+      "version": "2.6.10"
     }
   ],
-  "latest": "2.6.9"
+  "latest": "2.6.10"
 }
