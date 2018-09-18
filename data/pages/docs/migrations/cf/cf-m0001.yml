@@ -51,7 +51,7 @@ step will come last.
 
 ## Step 3: Stop All BBS VMs
 
-Perform a 'monit stop all' on all BBS instances of your CF deployment.
+Perform a `monit stop all` on all BBS instances of your CF deployment.
 Approximately 2 minutes after stopping all processes, routes to your apps will
 no longer work and downtime begins.
 
@@ -59,58 +59,52 @@ no longer work and downtime begins.
 
 On your master Postgres VM, execute the following statements:
 
-```
- 1. `sudo -i`
- 2. `mkdir /var/vcap/store/migration`
- 3. `cd /var/vcap/store/migration`
-```
+
+    sudo -i
+    mkdir /var/vcap/store/migration
+    cd /var/vcap/store/migration
+
 
 Dump the data in the `postgres` database by individual table:
 
-```
-/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -t locks postgres > postgres.locks.sql;
-/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t actual_lrps postgres > postgres.actual_lrps.sql;
-/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t configurations postgres > postgres.configurations.sql;
-/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t desired_lrps postgres > postgres.desired_lrps.sql;
-/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t domains postgres > postgres.domains.sql;
-/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t tasks postgres > postgres.tasks.sql;
-```
+    /var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -t locks postgres > postgres.locks.sql;
+    /var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t actual_lrps postgres > postgres.actual_lrps.sql;
+    /var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t configurations postgres > postgres.configurations.sql;
+    /var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t desired_lrps postgres > postgres.desired_lrps.sql;
+    /var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t domains postgres > postgres.domains.sql;
+    /var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t tasks postgres > postgres.tasks.sql;
 
 Import the recently exported data from `postgres` into their proper databases:
 
-```
-/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 locketdb < postgres.locks.sql;
-/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb < postgres.actual_lrps.sql;
-/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb < postgres.configurations.sql;
-/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb < postgres.desired_lrps.sql;
-/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb < postgres.domains.sql;
-/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb < postgres.tasks.sql;
-```
+    /var/vcap/packages/postgres/bin/psql -U vcap -p 6432 locketdb < postgres.locks.sql;
+    /var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb < postgres.actual_lrps.sql;
+    /var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb < postgres.configurations.sql;
+    /var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb < postgres.desired_lrps.sql;
+    /var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb < postgres.domains.sql;
+    /var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb < postgres.tasks.sql;
 
 ## Step 5: Verify the Data Migration was Successful
 
 Export the recently imported data:
 
-```
-/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -t locks locketdb > locketdb.locks.sql;
-/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t actual_lrps diegodb > diegodb.actual_lrps.sql;
-/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t configurations diegodb > diegodb.configurations.sql;
-/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t desired_lrps diegodb > diegodb.desired_lrps.sql;
-/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t domains diegodb > diegodb.domains.sql;
-/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t tasks diegodb > diegodb.tasks.sql;
-```
+    /var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -t locks locketdb > locketdb.locks.sql;
+    /var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t actual_lrps diegodb > diegodb.actual_lrps.sql;
+    /var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t configurations diegodb > diegodb.configurations.sql;
+    /var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t desired_lrps diegodb > diegodb.desired_lrps.sql;
+    /var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t domains diegodb > diegodb.domains.sql;
+    /var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t tasks diegodb > diegodb.tasks.sql;
 
 Verify the recently exported data has no difference from the originally exported
 data:
 
-```
-diff postgres.locks.sql locketdb.locks.sql;
-diff postgres.actual_lrps.sql diegodb.actual_lrps.sql;
-diff postgres.configurations.sql diegodb.configurations.sql;
-diff postgres.desired_lrps.sql diegodb.desired_lrps.sql;
-diff postgres.domains.sql diegodb.domains.sql;
-diff postgres.tasks.sql diegodb.tasks.sql;
-```
+
+    diff postgres.locks.sql locketdb.locks.sql;
+    diff postgres.actual_lrps.sql diegodb.actual_lrps.sql;
+    diff postgres.configurations.sql diegodb.configurations.sql;
+    diff postgres.desired_lrps.sql diegodb.desired_lrps.sql;
+    diff postgres.domains.sql diegodb.domains.sql;
+    diff postgres.tasks.sql diegodb.tasks.sql;
+
 
 If all went well, there should be no output from any of those `diff` commands.
 
@@ -118,18 +112,17 @@ If all went well, there should be no output from any of those `diff` commands.
 
 To ensure no processes reference old database tables, rename them:
 
-```
-/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE locks RENAME TO locks_old";
-/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE actual_lrps RENAME TO actual_lrps_old";
-/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE configurations RENAME TO configurations_old";
-/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE desired_lrps RENAME TO desired_lrps_old";
-/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE domains RENAME TO domains_old";
-/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE tasks RENAME TO tasks_old";
-```
+    /var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE locks RENAME TO locks_old";
+    /var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE actual_lrps RENAME TO actual_lrps_old";
+    /var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE configurations RENAME TO configurations_old";
+    /var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE desired_lrps RENAME TO desired_lrps_old";
+    /var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE domains RENAME TO domains_old";
+    /var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE tasks RENAME TO tasks_old";
+
 
 ## Step 7: Redeploy Genesis Environment
 
-Execute `genesis deploy <environment name>` of the affect environment, ensuring
+Execute `genesis deploy` of the affect environment, ensuring
 you've followed step 2. CF will now deploy with proper references to the
 database names.
 
@@ -143,4 +136,4 @@ Execute smoke tests to verify that your redeployed CF environment is nominal.
 # Conclusion
 
 If you have concerns about CF-M0001, please stop by our [Slack
-channel](/community) for support.	
+channel](#slack) for support.	
