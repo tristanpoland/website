@@ -88,22 +88,22 @@ inaccessible for 15 minutes while the fix was being applied.</p>
 
 <h1>Instructions on Applying Fix</h1>
 
-<p>The following is step-by-step instructions on how to successfully migrate Locket
-and Diego data from <code>postgres</code> and into their respective databases. The guides
+<p>The following are step-by-step instructions on how to successfully migrate Locket
+and Diego data from <code>postgres</code> and into their respective databases. This guide
 will mention when downtime approximately starts and ends.</p>
 
 <h2>Step 1: Get a Baseline</h2>
 
 <p>Ensure your CF deployment is running nominally by running smoke tests. If tests
-pass, continue onto step 2. Otherwise, please diagnose and correct your errors;
-do not continue until they pass.</p>
+pass, continue to step 2. Otherwise, please diagnose and correct your errors;
+do not continue until smoke tests pass.</p>
 
 <p>Running smoke tests will help you understand when, if ever, your CF deployment
 stopped working in case data migration fails.</p>
 
 <h2>Step 2: Stage Genesis Environment File for Deploy</h2>
 
-<p>The Genesis CF Kit version 1.2 includes the fix to CF-M0001 already. Download it
+<p>The Genesis CF Kit version 1.2 includes the fix to CF-M0001. Download it
 via <code>genesis download cf/1.2</code> in your CF deployments folder. Then, edit your
 environment file and set <code>version:</code> to <code>version: 1.2</code>. Do not deploy yet, that
 step will come last.</p>
@@ -182,21 +182,31 @@ diff postgres.tasks.sql diegodb.tasks.sql;
 
 <h2>Step 7: Redeploy Genesis Environment</h2>
 
-<p>Execute <code>genesis deploy</code> of the affect environment, ensuring
+<p>Execute <code>genesis deploy</code> of the affected environment, ensuring
 you've followed step 2. CF will now deploy with proper references to the
 database names.</p>
 
 <p>If all went well, BBS will begin running again and routes will restore within a
 minute after deploying. Downtime ends here.</p>
 
-<h2>Step 8: Verify Environment (Final step)</h2>
+<h2>Step 8: Cleanup &amp; Verification (Final step)</h2>
 
-<p>Execute smoke tests to verify that your redeployed CF environment is nominal.</p>
+<p>Execute smoke tests to verify that your redeployed CF environment is nominal.
+To finish, you may delete the old tables once you are confident your data
+migration was successful:</p>
+
+<pre><code>/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "DROP TABLE locks_old CASCADE";
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "DROP TABLE actual_lrps_old CASCADE";
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "DROP TABLE configurations_old CASCADE";
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "DROP TABLE desired_lrps_old CASCADE";
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "DROP TABLE domains_old CASCADE";
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "DROP TABLE tasks_old CASCADE";
+</code></pre>
 
 <h1>Conclusion</h1>
 
-<p>If you have concerns about CF-M0001, please stop by our <a href="#slack">Slack
-channel</a> for support.   </p>
+<p>If you have concerns about CF-M0001, please stop by our <a href="/community/#slack">Slack
+channel</a> for support.</p>
       </div>
     </div>
   </div>

@@ -70,7 +70,12 @@
 
 <h2>CF-M0001 Database Scheme Fix Migration</h2>
 
-<p>.. FIXME a brief description of the problem ...</p>
+<p>We recently discovered an issue with our CF kit that affects versions 1.1.0
+to 1.1.2. TLocket and Diego databases were configured to use the database name
+<code>postgres</code> by default. While this does not affect day-to-day nominal operation
+of CF, we still see this an issue that needs to be corrected ASAP. <strong>This 
+process must be completed in order to update to 1.2 or above if your CF 
+environments were deployed with kit versions 1.1.0, 1.1.1, or 1.1.2.</strong></p>
 
 <p>Read the <a href="/docs/migrations/cf/cf-m0001">Database Scheme Fix Migration</a>
 process documentation.</p>
