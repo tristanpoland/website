@@ -1,0 +1,14 @@
+---
+# vim:ft=markdown:tw=76
+title:  Genesis Kit Migration Processes
+url:    /docs/migrations/index.html
+format: markdown
+--- |-
+# Cloud Foundry
+
+## CF-M0001 Database Scheme Fix Migration
+
+.. FIXME a brief description of the problem ...
+
+Read the [Database Scheme Fix Migration](/docs/migrations/cf/cf-m0001)
+process documentation.

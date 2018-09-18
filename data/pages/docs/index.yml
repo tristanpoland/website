@@ -6,3 +6,4 @@ format: markdown
 --- |-
 - [Getting Started](/docs/getting-started)
 - [Operators' Manual](/docs/manual)
+- [Migration Processes](/docs/migrations)

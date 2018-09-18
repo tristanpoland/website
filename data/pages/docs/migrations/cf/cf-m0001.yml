@@ -1,0 +1,8 @@
+---
+# vim:ft=markdown:tw=76
+title:  CF-M0001: Database Scheme Fix Migration
+url:    /docs/migrations/cf/cf-m0001/index.html
+format: markdown
+--- |-
+
+We goofed.
