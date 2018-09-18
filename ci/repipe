@@ -1,3 +1,5 @@
 #!/bin/bash
 
-fly -t pipes set-pipeline -p genesisproject.io -c <(spruce merge ci/pipeline.yml)
+fly -t genesis@pipes set-pipeline     -p genesisproject.io -c <(spruce merge ci/pipeline.yml)
+fly -t genesis@pipes unpause-pipeline -p genesisproject.io
+fly -t genesis@pipes expose-pipeline  -p genesisproject.io
