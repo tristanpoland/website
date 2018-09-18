@@ -66,7 +66,143 @@
       </div>
       <div class="col-md-8 col-md-push-1">
         <div class="content">
-        <p>We goofed.</p>
+        <h1>Overview</h1>
+
+<p>We recently discovered an issue with our CF kit that affects versions 1.1.0
+to 1.1.2. Due to a YAML-related error, the Locket and Diego databases were
+configured to use the database name <code>postgres</code> by default. While this does not
+affect day-to-day nominal operation of CF, we still see this an issue that needs
+to be corrected as soon as possible.</p>
+
+<p>Please note that although your databases may already contain <code>locketdb</code> and
+<code>diegodb</code> tables, they are empty and unused. All data was written to <code>postgres</code>.</p>
+
+<h1>Impact</h1>
+
+<p>We believe the impact to be minimal to the stability and runtime of your CF
+deployments. However, it is in the best interest to correct this problem as
+confusion stemming from unorganized data may arise.</p>
+
+<p>The fix for this issue will require downtime. In our testing, apps were
+inaccessible for 15 minutes while the fix was being applied.</p>
+
+<h1>Instructions on Applying Fix</h1>
+
+<p>The following is step-by-step instructions on how to successfully migrate Locket
+and Diego data from <code>postgres</code> and into their respective databases. The guides
+will mention when downtime approximately starts and ends.</p>
+
+<h2>Step 1: Get a Baseline</h2>
+
+<p>Ensure your CF deployment is running nominally by running smoke tests. If tests
+pass, continue onto step 2. Otherwise, please diagnose and correct your errors;
+do not continue until they pass.</p>
+
+<p>Running smoke tests will help you understand when, if ever, your CF deployment
+stopped working in case data migration fails.</p>
+
+<h2>Step 2: Stage Genesis Environment File for Deploy</h2>
+
+<p>The Genesis CF Kit version 1.2 includes the fix to CF-M0001 already. Download it
+via <code>genesis download cf/1.2</code> in your CF deployments folder. Then, edit your
+environment file and set <code>version:</code> to <code>version: 1.2</code>. Do not deploy yet, that
+step will come last.</p>
+
+<h2>Step 3: Stop All BBS VMs</h2>
+
+<p>Perform a 'monit stop all' on all BBS instances of your CF deployment.
+Approximately 2 minutes after stopping all processes, routes to your apps will
+no longer work and downtime begins.</p>
+
+<h2>Step 4: Migrate Data</h2>
+
+<p>On your master Postgres VM, execute the following statements:</p>
+
+<p><code>
+ 1. `sudo -i`
+ 2. `mkdir /var/vcap/store/migration`
+ 3. `cd /var/vcap/store/migration`
+</code></p>
+
+<p>Dump the data in the <code>postgres</code> database by individual table:</p>
+
+<p><code>
+/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -t locks postgres &gt; postgres.locks.sql;
+/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t actual_lrps postgres &gt; postgres.actual_lrps.sql;
+/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t configurations postgres &gt; postgres.configurations.sql;
+/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t desired_lrps postgres &gt; postgres.desired_lrps.sql;
+/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t domains postgres &gt; postgres.domains.sql;
+/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t tasks postgres &gt; postgres.tasks.sql;
+</code></p>
+
+<p>Import the recently exported data from <code>postgres</code> into their proper databases:</p>
+
+<p><code>
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 locketdb &lt; postgres.locks.sql;
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb &lt; postgres.actual_lrps.sql;
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb &lt; postgres.configurations.sql;
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb &lt; postgres.desired_lrps.sql;
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb &lt; postgres.domains.sql;
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 diegodb &lt; postgres.tasks.sql;
+</code></p>
+
+<h2>Step 5: Verify the Data Migration was Successful</h2>
+
+<p>Export the recently imported data:</p>
+
+<p><code>
+/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -t locks locketdb &gt; locketdb.locks.sql;
+/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t actual_lrps diegodb &gt; diegodb.actual_lrps.sql;
+/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t configurations diegodb &gt; diegodb.configurations.sql;
+/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t desired_lrps diegodb &gt; diegodb.desired_lrps.sql;
+/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t domains diegodb &gt; diegodb.domains.sql;
+/var/vcap/packages/postgres/bin/pg_dump -U vcap -p 6432 -c -t tasks diegodb &gt; diegodb.tasks.sql;
+</code></p>
+
+<p>Verify the recently exported data has no difference from the originally exported
+data:</p>
+
+<p><code>
+diff postgres.locks.sql locketdb.locks.sql;
+diff postgres.actual_lrps.sql diegodb.actual_lrps.sql;
+diff postgres.configurations.sql diegodb.configurations.sql;
+diff postgres.desired_lrps.sql diegodb.desired_lrps.sql;
+diff postgres.domains.sql diegodb.domains.sql;
+diff postgres.tasks.sql diegodb.tasks.sql;
+</code></p>
+
+<p>If all went well, there should be no output from any of those <code>diff</code> commands.</p>
+
+<h2>Step 6: Rename Old Databases</h2>
+
+<p>To ensure no processes reference old database tables, rename them:</p>
+
+<p><code>
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE locks RENAME TO locks_old";
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE actual_lrps RENAME TO actual_lrps_old";
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE configurations RENAME TO configurations_old";
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE desired_lrps RENAME TO desired_lrps_old";
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE domains RENAME TO domains_old";
+/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -c "ALTER TABLE tasks RENAME TO tasks_old";
+</code></p>
+
+<h2>Step 7: Redeploy Genesis Environment</h2>
+
+<p>Execute <code>genesis deploy &lt;environment name&gt;</code> of the affect environment, ensuring
+you've followed step 2. CF will now deploy with proper references to the
+database names.</p>
+
+<p>If all went well, BBS will begin running again and routes will restore within a
+minute after deploying. Downtime ends here.</p>
+
+<h2>Step 8: Verify Environment (Final step)</h2>
+
+<p>Execute smoke tests to verify that your redeployed CF environment is nominal.</p>
+
+<h1>Conclusion</h1>
+
+<p>If you have concerns about CF-M0001, please stop by our <a href="/community">Slack
+channel</a> for support.   </p>
       </div>
     </div>
   </div>
