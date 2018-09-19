@@ -1,0 +1,157 @@
+---
+# vim:ft=markdown:tw=76
+title:  GMP-CF-0001 - Database Scheme Fix Migration
+url:    /docs/migrations/gmp-cf-0001/index.html
+format: markdown
+--- |-
+
+# Overview
+
+We recently discovered an issue affecting versions 1.1.0, 1.1.1 and 1.1.2 of
+the Genesis Cloud Foundry Kit.   Locket and Diego were incorrectly configured to place
+their tables in the `postgres` database, instead of their dedicated
+`locketdb` and `diegodb` databases.
+
+While this does not affect day-to-day operation of Cloud Foundry, we
+still see this an issue that needs to be corrected as soon as possible.
+
+Please note that although your PostgreSQL instance may already contain
+`locketdb` and `diegodb` databases, they are empty and unused. All tables
+that should be in those databases were instead created in the `postgres`
+database.
+
+
+# Impact
+
+We believe the impact to be minimal to the stability and runtime of your Cloud Foundry
+deployments. However, it is in the best interest to correct this problem as
+confusion stemming from unorganized data may arise.
+
+The fix for this issue will require downtime. In our testing, applications
+were inaccessible for 15 minutes while the fix was being applied.
+
+
+# Applying The Fix
+
+The following are step-by-step instructions on how to successfully migrate Locket
+and Diego data from `postgres` and into their respective databases. This guide
+will mention when downtime approximately starts and ends.
+
+## Step 1: Get a Baseline
+
+Ensure your Cloud Foundry deployment is running properly by running smoke tests. If tests
+pass, continue to step 2. Otherwise, please diagnose and correct your errors;
+do not continue until smoke tests pass.
+
+Running smoke tests will help you understand when, if ever, your Cloud Foundry deployment
+stopped working in case data migration fails.
+
+## Step 2: Stage Genesis Environment File for Deploy
+
+The Genesis Cloud Foundry Kit version 1.2.0 includes the fix to CF-M0001. Download it
+via `genesis download cf/1.2.0` in your Cloud Foundry deployments folder. Then, edit your
+environment file and set `version:` to `version: 1.2.0`. Do not deploy yet, that
+step will come last.
+
+## Step 3: Stop All BBS VMs
+
+Perform a `monit stop all` on all BBS instances of your Cloud Foundry deployment.
+Approximately 2 minutes after stopping all processes, routes to your apps will
+no longer work and downtime begins.
+
+## Step 4: Migrate Data
+
+On your master Postgres VM, execute the following statements:
+
+    sudo -i
+    mkdir /var/vcap/store/migration
+    cd /var/vcap/store/migration
+
+
+Dump the data in the `postgres` database by individual table:
+
+    export PATH=$PATH:/var/vcap/packages/postgres/bin
+    pg_dump -U vcap -p 6432    -t locks          postgres > postgres.locks.sql;
+    pg_dump -U vcap -p 6432 -c -t actual_lrps    postgres > postgres.actual_lrps.sql;
+    pg_dump -U vcap -p 6432 -c -t configurations postgres > postgres.configurations.sql;
+    pg_dump -U vcap -p 6432 -c -t desired_lrps   postgres > postgres.desired_lrps.sql;
+    pg_dump -U vcap -p 6432 -c -t domains        postgres > postgres.domains.sql;
+    pg_dump -U vcap -p 6432 -c -t tasks          postgres > postgres.tasks.sql;
+
+Import the recently exported data from `postgres` into their proper databases:
+
+    export PATH=$PATH:/var/vcap/packages/postgres/bin
+    psql -U vcap -p 6432 locketdb < postgres.locks.sql;
+    psql -U vcap -p 6432 diegodb  < postgres.actual_lrps.sql;
+    psql -U vcap -p 6432 diegodb  < postgres.configurations.sql;
+    psql -U vcap -p 6432 diegodb  < postgres.desired_lrps.sql;
+    psql -U vcap -p 6432 diegodb  < postgres.domains.sql;
+    psql -U vcap -p 6432 diegodb  < postgres.tasks.sql;
+
+## Step 5: Verify the Data Migration was Successful
+
+Export the recently imported data:
+
+    export PATH=$PATH:/var/vcap/packages/postgres/bin
+    pg_dump -U vcap -p 6432    -t locks          locketdb > locketdb.locks.sql;
+    pg_dump -U vcap -p 6432 -c -t actual_lrps    diegodb  > diegodb.actual_lrps.sql;
+    pg_dump -U vcap -p 6432 -c -t configurations diegodb  > diegodb.configurations.sql;
+    pg_dump -U vcap -p 6432 -c -t desired_lrps   diegodb  > diegodb.desired_lrps.sql;
+    pg_dump -U vcap -p 6432 -c -t domains        diegodb  > diegodb.domains.sql;
+    pg_dump -U vcap -p 6432 -c -t tasks          diegodb  > diegodb.tasks.sql;
+
+Verify the recently exported data has no difference from the originally exported
+data:
+
+
+    diff postgres.locks.sql          locketdb.locks.sql;
+    diff postgres.actual_lrps.sql    diegodb.actual_lrps.sql;
+    diff postgres.configurations.sql diegodb.configurations.sql;
+    diff postgres.desired_lrps.sql   diegodb.desired_lrps.sql;
+    diff postgres.domains.sql        diegodb.domains.sql;
+    diff postgres.tasks.sql          diegodb.tasks.sql;
+
+
+If all went well, there should be no output from any of those `diff` commands.
+
+## Step 6: Rename Old Databases
+
+To ensure no processes reference old database tables, rename them:
+
+    export PATH=$PATH:/var/vcap/packages/postgres/bin
+    psql -U vcap -p 6432 postgres -c "ALTER TABLE locks          RENAME TO locks_old";
+    psql -U vcap -p 6432 postgres -c "ALTER TABLE actual_lrps    RENAME TO actual_lrps_old";
+    psql -U vcap -p 6432 postgres -c "ALTER TABLE configurations RENAME TO configurations_old";
+    psql -U vcap -p 6432 postgres -c "ALTER TABLE desired_lrps   RENAME TO desired_lrps_old";
+    psql -U vcap -p 6432 postgres -c "ALTER TABLE domains        RENAME TO domains_old";
+    psql -U vcap -p 6432 postgres -c "ALTER TABLE tasks          RENAME TO tasks_old";
+
+
+## Step 7: Redeploy Genesis Environment
+
+Execute `genesis deploy` of the affected environment, ensuring
+you've followed step 2. Cloud Foundry will now deploy with proper references to the
+database names.
+
+If all went well, BBS will begin running again and routes will restore within a
+minute after deploying. Downtime ends here.
+
+## Step 8: Cleanup & Verification (Final step)
+
+Execute smoke tests to verify that your redeployed Cloud Foundry environment
+is operating properly.  Once you are satisfied with the results of the
+migration, you may delete the old tables:
+
+    export PATH=$PATH:/var/vcap/packages/postgres/bin
+    psql -U vcap -p 6432 postgres -c "DROP TABLE locks_old CASCADE";
+    psql -U vcap -p 6432 postgres -c "DROP TABLE actual_lrps_old CASCADE";
+    psql -U vcap -p 6432 postgres -c "DROP TABLE configurations_old CASCADE";
+    psql -U vcap -p 6432 postgres -c "DROP TABLE desired_lrps_old CASCADE";
+    psql -U vcap -p 6432 postgres -c "DROP TABLE domains_old CASCADE";
+    psql -U vcap -p 6432 postgres -c "DROP TABLE tasks_old CASCADE";
+
+# Help & Support
+
+If you have concerns about the impact of this migration process, or need
+assistance running through it, please don't hesitate to
+[find us in #help on Slack](/community#slack).

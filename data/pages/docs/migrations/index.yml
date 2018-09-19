@@ -4,16 +4,43 @@ title:  Genesis Kit Migration Processes
 url:    /docs/migrations/index.html
 format: markdown
 --- |-
+# Introduction
+
+_Migration Processes_ are specific, technical notes, authored by the Genesis
+Core Team and Genesis Kit Authors, to provide information on performing data
+and configuration migrations from one version of a kit to another.
+
+These processes are not easily automated, and are best served via
+documentation.  In some cases, these processes are required to properly
+migrate without data loss.  Sometimes they are merely advisory.
+
+Each migration process is given a unique identification, indicating which
+Genesis Kit it applies to.  Migration Process numbers will not be
+intentionally reused.  Indeed, they are intended to be used in reference
+documentation (like Github release notes).
+
 # Cloud Foundry
 
-## CF-M0001 Database Scheme Fix Migration
+The following migration processes apply to the Genesis CF Kit, for deploying
+Open Source Cloud Foundry instances.
 
-We recently discovered an issue with our CF kit that affects versions 1.1.0
-to 1.1.2. TLocket and Diego databases were configured to use the database name
-`postgres` by default. While this does not affect day-to-day nominal operation
-of CF, we still see this an issue that needs to be corrected ASAP. **This 
-process must be completed in order to update to 1.2 or above if your CF 
-environments were deployed with kit versions 1.1.0, 1.1.1, or 1.1.2.**
+## GMP-CF-0001 - Database Scheme Fix Migration
 
-Read the [Database Scheme Fix Migration](/docs/migrations/cf/cf-m0001)
-process documentation.
+We recently discovered an issue affecting versions 1.1.0, 1.1.1 and 1.1.2 of
+the Genesis CF Kit.   Locket and Diego were incorrectly configured to place
+their tables in the `postgres` database, instead of their dedicated
+`locketdb` and `diegodb` databases.
+
+While this does not affect day-to-day nominal operation of Cloud Foundry, we
+still see this an issue that needs to be corrected as soon as possible.
+
+<p style="color: red; font-weight: bold">This process must be completed in
+order to update to version 1.2.0 or newer if your Cloud Foundry environments
+were deployed with, or updated to the following versions:</p>
+
+- [Genesis CF Kit v1.1.0](https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.1.0)
+- [Genesis CF Kit v1.1.1](https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.1.1)
+- [Genesis CF Kit v1.1.2](https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.1.2)
+
+Read the [full details of **GMP-CF-0001 - Database Scheme Fix
+               Migration**](/docs/migrations/gmp-cf-0001).
