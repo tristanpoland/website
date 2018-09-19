@@ -29,7 +29,12 @@
       "notes": "# Bug Fixes\n\n- Accessing a Vault over HTTP/2 now works. Previously our regex was strictly\n  checking for HTTP/x.x connections. We've losened it to look for HTTP/x.x or\n  HTTP/x.\n\n- Genesis concourse pipelines now downloads the cloud configuration from the\n  bosh director. Previously, pipelines would fail to deploy because the deploy\n  didn't have a cloud-config to base spruce merges off of.\n\n- Genesis now ensures that `GENESIS_CALLBACK_BIN` is a fully-qualified path.\n",
       "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.10",
       "version": "2.6.10"
+    },
+    {
+      "notes": "# Improvements\n\n* Kits can now check that the required number of static_ips in each network\n  are available using the `cloud_config_needs static_ips <network_name>\n  <count>`\n",
+      "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.11",
+      "version": "2.6.11"
     }
   ],
-  "latest": "2.6.10"
+  "latest": "2.6.11"
 }
