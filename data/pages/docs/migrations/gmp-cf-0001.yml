@@ -23,7 +23,7 @@ database.
 
 # Analysis
 
-A major rewrite of internal Genesis YAML occured for the 1.1.0 kit release, as
+A major rewrite of internal Genesis YAML occurred for the 1.1.0 kit release, as
 various components were upgraded and required configuration changes. Namely,
 one of these changes was to the database connection information.
 
@@ -38,9 +38,9 @@ set the type of database used (typically `mysql` or `postgres`)
         description: "Database driver to use for SQL backend (for example: mysql,postgres)"
         default: mysql
 
-Whereas for most other SQL configuration YAML blocks used a varation of
+Whereas for most other SQL configuration YAML blocks used a variation of
 `db_name` or `database.name` to refer to the desired database name, and
-`db_type` or `database.type` to refer to the type of databse used.
+`db_type` or `database.type` to refer to the type of database used.
 
     database.name:
         description: "Name of logical database to use."
@@ -64,8 +64,8 @@ named `mysql` by default, our mistake went unnoticed because Cloud Foundry
 still operated normally as it was able to access and write to those databases.
 
 To fix this, we are making changes to `db_schema` to reference the proper
-`db_name` variable set. To mitigate future occurances of internal YAML variable
-misreferences, we plan to organize the Cloud Foundry kit's `params` variables
+`db_name` variable set. To mitigate future occurrences of internal YAML variable
+misuse, we plan to organize the Cloud Foundry kit's `params` variables
 into `meta` and `params`, a paradigm that we've used successfully for newer
 kits.
 
@@ -81,7 +81,7 @@ and Locket data to be in their proper database names; however backups taken of
 The fix for this issue will require downtime. In our testing, applications
 were inaccessible for 15 minutes while the fix was being applied.
 
-# Determining Affectedness
+# Am I Affected?
 
 If the Cloud Foundry environment in question was deployed or updated to the
 following versions:
@@ -91,16 +91,52 @@ following versions:
 - [Genesis CF Kit v1.1.2](https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.1.2)
 
 There is a very good chance you were affected. To further determine if you've
-been affected, follow the steps below.
+been affected, refer to the following table:
 
-## If you deployed with the `local-db` or `local-ha-db` Genesis feature
+<table class="gmp-matrix">
+  <thead><tr>
+    <th>Kit Version</th>
+    <th>Genesis Feature</th>
+    <th>Relevant Section</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td class="kits" rowspan="3">1.1.0<br>
+          1.1.1<br>
+          1.1.2</td>
+      <td class="features">local-db<br>
+          local-ha-db</td>
+      <td class="refs"><a href="#local-postgresql-databases">Local PostgreSQL Databases</a></td>
+    </tr>
 
-### Step 1: View Tables Within Postgres
+    <tr>
+      <td class="features">postgres</td>
+      <td class="refs"><a href="#external-postgresql-databases">External PostgreSQL Databases</a></td>
+    </tr>
+
+    <tr>
+      <td class="features">mysql</td>
+      <td class="refs"><a href="#external-mysql-databases">External MySQL Databases</a></td>
+    </tr>
+  </tbody>
+</table>
+
+## Local PostgreSQL Databases
+
+If you deployed with either of the following Genesis CF Kit features:
+
+  - `local-db`
+  - `local-ha-db`
+
+then use the following instructions to determine if your installation of
+Cloud Foundry is affected.
 
 Execute the following command, which will grab the tables currently in the
 `postgres` database name.
 
-    bosh ssh -e [environment name] -d [deployment name] postgres/0 -rc "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -t -c '\dt' 2>&1"
+    bosh ssh -e [environment name] -d [deployment name] postgres/0 -rc \
+      "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres \
+                                            -t -c '\dt' 2>&1"
 
 
 Next to the column `stdout`, there will be a list of tables. Look for any of
@@ -114,7 +150,27 @@ the following:
     public | tasks          | table | diegoadmin
 
 If any of your output matches above, you are affected and must follow the rest
-of this guide to upgrade to 1.2 or beyond.
+of this guide to upgrade to 1.2.0 or beyond.
+
+## External PostgreSQL Database
+
+// FIXME
+
+If you deployed with the `postgres` Genesis CF Kit feature, then this section
+would contain the instructions.  However, **we do not currently have
+migration steps for this scenario**.
+
+Please reach out to us on [Genesis Slack][slack]
+
+## External MySQL Database
+
+// FIXME
+
+If you deployed with the `mysql` Genesis CF Kit feature, then this section
+would contain the instructions.  However, **we do not currently have
+migration steps for this scenario**.
+
+Please reach out to us on [Genesis Slack][slack]
 
 # Applying The Fix
 
@@ -125,11 +181,14 @@ will mention when downtime approximately starts and ends.
 There are different steps to take depending on your Cloud Foundry environment.
 Please choose the one that matches your deployment.
 
-## If you deployed with the `local-db` Genesis feature
+## Standalone Local PostgreSQL
+
+If you deployed with the `local-db` Genesis CF Kit feature, then this
+section is for you.
 
 ### Step 1: Getting Started
 
-We'll frequently refernce `[environment name]` and `[deployment name]` during
+We'll frequently reference `[environment name]` and `[deployment name]` during
 this guide. `[environment name]` refers to the name of your BOSH director where
 Cloud Foundry is deployed to. `[deployment name]` refers to the name of your
 Cloud Foundry deployment.
@@ -157,7 +216,7 @@ folder. Then, edit your environment file and set `version:` to
 
 ### Step 3: Stop All BBS VMs
 
-Perform a BOSH stop on your BBS instances. This will stop all proccesses that
+Perform a BOSH stop on your BBS instances. This will stop all processes that
 are accessing the `postgres` database. Approximately 2 minutes after stopping
 all processes, routes to your apps will no longer work and downtime begins.
 
@@ -234,7 +293,7 @@ any old configurations from referencing data from `postgres`. To do so:
     psql -U vcap -p 6432 postgres -c "ALTER TABLE tasks          RENAME TO tasks_old";
 
 This way, any software that references the old tables should fail, making it
-easier to discover misconfigured processes.
+easier to discover improperly configured processes.
 
 ### Step 8: Redeploy Genesis Environment
 
@@ -261,11 +320,14 @@ migration, you may delete the old tables:
     psql -U vcap -p 6432 postgres -c "DROP TABLE domains_old CASCADE";
     psql -U vcap -p 6432 postgres -c "DROP TABLE tasks_old CASCADE";
 
-## If you deployed with the `local-ha-db` Genesis feature
+## Highly-Available Local PostgreSQL
+
+If you deployed with the `local-ha-db` Genesis CF Kit feature, then this
+section is for you.
 
 ### Step 1: Getting Started
 
-We'll frequently refernce `[environment name]` and `[deployment name]` during
+We'll frequently reference `[environment name]` and `[deployment name]` during
 this guide. `[environment name]` refers to the name of your BOSH director where
 Cloud Foundry is deployed to. `[deployment name]` refers to the name of your
 Cloud Foundry deployment.
@@ -293,7 +355,7 @@ folder. Then, edit your environment file and set `version:` to
 
 ### Step 3: Stop All BBS VMs
 
-Perform a BOSH stop on your BBS instances. This will stop all proccesses that
+Perform a BOSH stop on your BBS instances. This will stop all processes that
 are accessing the `postgres` database. Approximately 2 minutes after stopping
 all processes, routes to your apps will no longer work and downtime begins.
 
@@ -383,7 +445,7 @@ any old configurations from referencing data from `postgres`. To do so:
     psql -U vcap -p 6432 postgres -c "ALTER TABLE tasks          RENAME TO tasks_old";
 
 This way, any software that references the old tables should fail, making it
-easier to discover misconfigured processes.
+easier to discover improperly configured processes.
 
 ### Step 8: Redeploy Genesis Environment
 
@@ -410,8 +472,32 @@ migration, you may delete the old tables:
     psql -U vcap -p 6432 postgres -c "DROP TABLE domains_old CASCADE";
     psql -U vcap -p 6432 postgres -c "DROP TABLE tasks_old CASCADE";
 
+## External PostgreSQL Database
+
+// FIXME
+
+If you deployed with the `postgres` Genesis CF Kit feature, then this section
+would contain the instructions.  However, **we do not currently have
+migration steps for this scenario**.
+
+Please reach out to us on [Genesis Slack][slack]
+
+## External MySQL Database
+
+// FIXME
+
+If you deployed with the `mysql` Genesis CF Kit feature, then this section
+would contain the instructions.  However, **we do not currently have
+migration steps for this scenario**.
+
+Please reach out to us on [Genesis Slack][slack]
+
 # Help & Support
 
 If you have concerns about the impact of this migration process, or need
 assistance running through it, please don't hesitate to
-[find us in #help on Slack](/community#slack).
+[find us in #help on Slack][slack].
+
+
+
+[slack]: /community#slack
