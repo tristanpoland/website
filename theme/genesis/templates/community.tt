@@ -49,8 +49,8 @@
         <p><strong>Genesis</strong> itself contains the source code for the <tt>genesis</tt> utility.<br/>
         <a href="https://github.com/starkandwayne/genesis">https://github.com/starkandwayne/genesis</a></p>
 
-        <p>Related projects live under the <strong>genesisproject</strong> Github org:<br/>
-        <a href="https://github.com/genesisproject">https://github.com/genesisproject</a></p>
+        <p>Related projects live under the <strong>genesis-community</strong> Github org:<br/>
+        <a href="https://github.com/genesis-community">https://github.com/genesis-community</a></p>
       </div>
       <div class="col-md-3 community-icon">
         <img src="/community/github.png" />
