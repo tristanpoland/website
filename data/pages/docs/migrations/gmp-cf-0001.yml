@@ -1,8 +1,9 @@
 ---
 # vim:ft=markdown:tw=76
-title:  GMP-CF-0001 - Database Scheme Fix Migration
-url:    /docs/migrations/gmp-cf-0001/index.html
-format: markdown
+title:    GMP-CF-0001 - Database Scheme Fix Migration
+url:      /docs/migrations/gmp-cf-0001/index.html
+format:   markdown
+toplinks: yes
 --- |-
 
 # Overview
@@ -472,7 +473,7 @@ migration, you may delete the old tables:
     psql -U vcap -p 6432 postgres -c "DROP TABLE domains_old CASCADE";
     psql -U vcap -p 6432 postgres -c "DROP TABLE tasks_old CASCADE";
 
-## External PostgreSQL Database
+## External PostgreSQL
 
 // FIXME
 
@@ -482,7 +483,7 @@ migration steps for this scenario**.
 
 Please reach out to us on [Genesis Slack][slack]
 
-## External MySQL Database
+## External MySQL
 
 // FIXME
 
