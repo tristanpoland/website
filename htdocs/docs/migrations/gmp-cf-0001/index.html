@@ -201,8 +201,7 @@ Cloud Foundry is affected.</p>
 <code>postgres</code> database name.</p>
 
 <pre><code>bosh ssh -e [environment name] -d [deployment name] postgres/0 -rc \
-  "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres \
-                                        -t -c '\dt' 2&gt;&amp;1"
+  "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -t -c '\dt' 2&gt;&amp;1"
 </code></pre>
 
 <p>Next to the column <code>stdout</code>, there will be a list of tables. Look for any of
@@ -440,22 +439,21 @@ all processes, routes to your apps will no longer work and downtime begins.</p>
 <pre><code>bosh -e [environment name] -d [deployment name] stop bbs
 </code></pre>
 
-<h3>Step 4: Determine your master Postgres VM</h3>
+<h3>Step 4: Connect to your Postgres VM</h3>
 
-<p>Because we are writing information to the database, we require the PSQL
-statements to be executed on the Postgres master node. To determine which node
-is master, execute the following command:</p>
+<p>For Highly-Available PostgreSQL installations, all data manipulation
+commands must execute against the write master.  To determine which of your
+two <code>postgres/*</code> nodes is the master, execute the following command:</p>
 
-<pre><code>bosh ssh postgres/0 -rc "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -t -c 'SELECT pg_is_in_recovery()' 2&gt;&amp;1"
+<pre><code>bosh ssh postgres/0 -rc \
+  "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -t -c 'SELECT pg_is_in_recovery()' 2&gt;&amp;1"
 </code></pre>
 
 <p>If the column <code>stdout</code> reads <code>f</code>, then <code>postgres/0</code> is your master. If the printed
-output is <code>t</code>, then <code>postgres/1</code> is your master. Remember this for step 4.</p>
-
-<h3>Step 4: Connect to your Postgres VM</h3>
+output is <code>t</code>, then <code>postgres/1</code> is your master.</p>
 
 <p>To BOSH SSH into your Postgres VM, execute the following, substituting <code>#</code> with
-the number from the result of step 3.</p>
+the number of your master node.</p>
 
 <pre><code>bosh -e [environment name] -d [deployment name] ssh postgres/#
 </code></pre>

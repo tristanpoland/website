@@ -136,8 +136,7 @@ Execute the following command, which will grab the tables currently in the
 `postgres` database name.
 
     bosh ssh -e [environment name] -d [deployment name] postgres/0 -rc \
-      "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres \
-                                            -t -c '\dt' 2>&1"
+      "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -t -c '\dt' 2>&1"
 
 
 Next to the column `stdout`, there will be a list of tables. Look for any of
@@ -364,22 +363,20 @@ To stop all your BBS instances on your Cloud Foundry deployment:
 
     bosh -e [environment name] -d [deployment name] stop bbs
 
-### Step 4: Determine your master Postgres VM
-
-Because we are writing information to the database, we require the PSQL
-statements to be executed on the Postgres master node. To determine which node
-is master, execute the following command:
-
-    bosh ssh postgres/0 -rc "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -t -c 'SELECT pg_is_in_recovery()' 2>&1"
-
-If the column `stdout` reads `f`, then `postgres/0` is your master. If the printed
-output is `t`, then `postgres/1` is your master. Remember this for step 4.
-
-
 ### Step 4: Connect to your Postgres VM
 
+For Highly-Available PostgreSQL installations, all data manipulation
+commands must execute against the write master.  To determine which of your
+two `postgres/*` nodes is the master, execute the following command:
+
+    bosh ssh postgres/0 -rc \
+      "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -t -c 'SELECT pg_is_in_recovery()' 2>&1"
+
+If the column `stdout` reads `f`, then `postgres/0` is your master. If the printed
+output is `t`, then `postgres/1` is your master.
+
 To BOSH SSH into your Postgres VM, execute the following, substituting `#` with
-the number from the result of step 3.
+the number of your master node.
 
     bosh -e [environment name] -d [deployment name] ssh postgres/#
 
