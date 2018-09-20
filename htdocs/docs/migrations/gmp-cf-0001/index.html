@@ -145,8 +145,14 @@ were inaccessible for 15 minutes while the fix was being applied.</p>
 
 <h1>The Process</h1>
 
-<p>To apply this Genesis Migration Process, please refer to the <em>relevant
-section</em>, using the matrix below:</p>
+<p>The following sections contain step-by-step instructions on how to
+successfully migrate Locket and Diego data from <code>postgres</code> and into their
+respective databases. This guide will mention when downtime approximately
+starts and ends.</p>
+
+<p>There are different sets of steps to take depending on your Cloud Foundry
+environment.  Please choose the one that matches your deployment, using the
+matrix below:</p>
 
 <table class="gmp-matrix">
   <thead><tr>
@@ -181,13 +187,6 @@ section</em>, using the matrix below:</p>
   </tbody>
 </table>
 
-<p>The following are step-by-step instructions on how to successfully migrate Locket
-and Diego data from <code>postgres</code> and into their respective databases. This guide
-will mention when downtime approximately starts and ends.</p>
-
-<p>There are different sets of steps to take depending on your Cloud Foundry environment.
-Please choose the one that matches your deployment.</p>
-
 <h2>Standalone Local PostgreSQL</h2>
 
 <p>This process applies if you deployed with the <code>local-db</code> feature.</p>
@@ -213,7 +212,9 @@ public | tasks          | table | diegoadmin
 </code></pre>
 
 <p>If any of your output matches above, you are affected and must follow the rest
-of this guide to upgrade to 1.2.0 or beyond.</p>
+of this guide to upgrade to 1.2.0 or beyond.
+Otherwise, you can go brew
+yourself a cup of tea and pursue other endeavors.</p>
 
 <h3>Step A1: Getting Started</h3>
 
@@ -386,7 +387,9 @@ public | tasks          | table | diegoadmin
 </code></pre>
 
 <p>If any of your output matches above, you are affected and must follow the rest
-of this guide to upgrade to 1.2.0 or beyond.</p>
+of this guide to upgrade to 1.2.0 or beyond.
+Otherwise, you can go brew
+yourself a cup of tea and pursue other endeavors.</p>
 
 <h3>Step B1: Getting Started</h3>
 

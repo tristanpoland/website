@@ -85,8 +85,14 @@ were inaccessible for 15 minutes while the fix was being applied.
 
 # The Process
 
-To apply this Genesis Migration Process, please refer to the _relevant
-section_, using the matrix below:
+The following sections contain step-by-step instructions on how to
+successfully migrate Locket and Diego data from `postgres` and into their
+respective databases. This guide will mention when downtime approximately
+starts and ends.
+
+There are different sets of steps to take depending on your Cloud Foundry
+environment.  Please choose the one that matches your deployment, using the
+matrix below:
 
 <table class="gmp-matrix">
   <thead><tr>
@@ -122,13 +128,6 @@ section_, using the matrix below:
 </table>
 
 
-The following are step-by-step instructions on how to successfully migrate Locket
-and Diego data from `postgres` and into their respective databases. This guide
-will mention when downtime approximately starts and ends.
-
-There are different sets of steps to take depending on your Cloud Foundry environment.
-Please choose the one that matches your deployment.
-
 ## Standalone Local PostgreSQL
 
 This process applies if you deployed with the `local-db` feature.
@@ -154,6 +153,8 @@ the following:
 
 If any of your output matches above, you are affected and must follow the rest
 of this guide to upgrade to 1.2.0 or beyond.
+Otherwise, you can go brew
+yourself a cup of tea and pursue other endeavors.
 
 ### Step A1: Getting Started
 
@@ -314,6 +315,8 @@ the following:
 
 If any of your output matches above, you are affected and must follow the rest
 of this guide to upgrade to 1.2.0 or beyond.
+Otherwise, you can go brew
+yourself a cup of tea and pursue other endeavors.
 
 ### Step B1: Getting Started
 
