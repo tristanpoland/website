@@ -4,6 +4,7 @@ title:    GMP-CF-0001 - Database Scheme Fix Migration
 url:      /docs/migrations/gmp-cf-0001/index.html
 format:   markdown
 toplinks: yes
+sticknav: yes
 --- |-
 
 # Overview
@@ -110,12 +111,12 @@ section_, using the matrix below:
 
     <tr>
       <td class="features">postgres</td>
-      <td class="refs"><a href="#external-postgresql-databases">External PostgreSQL Databases</a></td>
+      <td class="refs"><a href="#external-postgresql">External PostgreSQL Databases</a></td>
     </tr>
 
     <tr>
       <td class="features">mysql</td>
-      <td class="refs"><a href="#external-mysql-databases">External MySQL Databases</a></td>
+      <td class="refs"><a href="#external-mysql">External MySQL Databases</a></td>
     </tr>
   </tbody>
 </table>

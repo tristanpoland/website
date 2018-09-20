@@ -14,7 +14,7 @@
   [%- if page.attrs.toplinks %]<a href="javascript:" id="return-to-top"><i class="icon-chevron-up"></i></a>[% end -%]
   <div id="container" class="container">
     <div class="row">
-      <div class="col-md-3 toc">
+      <div class="col-md-3 toc"[% if page.attrs.sticknav %] style="position: sticky; top: 0px;"[% end %]>
         [% page.attrs.toc %]
       </div>
       <div class="col-md-8 col-md-push-1">
