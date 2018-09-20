@@ -143,19 +143,10 @@ and Locket data to be in their proper database names; however backups taken of
 <p>The fix for this issue will require downtime. In our testing, applications
 were inaccessible for 15 minutes while the fix was being applied.</p>
 
-<h1>Am I Affected?</h1>
+<h1>The Process</h1>
 
-<p>If the Cloud Foundry environment in question was deployed or updated to the
-following versions:</p>
-
-<ul>
-<li><a href="https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.1.0">Genesis CF Kit v1.1.0</a></li>
-<li><a href="https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.1.1">Genesis CF Kit v1.1.1</a></li>
-<li><a href="https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.1.2">Genesis CF Kit v1.1.2</a></li>
-</ul>
-
-<p>There is a very good chance you were affected. To further determine if you've
-been affected, refer to the following table:</p>
+<p>To apply this Genesis Migration Process, please refer to the <em>relevant
+section</em>, using the matrix below:</p>
 
 <table class="gmp-matrix">
   <thead><tr>
@@ -165,12 +156,17 @@ been affected, refer to the following table:</p>
   </tr></thead>
   <tbody>
     <tr>
-      <td class="kits" rowspan="3">1.1.0<br>
-          1.1.1<br>
-          1.1.2</td>
-      <td class="features">local-db<br>
-          local-ha-db</td>
-      <td class="refs"><a href="#local-postgresql-databases">Local PostgreSQL Databases</a></td>
+      <td class="kits" rowspan="4">
+          <a href="https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.1.0" target="_blank">1.1.0<br>
+          <a href="https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.1.1" target="_blank">1.1.1<br>
+          <a href="https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.1.2" target="_blank">1.1.2</td>
+      <td class="features">local-db</td>
+      <td class="refs"><a href="#standalone-local-postgresql">Standalone Local PostgreSQL</a></td>
+    </tr>
+
+    <tr>
+      <td class="features">local-ha-db</td>
+      <td class="refs"><a href="#highly-available-local-postgresql">Highly-Available Local PostgreSQL</a></td>
     </tr>
 
     <tr>
@@ -185,17 +181,18 @@ been affected, refer to the following table:</p>
   </tbody>
 </table>
 
-<h2>Local PostgreSQL Databases</h2>
+<p>The following are step-by-step instructions on how to successfully migrate Locket
+and Diego data from <code>postgres</code> and into their respective databases. This guide
+will mention when downtime approximately starts and ends.</p>
 
-<p>If you deployed with either of the following Genesis CF Kit features:</p>
+<p>There are different sets of steps to take depending on your Cloud Foundry environment.
+Please choose the one that matches your deployment.</p>
 
-<ul>
-<li><code>local-db</code></li>
-<li><code>local-ha-db</code></li>
-</ul>
+<h2>Standalone Local PostgreSQL</h2>
 
-<p>then use the following instructions to determine if your installation of
-Cloud Foundry is affected.</p>
+<p>This process applies if you deployed with the <code>local-db</code> feature.</p>
+
+<h3>Am I Affected?</h3>
 
 <p>Execute the following command, which will grab the tables currently in the
 <code>postgres</code> database name.</p>
@@ -218,37 +215,7 @@ public | tasks          | table | diegoadmin
 <p>If any of your output matches above, you are affected and must follow the rest
 of this guide to upgrade to 1.2.0 or beyond.</p>
 
-<h2>External PostgreSQL Database</h2>
-
-<p>If you deployed with the <code>postgres</code> Genesis CF Kit feature, then this section
-would contain the instructions.  However, <strong>we do not currently have
-migration steps for this scenario</strong>.</p>
-
-<p>Please reach out to us on <a href="/community#slack">Genesis Slack</a></p>
-
-<h2>External MySQL Database</h2>
-
-<p>If you deployed with the <code>mysql</code> Genesis CF Kit feature, then this section
-would contain the instructions.  However, <strong>we do not currently have
-migration steps for this scenario</strong>.</p>
-
-<p>Please reach out to us on <a href="/community#slack">Genesis Slack</a></p>
-
-<h1>Applying The Fix</h1>
-
-<p>The following are step-by-step instructions on how to successfully migrate Locket
-and Diego data from <code>postgres</code> and into their respective databases. This guide
-will mention when downtime approximately starts and ends.</p>
-
-<p>There are different steps to take depending on your Cloud Foundry environment.
-Please choose the one that matches your deployment.</p>
-
-<h2>Standalone Local PostgreSQL</h2>
-
-<p>If you deployed with the <code>local-db</code> Genesis CF Kit feature, then this
-section is for you.</p>
-
-<h3>Step 1: Getting Started</h3>
+<h3>Step A1: Getting Started</h3>
 
 <p>We'll frequently reference <code>[environment name]</code> and <code>[deployment name]</code> during
 this guide. <code>[environment name]</code> refers to the name of your BOSH director where
@@ -270,14 +237,14 @@ deployment:</p>
 <pre><code>bosh -e [environment name] -d [deployment name] run-errand smoke-tests
 </code></pre>
 
-<h3>Step 2: Stage Genesis Environment File for Deploy</h3>
+<h3>Step A2: Stage Genesis Environment File for Deploy</h3>
 
 <p>The Genesis Cloud Foundry Kit version 1.2.0 includes the fix to GMP-CF-001.
 Download it via <code>genesis download cf/1.2.0</code> in your Cloud Foundry deployments
 folder. Then, edit your environment file and set <code>version:</code> to
 <code>version: 1.2.0</code>. Do not deploy yet, that step will come last.</p>
 
-<h3>Step 3: Stop All BBS VMs</h3>
+<h3>Step A3: Stop All BBS VMs</h3>
 
 <p>Perform a BOSH stop on your BBS instances. This will stop all processes that
 are accessing the <code>postgres</code> database. Approximately 2 minutes after stopping
@@ -288,7 +255,7 @@ all processes, routes to your apps will no longer work and downtime begins.</p>
 <pre><code>bosh -e [environment name] -d [deployment name] stop bbs
 </code></pre>
 
-<h3>Step 4: Connect to your Postgres VM</h3>
+<h3>Step A4: Connect to your Postgres VM</h3>
 
 <p>To BOSH SSH into your Postgres VM, execute the following:</p>
 
@@ -306,7 +273,7 @@ require it. To do so, run:</p>
 <pre><code>export PATH=$PATH:/var/vcap/packages/postgres/bin
 </code></pre>
 
-<h3>Step 5: Migrate the Data</h3>
+<h3>Step A5: Migrate the Data</h3>
 
 <p>We'll need a place to store SQL dumps, so create a directory under the
 permanent data directory by running:</p>
@@ -333,7 +300,7 @@ the properly named databases:</p>
 psql -U vcap -p 6432 diegodb  &lt; diegodb.sql;
 </code></pre>
 
-<h3>Step 6: Verify the Data Migration was Successful</h3>
+<h3>Step A6: Verify the Data Migration was Successful</h3>
 
 <p>To make certain that no GUIDs were changed and that all primary keys stayed the
 same, we want to re-export the recently imported data and verify against our
@@ -352,7 +319,7 @@ diff diegodb.sql   diegodb.new.sql;
 
 <p>If all went well, there should be no output from any of those <code>diff</code> commands.</p>
 
-<h3>Step 7: Rename Old Databases</h3>
+<h3>Step A7: Rename Old Databases</h3>
 
 <p>Now that we've migrated the data to their proper databases, we want to prevent
 any old configurations from referencing data from <code>postgres</code>. To do so:</p>
@@ -368,7 +335,7 @@ psql -U vcap -p 6432 postgres -c "ALTER TABLE tasks          RENAME TO tasks_old
 <p>This way, any software that references the old tables should fail, making it
 easier to discover improperly configured processes.</p>
 
-<h3>Step 8: Redeploy Genesis Environment</h3>
+<h3>Step A8: Redeploy Genesis Environment</h3>
 
 <p>If all went well, the next step is to redeploy your Cloud Foundry environment
 with the v1.2 fix, which will point Locket and Diego to their properly named
@@ -380,7 +347,7 @@ databases:</p>
 <p>If all went well, after redeploy BBS will begin running again and routes will
 restore within a minute after deploying. Downtime ends here.</p>
 
-<h3>Step 9: Cleanup &amp; Verification (Final step)</h3>
+<h3>Step A9: Cleanup &amp; Verification (Final step)</h3>
 
 <p>Execute smoke tests to verify that your redeployed Cloud Foundry environment
 is operating properly.  Once you are satisfied with the results of the
@@ -396,10 +363,32 @@ psql -U vcap -p 6432 postgres -c "DROP TABLE tasks_old CASCADE";
 
 <h2>Highly-Available Local PostgreSQL</h2>
 
-<p>If you deployed with the <code>local-ha-db</code> Genesis CF Kit feature, then this
-section is for you.</p>
+<p>This process applies if you deployed with the <code>local-ha-db</code> feature.</p>
 
-<h3>Step 1: Getting Started</h3>
+<h3>Am I Affected?</h3>
+
+<p>Execute the following command, which will grab the tables currently in the
+<code>postgres</code> database name.</p>
+
+<pre><code>bosh ssh -e [environment name] -d [deployment name] postgres/0 -rc \
+  "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -t -c '\dt' 2&gt;&amp;1"
+</code></pre>
+
+<p>Next to the column <code>stdout</code>, there will be a list of tables. Look for any of
+the following:</p>
+
+<pre><code>public | actual_lrps    | table | diegoadmin
+public | configurations | table | diegoadmin
+public | desired_lrps   | table | diegoadmin
+public | domains        | table | diegoadmin
+public | locks          | table | locketadmin
+public | tasks          | table | diegoadmin
+</code></pre>
+
+<p>If any of your output matches above, you are affected and must follow the rest
+of this guide to upgrade to 1.2.0 or beyond.</p>
+
+<h3>Step B1: Getting Started</h3>
 
 <p>We'll frequently reference <code>[environment name]</code> and <code>[deployment name]</code> during
 this guide. <code>[environment name]</code> refers to the name of your BOSH director where
@@ -421,14 +410,14 @@ deployment:</p>
 <pre><code>bosh -e [environment name] -d [deployment name] run-errand smoke-tests
 </code></pre>
 
-<h3>Step 2: Stage Genesis Environment File for Deploy</h3>
+<h3>Step B2: Stage Genesis Environment File for Deploy</h3>
 
 <p>The Genesis Cloud Foundry Kit version 1.2.0 includes the fix to GMP-CF-0001.
 Download it via <code>genesis download cf/1.2.0</code> in your Cloud Foundry deployments
 folder. Then, edit your environment file and set <code>version:</code> to
 <code>version: 1.2.0</code>. Do not deploy yet, that step will come last.</p>
 
-<h3>Step 3: Stop All BBS VMs</h3>
+<h3>Step B3: Stop All BBS VMs</h3>
 
 <p>Perform a BOSH stop on your BBS instances. This will stop all processes that
 are accessing the <code>postgres</code> database. Approximately 2 minutes after stopping
@@ -439,7 +428,7 @@ all processes, routes to your apps will no longer work and downtime begins.</p>
 <pre><code>bosh -e [environment name] -d [deployment name] stop bbs
 </code></pre>
 
-<h3>Step 4: Connect to your Postgres VM</h3>
+<h3>Step B4: Connect to your Postgres VM</h3>
 
 <p>For Highly-Available PostgreSQL installations, all data manipulation
 commands must execute against the write master.  To determine which of your
@@ -469,7 +458,7 @@ require it. To do so, run:</p>
 <pre><code>export PATH=$PATH:/var/vcap/packages/postgres/bin
 </code></pre>
 
-<h3>Step 5: Migrate the Data</h3>
+<h3>Step B5: Migrate the Data</h3>
 
 <p>We'll need a place to store SQL dumps, so create a directory under the
 permanent data directory by running:</p>
@@ -496,7 +485,7 @@ the properly named databases:</p>
 psql -U vcap -p 6432 diegodb  &lt; diegodb.sql;
 </code></pre>
 
-<h3>Step 6: Verify the Data Migration was Successful</h3>
+<h3>Step B6: Verify the Data Migration was Successful</h3>
 
 <p>To make certain that no GUIDs were changed and that all primary keys stayed the
 same, we want to re-export the recently imported data and verify against our
@@ -515,7 +504,7 @@ diff diegodb.sql   diegodb.new.sql;
 
 <p>If all went well, there should be no output from any of those <code>diff</code> commands.</p>
 
-<h3>Step 7: Rename Old Databases</h3>
+<h3>Step B7: Rename Old Databases</h3>
 
 <p>Now that we've migrated the data to their proper databases, we want to prevent
 any old configurations from referencing data from <code>postgres</code>. To do so:</p>
@@ -531,7 +520,7 @@ psql -U vcap -p 6432 postgres -c "ALTER TABLE tasks          RENAME TO tasks_old
 <p>This way, any software that references the old tables should fail, making it
 easier to discover improperly configured processes.</p>
 
-<h3>Step 8: Redeploy Genesis Environment</h3>
+<h3>Step B8: Redeploy Genesis Environment</h3>
 
 <p>If all went well, the next step is to redeploy your Cloud Foundry environment
 with the v1.2 fix, which will point Locket and Diego to their properly named
@@ -543,7 +532,7 @@ databases:</p>
 <p>If all went well, after redeploy BBS will begin running again and routes will
 restore within a minute after deploying. Downtime ends here.</p>
 
-<h3>Step 9: Cleanup &amp; Verification (Final step)</h3>
+<h3>Step B9: Cleanup &amp; Verification (Final step)</h3>
 
 <p>Execute smoke tests to verify that your redeployed Cloud Foundry environment
 is operating properly.  Once you are satisfied with the results of the
@@ -559,17 +548,17 @@ psql -U vcap -p 6432 postgres -c "DROP TABLE tasks_old CASCADE";
 
 <h2>External PostgreSQL</h2>
 
-<p>If you deployed with the <code>postgres</code> Genesis CF Kit feature, then this section
-would contain the instructions.  However, <strong>we do not currently have
-migration steps for this scenario</strong>.</p>
+<p>This process applies if you deployed with the <code>postgres</code> feature.</p>
+
+<p><strong>We do not currently have migration steps for this scenario</strong>.</p>
 
 <p>Please reach out to us on <a href="/community#slack">Genesis Slack</a></p>
 
 <h2>External MySQL</h2>
 
-<p>If you deployed with the <code>mysql</code> Genesis CF Kit feature, then this section
-would contain the instructions.  However, <strong>we do not currently have
-migration steps for this scenario</strong>.</p>
+<p>This process applies if you deployed with the <code>mysql</code> feature.</p>
+
+<p><strong>We do not currently have migration steps for this scenario</strong>.</p>
 
 <p>Please reach out to us on <a href="/community#slack">Genesis Slack</a></p>
 
