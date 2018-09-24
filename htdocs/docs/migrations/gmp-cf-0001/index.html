@@ -197,7 +197,7 @@ matrix below:</p>
 <code>postgres</code> database name.</p>
 
 <pre><code>bosh ssh -e [environment name] -d [deployment name] postgres/0 -rc \
-  "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -t -c '\dt' 2&gt;&amp;1"
+  "/var/vcap/packages/postgres/bin/psql -U vcap -p 5432 postgres -t -c '\dt' 2&gt;&amp;1"
 </code></pre>
 
 <p>Next to the column <code>stdout</code>, there will be a list of tables. Look for any of
@@ -286,8 +286,8 @@ cd /var/vcap/store/migration
 <p>Dump the data in the <code>postgres</code> database into files named after their proper
 database name:</p>
 
-<pre><code>pg_dump -U vcap -p 6432    -t locks postgres &gt; locketdb.sql;
-pg_dump -U vcap -p 6432 -c -t actual_lrps -t configurations -t desired_lrps -t domains -t tasks postgres &gt; diegodb.sql;
+<pre><code>pg_dump -U vcap -p 5432    -t locks postgres &gt; locketdb.sql;
+pg_dump -U vcap -p 5432 -c -t actual_lrps -t configurations -t desired_lrps -t domains -t tasks postgres &gt; diegodb.sql;
 </code></pre>
 
 <p>You will then have two files under <code>/var/vcap/store/migration</code>, <code>locket.sql</code>
@@ -297,8 +297,8 @@ database data.</p>
 <p>Now that we've exported the data from <code>postgres</code>, we want to import back into
 the properly named databases:</p>
 
-<pre><code>psql -U vcap -p 6432 locketdb &lt; locketdb.sql;
-psql -U vcap -p 6432 diegodb  &lt; diegodb.sql;
+<pre><code>psql -U vcap -p 5432 locketdb &lt; locketdb.sql;
+psql -U vcap -p 5432 diegodb  &lt; diegodb.sql;
 </code></pre>
 
 <h3>Step A6: Verify the Data Migration was Successful</h3>
@@ -307,8 +307,8 @@ psql -U vcap -p 6432 diegodb  &lt; diegodb.sql;
 same, we want to re-export the recently imported data and verify against our
 original export:</p>
 
-<pre><code>pg_dump -U vcap -p 6432    -t locks locketdb &gt; locketdb.new.sql;
-pg_dump -U vcap -p 6432 -c -t actual_lrps -t configurations -t desired_lrps -t domains -t tasks postgres &gt; diegodb.new.sql;
+<pre><code>pg_dump -U vcap -p 5432    -t locks locketdb &gt; locketdb.new.sql;
+pg_dump -U vcap -p 5432 -c -t actual_lrps -t configurations -t desired_lrps -t domains -t tasks postgres &gt; diegodb.new.sql;
 </code></pre>
 
 <p>Verify the recently exported data has no difference from the originally exported
@@ -325,12 +325,12 @@ diff diegodb.sql   diegodb.new.sql;
 <p>Now that we've migrated the data to their proper databases, we want to prevent
 any old configurations from referencing data from <code>postgres</code>. To do so:</p>
 
-<pre><code>psql -U vcap -p 6432 postgres -c "ALTER TABLE locks          RENAME TO locks_old";
-psql -U vcap -p 6432 postgres -c "ALTER TABLE actual_lrps    RENAME TO actual_lrps_old";
-psql -U vcap -p 6432 postgres -c "ALTER TABLE configurations RENAME TO configurations_old";
-psql -U vcap -p 6432 postgres -c "ALTER TABLE desired_lrps   RENAME TO desired_lrps_old";
-psql -U vcap -p 6432 postgres -c "ALTER TABLE domains        RENAME TO domains_old";
-psql -U vcap -p 6432 postgres -c "ALTER TABLE tasks          RENAME TO tasks_old";
+<pre><code>psql -U vcap -p 5432 postgres -c "ALTER TABLE locks          RENAME TO locks_old";
+psql -U vcap -p 5432 postgres -c "ALTER TABLE actual_lrps    RENAME TO actual_lrps_old";
+psql -U vcap -p 5432 postgres -c "ALTER TABLE configurations RENAME TO configurations_old";
+psql -U vcap -p 5432 postgres -c "ALTER TABLE desired_lrps   RENAME TO desired_lrps_old";
+psql -U vcap -p 5432 postgres -c "ALTER TABLE domains        RENAME TO domains_old";
+psql -U vcap -p 5432 postgres -c "ALTER TABLE tasks          RENAME TO tasks_old";
 </code></pre>
 
 <p>This way, any software that references the old tables should fail, making it
@@ -354,12 +354,12 @@ restore within a minute after deploying. Downtime ends here.</p>
 is operating properly.  Once you are satisfied with the results of the
 migration, you may delete the old tables:</p>
 
-<pre><code>psql -U vcap -p 6432 postgres -c "DROP TABLE locks_old CASCADE";
-psql -U vcap -p 6432 postgres -c "DROP TABLE actual_lrps_old CASCADE";
-psql -U vcap -p 6432 postgres -c "DROP TABLE configurations_old CASCADE";
-psql -U vcap -p 6432 postgres -c "DROP TABLE desired_lrps_old CASCADE";
-psql -U vcap -p 6432 postgres -c "DROP TABLE domains_old CASCADE";
-psql -U vcap -p 6432 postgres -c "DROP TABLE tasks_old CASCADE";
+<pre><code>psql -U vcap -p 5432 postgres -c "DROP TABLE locks_old CASCADE";
+psql -U vcap -p 5432 postgres -c "DROP TABLE actual_lrps_old CASCADE";
+psql -U vcap -p 5432 postgres -c "DROP TABLE configurations_old CASCADE";
+psql -U vcap -p 5432 postgres -c "DROP TABLE desired_lrps_old CASCADE";
+psql -U vcap -p 5432 postgres -c "DROP TABLE domains_old CASCADE";
+psql -U vcap -p 5432 postgres -c "DROP TABLE tasks_old CASCADE";
 </code></pre>
 
 <h2>Highly-Available Local PostgreSQL</h2>

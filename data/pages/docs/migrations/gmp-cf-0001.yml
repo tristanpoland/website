@@ -138,7 +138,7 @@ Execute the following command, which will grab the tables currently in the
 `postgres` database name.
 
     bosh ssh -e [environment name] -d [deployment name] postgres/0 -rc \
-      "/var/vcap/packages/postgres/bin/psql -U vcap -p 6432 postgres -t -c '\dt' 2>&1"
+      "/var/vcap/packages/postgres/bin/psql -U vcap -p 5432 postgres -t -c '\dt' 2>&1"
 
 
 Next to the column `stdout`, there will be a list of tables. Look for any of
@@ -220,8 +220,8 @@ permanent data directory by running:
 Dump the data in the `postgres` database into files named after their proper
 database name:
 
-    pg_dump -U vcap -p 6432    -t locks postgres > locketdb.sql;
-    pg_dump -U vcap -p 6432 -c -t actual_lrps -t configurations -t desired_lrps -t domains -t tasks postgres > diegodb.sql;
+    pg_dump -U vcap -p 5432    -t locks postgres > locketdb.sql;
+    pg_dump -U vcap -p 5432 -c -t actual_lrps -t configurations -t desired_lrps -t domains -t tasks postgres > diegodb.sql;
 
 You will then have two files under `/var/vcap/store/migration`, `locket.sql`
 will contain the Locket database data, and `diegodb.sql` will contain the Diego
@@ -230,8 +230,8 @@ database data.
 Now that we've exported the data from `postgres`, we want to import back into
 the properly named databases:
 
-    psql -U vcap -p 6432 locketdb < locketdb.sql;
-    psql -U vcap -p 6432 diegodb  < diegodb.sql;
+    psql -U vcap -p 5432 locketdb < locketdb.sql;
+    psql -U vcap -p 5432 diegodb  < diegodb.sql;
 
 ### Step A6: Verify the Data Migration was Successful
 
@@ -239,8 +239,8 @@ To make certain that no GUIDs were changed and that all primary keys stayed the
 same, we want to re-export the recently imported data and verify against our
 original export:
 
-    pg_dump -U vcap -p 6432    -t locks locketdb > locketdb.new.sql;
-    pg_dump -U vcap -p 6432 -c -t actual_lrps -t configurations -t desired_lrps -t domains -t tasks postgres > diegodb.new.sql;
+    pg_dump -U vcap -p 5432    -t locks locketdb > locketdb.new.sql;
+    pg_dump -U vcap -p 5432 -c -t actual_lrps -t configurations -t desired_lrps -t domains -t tasks postgres > diegodb.new.sql;
 
 Verify the recently exported data has no difference from the originally exported
 data:
@@ -255,12 +255,12 @@ If all went well, there should be no output from any of those `diff` commands.
 Now that we've migrated the data to their proper databases, we want to prevent
 any old configurations from referencing data from `postgres`. To do so:
 
-    psql -U vcap -p 6432 postgres -c "ALTER TABLE locks          RENAME TO locks_old";
-    psql -U vcap -p 6432 postgres -c "ALTER TABLE actual_lrps    RENAME TO actual_lrps_old";
-    psql -U vcap -p 6432 postgres -c "ALTER TABLE configurations RENAME TO configurations_old";
-    psql -U vcap -p 6432 postgres -c "ALTER TABLE desired_lrps   RENAME TO desired_lrps_old";
-    psql -U vcap -p 6432 postgres -c "ALTER TABLE domains        RENAME TO domains_old";
-    psql -U vcap -p 6432 postgres -c "ALTER TABLE tasks          RENAME TO tasks_old";
+    psql -U vcap -p 5432 postgres -c "ALTER TABLE locks          RENAME TO locks_old";
+    psql -U vcap -p 5432 postgres -c "ALTER TABLE actual_lrps    RENAME TO actual_lrps_old";
+    psql -U vcap -p 5432 postgres -c "ALTER TABLE configurations RENAME TO configurations_old";
+    psql -U vcap -p 5432 postgres -c "ALTER TABLE desired_lrps   RENAME TO desired_lrps_old";
+    psql -U vcap -p 5432 postgres -c "ALTER TABLE domains        RENAME TO domains_old";
+    psql -U vcap -p 5432 postgres -c "ALTER TABLE tasks          RENAME TO tasks_old";
 
 This way, any software that references the old tables should fail, making it
 easier to discover improperly configured processes.
@@ -283,12 +283,12 @@ Execute smoke tests to verify that your redeployed Cloud Foundry environment
 is operating properly.  Once you are satisfied with the results of the
 migration, you may delete the old tables:
 
-    psql -U vcap -p 6432 postgres -c "DROP TABLE locks_old CASCADE";
-    psql -U vcap -p 6432 postgres -c "DROP TABLE actual_lrps_old CASCADE";
-    psql -U vcap -p 6432 postgres -c "DROP TABLE configurations_old CASCADE";
-    psql -U vcap -p 6432 postgres -c "DROP TABLE desired_lrps_old CASCADE";
-    psql -U vcap -p 6432 postgres -c "DROP TABLE domains_old CASCADE";
-    psql -U vcap -p 6432 postgres -c "DROP TABLE tasks_old CASCADE";
+    psql -U vcap -p 5432 postgres -c "DROP TABLE locks_old CASCADE";
+    psql -U vcap -p 5432 postgres -c "DROP TABLE actual_lrps_old CASCADE";
+    psql -U vcap -p 5432 postgres -c "DROP TABLE configurations_old CASCADE";
+    psql -U vcap -p 5432 postgres -c "DROP TABLE desired_lrps_old CASCADE";
+    psql -U vcap -p 5432 postgres -c "DROP TABLE domains_old CASCADE";
+    psql -U vcap -p 5432 postgres -c "DROP TABLE tasks_old CASCADE";
 
 ## Highly-Available Local PostgreSQL
 
