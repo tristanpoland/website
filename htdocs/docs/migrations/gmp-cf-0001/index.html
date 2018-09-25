@@ -247,14 +247,45 @@ folder. Then, edit your environment file and set <code>version:</code> to
 
 <h3>Step A3: Stop All BBS VMs</h3>
 
-<p>Perform a BOSH stop on your BBS instances. This will stop all processes that
-are accessing the <code>postgres</code> database. Approximately 2 minutes after stopping
-all processes, routes to your apps will no longer work and downtime begins.</p>
+<p>In order to migrate the data, we first need to stop the processes that access
+the affected DB tables. We'll do this via BOSH SSHing into all the BBS
+instances</p>
 
-<p>To stop all your BBS instances on your Cloud Foundry deployment:</p>
+<p>To do so, gather how many BBS instances running via:</p>
 
-<pre><code>bosh -e [environment name] -d [deployment name] stop bbs
+<pre><code>bosh -e [environment name] -d [deplyoment name] vms | grep bbs
 </code></pre>
+
+<p>This will print out a list of all BBS instances deployed in your CF environment.
+With each entry on the list, copy the <code>bbs/instance-guid-here</code> and run:</p>
+
+<pre><code>bosh -e [environment name] -d [deployment name] ssh `bbs/instance-guid-here`
+</code></pre>
+
+<p>Once connected to your VM, become the root user:</p>
+
+<pre><code>sudo -i
+</code></pre>
+
+<p>Stop all processess on the VM:</p>
+
+<pre><code>monit stop all
+</code></pre>
+
+<p>Logout of the root user:</p>
+
+<pre><code>exit
+</code></pre>
+
+<p>End the SSH session:</p>
+
+<pre><code>exit
+</code></pre>
+
+<p>Repeat these steps for each BBS instance listed from above.</p>
+
+<p>Approximately 2 minutes after stopping all processes on all VMs,routes to your
+apps will no longer work and downtime begins.</p>
 
 <h3>Step A4: Connect to your Postgres VM</h3>
 
@@ -422,14 +453,45 @@ folder. Then, edit your environment file and set <code>version:</code> to
 
 <h3>Step B3: Stop All BBS VMs</h3>
 
-<p>Perform a BOSH stop on your BBS instances. This will stop all processes that
-are accessing the <code>postgres</code> database. Approximately 2 minutes after stopping
-all processes, routes to your apps will no longer work and downtime begins.</p>
+<p>In order to migrate the data, we first need to stop the processes that access
+the affected DB tables. We'll do this via BOSH SSHing into all the BBS
+instances</p>
 
-<p>To stop all your BBS instances on your Cloud Foundry deployment:</p>
+<p>To do so, gather how many BBS instances running via:</p>
 
-<pre><code>bosh -e [environment name] -d [deployment name] stop bbs
+<pre><code>bosh -e [environment name] -d [deplyoment name] vms | grep bbs
 </code></pre>
+
+<p>This will print out a list of all BBS instances deployed in your CF environment.
+With each entry on the list, copy the <code>bbs/instance-guid-here</code> and run:</p>
+
+<pre><code>bosh -e [environment name] -d [deployment name] ssh `bbs/instance-guid-here`
+</code></pre>
+
+<p>Once connected to your VM, become the root user:</p>
+
+<pre><code>sudo -i
+</code></pre>
+
+<p>Stop all processess on the VM:</p>
+
+<pre><code>monit stop all
+</code></pre>
+
+<p>Logout of the root user:</p>
+
+<pre><code>exit
+</code></pre>
+
+<p>End the SSH session:</p>
+
+<pre><code>exit
+</code></pre>
+
+<p>Repeat these steps for each BBS instance listed from above.</p>
+
+<p>Approximately 2 minutes after stopping all processes on all VMs,routes to your
+apps will no longer work and downtime begins.</p>
 
 <h3>Step B4: Connect to your Postgres VM</h3>
 
