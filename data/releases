@@ -34,7 +34,12 @@
       "notes": "# Improvements\n\n* Kits can now check that the required number of static_ips in each network\n  are available using the `cloud_config_needs static_ips <network_name>\n  <count>`\n",
       "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.11",
       "version": "2.6.11"
+    },
+    {
+      "notes": "# Bug Fixes\n\n- CI pipelines no longer bail out when trying to determine their\n  BOSH alias, because of some unfortunate interactions.\n",
+      "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.12",
+      "version": "2.6.12"
     }
   ],
-  "latest": "2.6.11"
+  "latest": "2.6.12"
 }

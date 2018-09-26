@@ -62,10 +62,12 @@
     <div class="row">
       <div class="col-md-3 toc">
         <ul>
-          <li><a href="#latest">Latest Release (2.6.11)</a></li>
+          <li><a href="#latest">Latest Release (2.6.12)</a></li>
           <li><a href="#source">Build From Source</a></li>
           <li><a href="#older">Older Releases</a>
             <ul>
+              
+              <li><a href="#v2.6.11">2.6.11</a></li>
               
               <li><a href="#v2.6.10">2.6.10</a></li>
               
@@ -85,17 +87,16 @@
       </div>
       <div class="col-md-8 col-md-push-1">
         <div class="content">
-          <span id="v2.6.11"></span>
-          <h1 id="latest">Genesis v2.6.11</h1>
+          <span id="v2.6.12"></span>
+          <h1 id="latest">Genesis v2.6.12</h1>
           
-            <h3>Improvements</h3>
+            <h3>Bug Fixes</h3>
 
 <ul>
-<li>Kits can now check that the required number of static_ips in each network
-are available using the <code>cloud_config_needs static_ips &lt;network_name&gt;
-&lt;count&gt;</code></li>
+<li>CI pipelines no longer bail out when trying to determine their
+BOSH alias, because of some unfortunate interactions.</li>
 </ul>
-            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.11" target="_blank">Download v2.6.11 from Github</a>
+            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.12" target="_blank">Download v2.6.12 from Github</a>
           
 
           <h1>Build From Source</h1>
@@ -103,6 +104,16 @@ are available using the <code>cloud_config_needs static_ips &lt;network_name&gt;
           <p>... we're still working on this one ... <!-- FIXME --></p>
 
           <h1 id="older">Older Genesis Releases</h1>
+          
+          <h2 id="v2.6.11">SHIELD v2.6.11</h2>
+          <h3>Improvements</h3>
+
+<ul>
+<li>Kits can now check that the required number of static_ips in each network
+are available using the <code>cloud_config_needs static_ips &lt;network_name&gt;
+&lt;count&gt;</code></li>
+</ul>
+          <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.11" target="_blank">Download v2.6.11 from Github</a>
           
           <h2 id="v2.6.10">SHIELD v2.6.10</h2>
           <h3>Bug Fixes</h3>
