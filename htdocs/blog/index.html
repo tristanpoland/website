@@ -185,6 +185,24 @@ device names under <code>/dev/</code> are all kinds of different; <code>nvme*</c
 was quite insistent on mounting <code>/dev/sdb</code> and <code>/dev/sdf</code>, which just plain
 weren't there.</p>
 
+<p>Here's the relevant log snippet, in case it helps:</p>
+
+<pre><code>2018-11-08_15:53:49.01246 [File System] 2018/11/08 15:53:49 DEBUG - Checking if file exists /dev/xvdb
+2018-11-08_15:53:49.01248 [File System] 2018/11/08 15:53:49 DEBUG - Stat '/dev/xvdb'
+2018-11-08_15:53:49.01248 [File System] 2018/11/08 15:53:49 DEBUG - Checking if file exists /dev/vdb
+2018-11-08_15:53:49.01249 [File System] 2018/11/08 15:53:49 DEBUG - Stat '/dev/vdb'
+2018-11-08_15:53:49.01249 [File System] 2018/11/08 15:53:49 DEBUG - Checking if file exists /dev/sdb
+2018-11-08_15:53:49.01249 [File System] 2018/11/08 15:53:49 DEBUG - Stat '/dev/sdb'
+2018-11-08_15:53:49.01298 [unlimitedRetryStrategy] 2018/11/08 15:53:49 DEBUG - Making attempt #271
+2018-11-08_15:53:49.01300 [DelayedAuditLogger] 2018/11/08 15:53:49 ERROR - Unix syslog delivery error
+2018-11-08_15:53:49.11261 [File System] 2018/11/08 15:53:49 DEBUG - Checking if file exists /dev/xvdb
+2018-11-08_15:53:49.11264 [File System] 2018/11/08 15:53:49 DEBUG - Stat '/dev/xvdb'
+2018-11-08_15:53:49.11264 [File System] 2018/11/08 15:53:49 DEBUG - Checking if file exists /dev/vdb
+2018-11-08_15:53:49.11264 [File System] 2018/11/08 15:53:49 DEBUG - Stat '/dev/vdb'
+2018-11-08_15:53:49.11265 [File System] 2018/11/08 15:53:49 DEBUG - Checking if file exists /dev/sdb
+2018-11-08_15:53:49.11265 [File System] 2018/11/08 15:53:49 DEBUG - Stat '/dev/sdb'
+</code></pre>
+
 <p>Luckily, I was able to get into the compilation VM via SSH, and diagnose the
 problem in under two hours.  And the demo lived happily ever after, the end.</p>
         </article></div>
