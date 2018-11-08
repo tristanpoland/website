@@ -111,20 +111,21 @@
   </div>
 </section>
 
-<section class="section-blog" style="padding-top: 0">
-  <img class="blog-header" style="width: 100%; border-top: 4px solid #333;" src="/img/blog1.jpg" />
+<section class="section-blog-header">
+  <span>The Genesis Blog</span>
+</section>
+
+<section class="section-blog">
   <div class="container feed">
   [% FOR article IN articles %]
     <div class="row">
-      <div class="col-md-8 col-md-push-2">
-        <div class="center heading-title">
-          <h2>[% article.attrs.title %]</h2>
-          <div class="small-desd">[% article.attrs.dated %]</div>
-          <div class="syndicated">[% article.attrs.teaser %]</div>
-          <div class="buttons-section" style="margin-top: 45px">
-            <a class="btn large-btn white-btn" href="/blog/[% article.attrs.permalink %]">Read More</a>
-          </div>
-        </div>
+      <div class="col-md-5">
+        <img class="cover" src="/blog/header/[% article.attrs.header %]">
+      </div>
+      <div class="col-md-7">
+        <h2><a href="/blog/[% article.attrs.permalink %]">[% article.attrs.title %]</a></h2>
+        <p class="dated">[% strftime(article.__dated, "%A, %B %e, %Y") %]</p>
+        <div class="syndicated">[% article.attrs.teaser %]</div>
       </div>
     </div>
   [% END %]

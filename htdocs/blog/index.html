@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+
+<title>Genesis</title>
+
+
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/css/libs.css?3">
+<link rel="stylesheet" href="/css/main.css?3">
+<link rel="stylesheet" href="/css/extra.css?3">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="/feed.xml">
+</head>
+<body class="dark-load">
+	<header id="top-nav" class="top-nav page-header">
+		<div class="container">
+			<a class="logo smooth-scroll" href="/">
+				<img class="logo-white" alt="Stark & Wayne" src="/img/logo.png?3" />
+			</a>
+			<nav class="top-menu">
+				<ul class="sf-menu">
+					<li><a href="/">Home</a></li>
+					<li><a href="/blog">Blog</a></li>
+					<li><a href="/download">Download</a></li>
+					<li><a href="/community">Community</a></li>
+					<li><a href="/docs/getting-started">Docs</a></li>
+					<li><a href="/dev">Developers</a></li>
+				</ul>
+			</nav>
+			<div id="mobile-menu">
+				<div class="inner-wrap">
+					<nav>
+						<ul class="nav_menu">
+							<li><a href="/">Home</a></li>
+							<li><a href="/download">Download</a></li>
+							<li><a href="/docs">Documentation</a></li>
+							<li><a href="/dev">Developers</a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<section id="top" class="display-page img-parallax bg-mask background-image"
+                  data-image="/img/hbg.jpg">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>The Genesis Blog</h1>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page article">
+  <div id="container" class="container">
+    
+    <div class="row">
+      <div class="col-md-8 col-md-push-2">
+        <div class="content"><article>
+          <div class="header">
+            
+              <img src="/blog/header/sam-loyd-360eeb61a0ad.jpg" />
+              
+              <cite><a href="https://unsplash.com/@samloyd">Sam Loyd (@samloyd), via Unsplash</a></cite>
+              
+            
+            <h1>Debugging BOSH IaaS Issues</h1>
+            <p class="dated">Thursday, November  8, 2018</p>
+          </div>
+          <p>A well-tuned BOSH director is a thing of beauty.  When all the pieces and
+parts are humming and clicking properly, everything just works and you start
+to forget that provisioning operating systems and software stacks,
+especially in the cloud provider of your choice, was ever difficult in the
+first place.</p>
+
+<h2>Meet The T3, Same As The T2</h2>
+
+<p>On August 21st, 2018, <a href="https://aws.amazon.com/blogs/aws/new-t3-instances-burstable-cost-effective-performance">Amazon introduced T3</a>, the next round of upgrades
+to the T-series of instance types that include the venerable t2.micro, and
+the miserly t2.nano.  If you, like me, do a lot of cloud demos and want to
+keep costs down, you've probably run into a Tx.something or five.</p>
+
+<p>I just so happened to be sitting down to fire up a lab for installing
+Genesis when I saw the announcement, so I decided to take them for a spin.
+I was also working through writing <a href="https://github.com/genesis-community/terraforms">distributable Terraform configurations
+for Genesis</a> and so I incorporated the T3's into the cloud
+configuration template, deployed a VPC, and promptly forgot about the
+instance type.</p>
+
+<p>All was not well, however, and my first deployment on the demo BOSH director
+was failing to compile packages, with this error:</p>
+
+<pre><code>Task 21 | 14:08:28 | Compiling packages: vault/4f754614313fc27928476ec02e248efd1622c94d (00:15:33)
+               L Error: Timed out pinging to 4a320dab-328d-48d0-bd6f-f7776f821b53 after 600 seconds
+</code></pre>
+
+<p>We see this a lot when networking is wonky; firewalls, bad NAT
+configurations, AWS security groups shenanigans can all cause this.  When
+BOSH says it's <em>pinging</em> the instance, it's actually waiting patiently for
+the instance to send an "All Good" on the BOSH NATS message bus.</p>
+
+<p>In Amazon, I can use my EC2 SSH key pair to remotely access the instance, as
+the <code>vcap</code> user:</p>
+
+<pre><code>SSH_AUTH_SOCK= ssh -i 'vcap@jhunt-aws.pem' vcap@10.4.0.193
+</code></pre>
+
+<p>(<code>vcap@jhunt-aws.pem</code> is just what I named the private key file.  I also
+unset <code>$SSH_AUTH_SOCK</code> because I have a lot of keys in my SSH agent, and I
+don't want to run out of authentication attempts.)</p>
+
+<p>That lets me in just fine.  The instance is clearly being created, and there
+are at least no weird networking restrictions between my jumpbox and the
+compilation VM.  We need to dig in more.</p>
+
+<p>The next step is to review the BOSH agent logs (in <code>/var/vcap/bosh/logs</code>)
+and see what the agent is doing, but to do that I need root privileges.</p>
+
+<pre><code>$ sudo -i
+Password for vcap:
+</code></pre>
+
+<p>Dang.  So close.  I don't <em>know</em> what the vcap user's password is.
+Normally, BOSH randomizes it for each instance it deploys, to help secure
+the entire platform.  We need to knock that off for a bit, since it is
+interfering with our troubleshooting.</p>
+
+<h2>A Detour To "Soften" The VMs</h2>
+
+<p>To get our sudo back in working order, we have to <em>soften up</em> these VMs a
+little bit, in the security department.</p>
+
+<p>First, we are going to need a suitable, <em>encrypted</em> password:</p>
+
+<pre><code>$6$lFvaAqSVJbrigByR$XRtYFRHw2CdNQ54g3sCew5aNpRIrU9gPC8lY8b6ZVM8Er9j16HNyIlJERj4RAPf96p8Ggn/94PUrzEJot0nV4/
+</code></pre>
+
+<p>BOSH can set a password for the vcap user, if you give it one in
+<a href="https://linux.die.net/man/5/shadow"><code>crypt(3)</code> / <code>shadow(5)</code> format</a>.  In case you don't read the
+SHA-512 dialect of crypt, that says "debug".</p>
+
+<p>Now, we just need to inject that into the deployment recipe, via cloud
+config.  Because I'm specifically troubleshooting my compilation VMs, I'm
+putting this in the <code>compilation:</code> stanza.</p>
+
+<pre><code>compilation:
+  #
+  # ... the rest of the compilation block ...
+  #
+
+  env:
+    bosh:
+      password: $6$lFvaAqSVJbrigByR$XRtYFRHw2CdNQ54g3sCew5aNpRIrU9gPC8lY8b6ZVM8Er9j16HNyIlJERj4RAPf96p8Ggn/94PUrzEJot0nV4/
+</code></pre>
+
+<p>You can also put the <code>env:</code> stuff in your <code>instance_groups:</code> stanza in the
+deployment manifest, if you're okay to compile but having similar "pinging"
+issues elsewhere.</p>
+
+<p>One re-deploy later, and I'm back on a new (failing) compilation VM,
+<strong>ONLY THIS TIME I CAN SUDO!</strong></p>
+
+<pre><code>$ SSH_AUTH_SOCK= ssh -i 'vcap@jhunt-aws.pem' vcap@10.4.0.193
+$ sudo -i
+Password for vcap: (debug)
+
+# whoami
+root
+</code></pre>
+
+<p>Now we're getting somewhere.</p>
+
+<h2>Remember that T3?</h2>
+
+<p>Turns out the T3 line <em>is not at all</em> the same as the T2.  Namely, the disk
+device names under <code>/dev/</code> are all kinds of different; <code>nvme*</code> instead of
+<code>sd*</code>.  My stemcell was too old for that kind of change, and the BOSH agent
+was quite insistent on mounting <code>/dev/sdb</code> and <code>/dev/sdf</code>, which just plain
+weren't there.</p>
+
+<p>Luckily, I was able to get into the compilation VM via SSH, and diagnose the
+problem in under two hours.  And the demo lived happily ever after, the end.</p>
+        </article></div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+	<footer>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4">
+					<a class="logo" href="https://starkandwayne.com/">
+						<img class="logo-white" alt="Stark & Wayne" src="/img/swlogo.png?3" />
+						<p><strong>Genesis</strong> is funded and supported by <strong>Stark &amp; Wayne</strong>, the premier BOSH and Cloud Foundry consulting firm.<br>Stark &amp; Wayne: We Know Cloud.</p>
+					</a>
+				</div>
+
+				<div class="col-md-4">
+					<div class="links">
+						<h5>Genesis</h5>
+						<ul class="list">
+							<li><a href="/download">Download Genesis</a></li>
+							<li><a href="/docs/getting-started">Getting Started</a></li>
+							<li><a href="/docs">Documentation</a></li>
+							<li><a href="/community">Community Support</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="links">
+						<h5>Reference</h5>
+						<ul class="list">
+							<li><a href="#">Genesis CLI</a></li>
+							<li><a href="#">Pipelines</a></li>
+							<li><a href="#">Genesis Kits</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="down-footer">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12">
+						<p>&copy; 2018 Stark &amp; Wayne.  All Rights Reserved.</p>
+						<ul class="footer-menu"></ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<!-- FIXME: these don't exist: -->
+	<!--[if lt IE 9]>
+		<script type="text/javascript" src="/libs/html5shiv/es5-shim.min.js"></script>
+		<script type="text/javascript" src="/libs/html5shiv/html5shiv.min.js"></script>
+		<script type="text/javascript" src="/libs/html5shiv/html5shiv-printshiv.min.js"></script>
+		<script type="text/javascript" src="/libs/respond/respond.min.js"></script>
+	<![endif]-->
+
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+	<script type="text/javascript" src="/js/libs.js?3"></script>
+	<script type="text/javascript" src="/js/common.js?3"></script>
+</body>
+</html>

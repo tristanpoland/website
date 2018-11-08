@@ -22,23 +22,54 @@ table.gmp-matrix td.kits {
   margin: 0 0 2em 0;
   font-family: "Noto Sans", sans-serif;
 }
+.section-blog img.cover,
 .article.page .header img {
   max-width: 100%;
   margin: 0;
 }
+.section-blog cite,
 .article.page .header cite {
   float: right;
   color: #888;
   font-size: 9pt;
 }
+.section-blog cite a,
 .article.page .header cite a {
   color: inherit;
 }
 .article.page .header h1 {
   margin: 1em 0 0 0;
 }
+.section-blog h2 {
+  margin: 0;
+}
+
+.section-blog p.dated,
 .article.page .header p.dated {
   color: #888;
   margin: 0 0 0 1ex;
   font: inherit;
+}
+
+.section-blog h2 {
+  text-align: left;
+}
+
+.section-blog-header {
+  height: 400px;
+  background: #333 url(/img/blog1.jpg) no-repeat 0% 20%;
+  background-size: cover;
+  position: relative;
+}
+.section-blog-header span {
+  font-size: 4.6875rem;
+  font-family: "Noto Sans",sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #fff;
+  letter-spacing: 5px;
+  line-height: initial;
+  position: absolute;
+  right: 3vh;
+  bottom: 0;
 }
