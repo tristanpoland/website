@@ -15,17 +15,10 @@
 <meta property="og:type"        content="article">
 <meta property="og:title"       content="[% article.attrs.title %]">
 <meta property="og:site_name"   content="[% site.title %]">
-<meta property="og:url"         content="[% site.canon %]/writings/[% article.attrs.permalink %].html">
+<meta property="og:url"         content="[% site.canon %]/blog/[% article.attrs.permalink %]">
 
-[% if article.attrs.thumb %]
-<meta property="og:image"       content="[% site.canon %]/content/wrt/stack.jpg">
-
-[% end %]
-<meta property="og:description" content="[% if article.attrs.abstract %][% article.attrs.abstract %][% else %]I'm sure it's enthralling and interesting[% end %]">
-[% if site.id.facebook %]
-<meta property="article:author" content="[% site.id.facebook %]">
-[% end %]
-
+<meta property="og:image"       content="[% site.canon %]/blog/header/[% article.attrs.header %]">
+<meta property="og:description" content="[% if article.attrs.abstract %][% article.attrs.abstract %][% else %]Read more about Genesis, BOSH deployments, and Cloud Foundry![% end %]">
 <title>[% article.attrs.title %] - [% site.title %]</title>
 
 [% else %]
