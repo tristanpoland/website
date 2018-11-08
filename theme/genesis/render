@@ -44,4 +44,16 @@ render $releases,
 	using  => 'download.tt',
 	at     => "{site}/download/index.html";
 
+render { articles => [@blog] },
+	using  => 'articles.tt',
+	layout => 'blog.tt',
+	at     => '{site}/blog/index.html';
+
+for my $article (blog->read_all) {
+	render [$article, { articles => [@blog] }],
+		using  => $article->attrs->{template} || 'article.tt',
+		layout => $article->attrs->{layout}   || 'blog.tt',
+		at     => "{site}/blog/{permalink}/index.html";
+}
+
 1;

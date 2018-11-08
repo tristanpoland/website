@@ -122,7 +122,7 @@
           <div class="small-desd">[% article.attrs.dated %]</div>
           <div class="syndicated">[% article.attrs.teaser %]</div>
           <div class="buttons-section" style="margin-top: 45px">
-            <a class="btn large-btn white-btn" href="#fixme">Read More</a>
+            <a class="btn large-btn white-btn" href="/blog/[% article.attrs.permalink %]">Read More</a>
           </div>
         </div>
       </div>

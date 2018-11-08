@@ -16,3 +16,29 @@ table.gmp-matrix td {
 table.gmp-matrix td.kits {
   background-color: #eee;
 }
+
+
+.article.page article .header {
+  margin: 0 0 2em 0;
+  font-family: "Noto Sans", sans-serif;
+}
+.article.page .header img {
+  max-width: 100%;
+  margin: 0;
+}
+.article.page .header cite {
+  float: right;
+  color: #888;
+  font-size: 9pt;
+}
+.article.page .header cite a {
+  color: inherit;
+}
+.article.page .header h1 {
+  margin: 1em 0 0 0;
+}
+.article.page .header p.dated {
+  color: #888;
+  margin: 0 0 0 1ex;
+  font: inherit;
+}
