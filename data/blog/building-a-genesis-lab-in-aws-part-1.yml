@@ -1,4 +1,8 @@
 # vim:ft=markdown:tw=76
+fixme:
+  - new screenshot for tmux
+  - write a tmux cheatsheet (jhunt/env)
+
 title:     Building a Genesis Lab in AWS (Part I)
 permalink: aws-lab-1
 format:    markdown
@@ -16,12 +20,12 @@ abstract: |
   with Genesis, using Amazon Web Service VPCs and EC2 instances.
 
 --- |-
-Everybody needs a place to play, to experiment, and to try whacky things
+Everybody needs a place to play, to experiment, and to try wacky things
 with new technology.  It's the same when you're just getting started with
 Genesis &mdash; you need a lab environment!
 
 --- |-
-Everybody needs a place to play, to experiment, and to try whacky things
+Everybody needs a place to play, to experiment, and to try wacky things
 with new technology.  It's the same when you're just getting started with
 Genesis &mdash; you need a lab environment!
 
@@ -44,7 +48,7 @@ Want a production operations tier on GCP?  Genesis Terraforms.  Want to
 train a bunch of people on Concourse?  Genesis Terraforms.  Trying to follow
 along in a blog post about setting up a lab in AWS?  Genesis Terraforms.
 
-First, you're going to want to clone the git repo.
+First, you're going to want to clone the git repository.
 
     $ git clone https://github.com/genesis-community/terraforms
 
@@ -106,7 +110,7 @@ So what have we just deployed?  It looks a little something like this:
 
 <img class="full border" src="/blog/aws-lab-1/topology.png">
 
-There are two networks, **DMZ** and **Lab**, wich appropriate gateways and
+There are two networks, **DMZ** and **Lab**, which appropriate gateways and
 NAT devices to make the Internet traffic work.  Inside the DMZ network
 (a 10.4.255.192/26), we have a **bastion host**, which has a public IPv4
 address.  This is how we'll get into the VPC to administer it, configure
@@ -141,17 +145,12 @@ The first time you log into the bastion, you're going to have to do a little
 bit of configuration.
 
     $ sudo jumpbox system
-    $ jumpbox user
 
 The first command sets up global jumpbox-y things.  It installs a slew of
 useful utilities like [safe][safe], [spruce][spruce], [jq][jq], and more.
 It also installs required commands like `bosh`, `cf`, and `genesis`.
 
-If you want to create named operator accounts, now is a good time to do
-that.  Just make sure that each additional user also runs through `jumpbox
-user` (as them).
-
-Finally, to see what's installed, just run `jumpbox` with no arguments.
+To see what's installed, just run `jumpbox` with no arguments.
 
     $ jumpbox
     >> Checking jumpbox installation
@@ -221,7 +220,7 @@ So, without further ado:
     If you want to retain your secrets be sure to safe export.
     Ctrl-C to shut down the Vault
 
-This gives us a _memory-backed_ Vault, named `dev`.  If we kill the process,
+This gives us a _memory-backed_ Vault, named `init`.  If we kill the process,
 we will lose all the secrets.  That might seem like a bad thing, but we only
 really have to get through two deployments (about 2 hours wall time), and
 a memory-backed initial Vault won't leak credentials as easily.
@@ -241,7 +240,7 @@ because you had to close the lid on your laptop and drive home.</p></aside>
 
 ## Deploying the proto-BOSH
 
-Before we can begin depoying things with BOSH, we need a BOSH director.
+Before we can begin deploying things with BOSH, we need a BOSH director.
 This will be our very first Genesis deployment in this environment, and
 we'll use the BOSH `create-env` tooling (under the hood) to get up and
 running.
@@ -276,7 +275,7 @@ new set of deployments, using `genesis init` (remember to do this from a
 
 The `genesis init` command creates a _deployments_ directory for the type of
 thing you are deploying (in our case, BOSH), and then downloads a Genesis
-Kit from Github.
+Kit from GitHub.
 
 Next, we need to write an _environment_ file for our new BOSH director.
 
@@ -284,7 +283,7 @@ Next, we need to write an _environment_ file for our new BOSH director.
     $ genesis new jhunt-aws
 
 Genesis will then ask a whole bunch of (pertinent) questions about your
-configuration, infrastructure / cloud provider, and your perferences.
+configuration, infrastructure / cloud provider, and your preferences.
 First up, Genesis needs to know what Vault to store your credentials in:
 
     Known Vault targets - current target indicated with a (*):
@@ -469,7 +468,7 @@ That will print out a cloud config YAML document that you can transfer to
 the bastion host, and use that to `bosh update-cloud-config`.
 
 This cloud config defines a `default` network, some generic VM types (small,
-medium, large), a default disk type, and a sinvle availability zone (z1).
+medium, large), a default disk type, and a single availability zone (z1).
 It should suffice to get us through the next deployment, and since this is a
 lab, you're probably going to modify it eventually anyway!
 
@@ -512,7 +511,7 @@ Now we can deploy.
 
     $ genesis deploy jhunt-aws
 
-After the deployment suceeds, we need to initialize the Vault:
+After the deployment succeeds, we need to initialize the Vault:
 
     $ genesis do jhunt-aws -- init
 
@@ -537,7 +536,7 @@ we deployed has Credhub installed, so you're able to deploy whatever you
 want to it, with or without the power of Genesis.
 
 If you do think Genesis is awesome sauce, check out the other kits and see
-if anything tickles your fancy.  Official Genesis Kits live on Github, in
+if anything tickles your fancy.  Official Genesis Kits live on GitHub, in
 the [Genesis Community organization][gh-gc].  Notable Kits include:
 
   - **[Concourse][concourse-kit]** - Deploy a CI/CD pipeline and get started
@@ -545,12 +544,12 @@ the [Genesis Community organization][gh-gc].  Notable Kits include:
 
   - **[SHIELD][shield-kit]** - A data protection solution for the cloud.
     Schedule backups and perform restores on databases, key-value stores,
-    even filesystems.
+    even file systems.
 
   - **[Cloud Foundry][cf-kit]** - The Cloud Foundry PaaS itself.  Now
-    deployble via Genesis.
+    deployed via Genesis.
 
-  - **[Blacksmih][blacksmith-kit]** - Data services, on-demand, leveraging
+  - **[Blacksmith][blacksmith-kit]** - Data services, on-demand, leveraging
     BOSH.  Available for CF marketplaces and Kubernetes!
 
 <aside><p><strong>Stay Tuned!</strong>  This is the first in a series of

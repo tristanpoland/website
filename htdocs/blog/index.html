@@ -74,7 +74,7 @@
             <h1>Building a Genesis Lab in AWS (Part I)</h1>
             <p class="dated">Friday, November  9, 2018</p>
           </div>
-          <p>Everybody needs a place to play, to experiment, and to try whacky things
+          <p>Everybody needs a place to play, to experiment, and to try wacky things
 with new technology.  It's the same when you're just getting started with
 Genesis &mdash; you need a lab environment!</p>
 
@@ -95,7 +95,7 @@ Want a production operations tier on GCP?  Genesis Terraforms.  Want to
 train a bunch of people on Concourse?  Genesis Terraforms.  Trying to follow
 along in a blog post about setting up a lab in AWS?  Genesis Terraforms.</p>
 
-<p>First, you're going to want to clone the git repo.</p>
+<p>First, you're going to want to clone the git repository.</p>
 
 <pre><code>$ git clone https://github.com/genesis-community/terraforms
 </code></pre>
@@ -160,7 +160,7 @@ To access the bastion host:
 
 <p><img class="full border" src="/blog/aws-lab-1/topology.png"></p>
 
-<p>There are two networks, <strong>DMZ</strong> and <strong>Lab</strong>, wich appropriate gateways and
+<p>There are two networks, <strong>DMZ</strong> and <strong>Lab</strong>, which appropriate gateways and
 NAT devices to make the Internet traffic work.  Inside the DMZ network
 (a 10.4.255.192/26), we have a <strong>bastion host</strong>, which has a public IPv4
 address.  This is how we'll get into the VPC to administer it, configure
@@ -193,18 +193,13 @@ Terraforming.</p></aside></p>
 bit of configuration.</p>
 
 <pre><code>$ sudo jumpbox system
-$ jumpbox user
 </code></pre>
 
 <p>The first command sets up global jumpbox-y things.  It installs a slew of
 useful utilities like <a href="https://github.com/starkandwayne/safe">safe</a>, <a href="https://github.com/geofffranks/spruce">spruce</a>, <a href="https://github.com/stedolan/jq">jq</a>, and more.
 It also installs required commands like <code>bosh</code>, <code>cf</code>, and <code>genesis</code>.</p>
 
-<p>If you want to create named operator accounts, now is a good time to do
-that.  Just make sure that each additional user also runs through <code>jumpbox
-user</code> (as them).</p>
-
-<p>Finally, to see what's installed, just run <code>jumpbox</code> with no arguments.</p>
+<p>To see what's installed, just run <code>jumpbox</code> with no arguments.</p>
 
 <pre><code>$ jumpbox
 &gt;&gt; Checking jumpbox installation
@@ -272,7 +267,7 @@ If you want to retain your secrets be sure to safe export.
 Ctrl-C to shut down the Vault
 </code></pre>
 
-<p>This gives us a <em>memory-backed</em> Vault, named <code>dev</code>.  If we kill the process,
+<p>This gives us a <em>memory-backed</em> Vault, named <code>init</code>.  If we kill the process,
 we will lose all the secrets.  That might seem like a bad thing, but we only
 really have to get through two deployments (about 2 hours wall time), and
 a memory-backed initial Vault won't leak credentials as easily.</p>
@@ -291,7 +286,7 @@ because you had to close the lid on your laptop and drive home.</p></aside></p>
 
 <h2>Deploying the proto-BOSH</h2>
 
-<p>Before we can begin depoying things with BOSH, we need a BOSH director.
+<p>Before we can begin deploying things with BOSH, we need a BOSH director.
 This will be our very first Genesis deployment in this environment, and
 we'll use the BOSH <code>create-env</code> tooling (under the hood) to get up and
 running.</p>
@@ -327,7 +322,7 @@ using the bosh/1.2.1 kit.
 
 <p>The <code>genesis init</code> command creates a <em>deployments</em> directory for the type of
 thing you are deploying (in our case, BOSH), and then downloads a Genesis
-Kit from Github.</p>
+Kit from GitHub.</p>
 
 <p>Next, we need to write an <em>environment</em> file for our new BOSH director.</p>
 
@@ -336,7 +331,7 @@ $ genesis new jhunt-aws
 </code></pre>
 
 <p>Genesis will then ask a whole bunch of (pertinent) questions about your
-configuration, infrastructure / cloud provider, and your perferences.
+configuration, infrastructure / cloud provider, and your preferences.
 First up, Genesis needs to know what Vault to store your credentials in:</p>
 
 <pre><code>Known Vault targets - current target indicated with a (*):
@@ -533,7 +528,7 @@ rudimentary, baseline cloud config, if you ask it to.</p>
 the bastion host, and use that to <code>bosh update-cloud-config</code>.</p>
 
 <p>This cloud config defines a <code>default</code> network, some generic VM types (small,
-medium, large), a default disk type, and a sinvle availability zone (z1).
+medium, large), a default disk type, and a single availability zone (z1).
 It should suffice to get us through the next deployment, and since this is a
 lab, you're probably going to modify it eventually anyway!</p>
 
@@ -577,7 +572,7 @@ only uploaded Xenial stemcells.</p>
 <pre><code>$ genesis deploy jhunt-aws
 </code></pre>
 
-<p>After the deployment suceeds, we need to initialize the Vault:</p>
+<p>After the deployment succeeds, we need to initialize the Vault:</p>
 
 <pre><code>$ genesis do jhunt-aws -- init
 </code></pre>
@@ -602,7 +597,7 @@ we deployed has Credhub installed, so you're able to deploy whatever you
 want to it, with or without the power of Genesis.</p>
 
 <p>If you do think Genesis is awesome sauce, check out the other kits and see
-if anything tickles your fancy.  Official Genesis Kits live on Github, in
+if anything tickles your fancy.  Official Genesis Kits live on GitHub, in
 the <a href="https://github.com/genesis-community">Genesis Community organization</a>.  Notable Kits include:</p>
 
 <ul>
@@ -610,10 +605,10 @@ the <a href="https://github.com/genesis-community">Genesis Community organizatio
 with automating your Genesis deployments!</p></li>
 <li><p><strong><a href="https://github.com/genesis-community/shield-genesis-kit">SHIELD</a></strong> - A data protection solution for the cloud.
 Schedule backups and perform restores on databases, key-value stores,
-even filesystems.</p></li>
+even file systems.</p></li>
 <li><p><strong><a href="https://github.com/genesis-community/cf-genesis-kit">Cloud Foundry</a></strong> - The Cloud Foundry PaaS itself.  Now
-deployble via Genesis.</p></li>
-<li><p><strong><a href="https://github.com/genesis-community/blacksmith-genesis-kit">Blacksmih</a></strong> - Data services, on-demand, leveraging
+deployed via Genesis.</p></li>
+<li><p><strong><a href="https://github.com/genesis-community/blacksmith-genesis-kit">Blacksmith</a></strong> - Data services, on-demand, leveraging
 BOSH.  Available for CF marketplaces and Kubernetes!</p></li>
 </ul>
 
