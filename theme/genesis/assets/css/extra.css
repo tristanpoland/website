@@ -54,6 +54,9 @@ table.gmp-matrix td.kits {
 .section-blog h2 {
   text-align: left;
 }
+.section-blog .row {
+  margin-bottom: 90px;
+}
 
 .section-blog-header {
   height: 400px;
@@ -72,4 +75,31 @@ table.gmp-matrix td.kits {
   position: absolute;
   right: 3vh;
   bottom: 0;
+}
+
+.article.page aside {
+  background-color: #63a24a;
+  color: #fff;
+  padding: 2em;
+  margin: 3em 0;
+  font-family: sans-serif;
+}
+.article.page aside a,
+.article.page aside p {
+  color: inherit;
+  font: inherit;
+}
+.article.page aside p:first-child {
+  margin-top: 0;
+}
+
+.article.page img.full {
+  max-width: 100%;
+}
+.article.page img.border {
+  padding: 2px;
+  border: 1px solid #333;
+}
+.article.page p.emoji {
+  font-size: 250%;
 }
