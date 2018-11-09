@@ -103,3 +103,9 @@ table.gmp-matrix td.kits {
 .article.page p.emoji {
   font-size: 250%;
 }
+
+.section-blog .feed {
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
