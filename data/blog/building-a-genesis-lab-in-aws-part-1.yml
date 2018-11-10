@@ -1,7 +1,4 @@
 # vim:ft=markdown:tw=76
-fixme:
-  - new screenshot for tmux
-
 title:     Building a Genesis Lab in AWS (Part I)
 permalink: aws-lab-1
 format:    markdown
