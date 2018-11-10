@@ -1,7 +1,6 @@
 # vim:ft=markdown:tw=76
 fixme:
   - new screenshot for tmux
-  - write a tmux cheatsheet (jhunt/env)
 
 title:     Building a Genesis Lab in AWS (Part I)
 permalink: aws-lab-1
@@ -572,7 +571,7 @@ Concourse.</p></aside>
 
 [tf]:     https://github.com/genesis-community/terraforms
 [ec2kp]:  https://github.com/genesis-community/terraforms/tree/master/lab/aws#deploying-an-aws-lab
-[tmux]:   https://gist.github.com/andreyvit/2921703
+[tmux]:   https://jameshunt.us/writings/my-tmux-cheat-sheet.html
 [vault]:  https://vaultproject.io
 [gh-gc]:  https://github.com/genesis-community
 
