@@ -17,13 +17,97 @@ down the line.
 
 # A Place To Start
 
+To begin, let's go over the general layout of a finished Genesis deployment. At
+the end of this guide, your environment will logically look like this:
+
+[[image]]
+
+There's two main abstractions at play here: the operations layer, and the
+environment layer. The environment layer is a individual segment of your
+cloud for a specific purpose. Typically, this is a lab environment,
+a development environment, a pre-production environment, and a production
+environment. You can have as many or as little of each as you'd desire, but for
+our example we'll have one of each. Each of these environments is their own
+separate BOSH instance with independant BOSH directors. Controlling these BOSH
+directors, and responsible for higher-level management of each environment, is
+contained within the operations layer. This is another BOSH director, often
+refered to as the Proto BOSH, as it's the only BOSH director created via a
+`create-env` BOSH command. All BOSH directors for the environment layer are
+deployed via the Proto BOSH.
+
+Now that we have a general end result, we want to start with deploying the
+operations layer first. We'll explain in-depth each individual component
+as the guide progresses.
+
+FIXME
+* Should explain about networking
+* Should explain that this relies on a flat network structure
+* Should explain that it's wholly contained
+
+## Naming Scheme
+
+A key component in planning your Genesis deployments is a naming scheme. You
+want something that accurately reflects the nature of that service. Here's a
+few questions to ask yourself in thinking of names:
+
+* Does this naming scheme show what IaaS this service was deployed to?
+* Does this naming scheme show what environment this service exists in?
+* Does this naming scheme show what service it is?
+* Is this quick to read? Does it make immediate sense?
+
+Proper naming of your environments and their services is an often overlooked
+component, but could mean the difference between a whole-site outage or not
+in times of panic (FIXME: REWORD?).
+
+If it helps, here's a naming scheme we use often and recommend to everyone. It
+answers all the above questions, and is easy to extend if you desire.
+
+`company-iaas-environment-location(-service)`
+
+Feel free to make `company` whatever you'd like. Or skip it entirely if you'd
+prefer shorter names. We find that it scratches that itch to customize naming
+schemes or make it feel less rigid. 
+
+Say we have a vSphere cloud located in NYC, and we're going to deploy Cloud
+Foundry to our production environment. The resulting name would be:
+
+`genesis-vs-prod-nyc-cf`
+
+We've shortened vSphere to `vs` and Genesis itself added the `cf` to the name
+for the service. The result is an easy to identify
+
 ## Provisioning a Bastion Host
+
+Above points regarding networking should be fleshed out first, otherwise
+we introduce a component not yet explained. 
+
+[[ this is a wildcard. what IaaS are they using? etc. ]]
+
+The bastion host is the name of a designated VM outside of the various layers
+that's used to deploy and manage the operations tier. It's a jumpbox, where
+operators can SSH into and use as a consistent, global state for all to
+collaborate 
+
 
 ## Installing Genesis
 
+Once the bastion host is setup, you'll want to install the Genesis Runtime.
+
+[[ install instructions ]]
+
 # The Operations Tier
 
-## Bootstrapping proto-BOSH
+So far, we've got the bastion host, and Genesis installed. Up next, we'll be 
+deploying components of the operations layer. We'll start with the Proto BOSH.
+
+## Bootstrapping Proto BOSH
+
+mkdir ops
+genesis init -k bosh
+cd bosh-deployments
+genesis new 
+
+
 
 ## Installing the Vault
 
