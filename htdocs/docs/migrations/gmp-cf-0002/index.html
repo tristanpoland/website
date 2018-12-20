@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+
+<title>Genesis</title>
+
+
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/css/libs.css?5">
+<link rel="stylesheet" href="/css/main.css?5">
+<link rel="stylesheet" href="/css/extra.css?5">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="/feed.xml">
+</head>
+<body class="dark-load">
+	<header id="top-nav" class="top-nav page-header">
+		<div class="container">
+			<a class="logo smooth-scroll" href="/">
+				<img class="logo-white" alt="Stark & Wayne" src="/img/logo.png?5" />
+			</a>
+			<nav class="top-menu">
+				<ul class="sf-menu">
+					<li><a href="/">Home</a></li>
+					<li><a href="/blog">Blog</a></li>
+					<li><a href="/download">Download</a></li>
+					<li><a href="/community">Community</a></li>
+					<li><a href="/docs/getting-started">Docs</a></li>
+					<li><a href="/dev">Developers</a></li>
+				</ul>
+			</nav>
+			<div id="mobile-menu">
+				<div class="inner-wrap">
+					<nav>
+						<ul class="nav_menu">
+							<li><a href="/">Home</a></li>
+							<li><a href="/download">Download</a></li>
+							<li><a href="/docs">Documentation</a></li>
+							<li><a href="/dev">Developers</a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<section id="top" class="display-page img-parallax bg-mask background-image"
+         data-image="/img/hbg.jpg">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>GMP-CF-0002 - Optionally Removing Consul in 1.3</h1>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page"><a href="javascript:" id="return-to-top"><i class="icon-chevron-up"></i></a><div id="container" class="container">
+    <div class="row">
+      <div class="col-md-3 toc" style="position: sticky; top: 0px;">
+        
+      </div>
+      <div class="col-md-8 col-md-push-1">
+        <div class="content">
+          <h1>Overview</h1>
+
+<p>With BOSH DNS a mature product and an integral component in many BOSH
+deployments, we have begun replacing Consul service discovery with
+BOSH DNS. The Cloud Foundry Genesis Kit v1.3 is the first step in this
+two-step phase. v1.3 colocates BOSH DNS and disables Consul DNS, but
+does not remove Consul entirely. The result is a seamless upgrade from
+v1.2.X while also leveraging BOSH DNS for service discovery.</p>
+
+<p>It is our plan to fully remove Consul from the Cloud Foundry Genesis
+Kit in v1.4, which will include the deletion of all <code>consul_etcd</code>
+virtual machines. This is the second step of the two-step phase, which
+enables a zero-downtime upgrade path from Consul DNS to BOSH DNS.</p>
+
+<p>However, if an operator wishes to remove all Consul related services
+from their Cloud Foundry deployment without waiting for v1.4, they may
+do so with a temporary feature flag implemented just for v1.3 called
+<code>migrate-1.3-without-consul</code>. This GMP will explain the steps
+necessary to use this feature.</p>
+
+<h1>Impact</h1>
+
+<p>The impact of this feature is minimal to the runtime and stability of
+your Cloud Foundry deployment. The decision to either apply or not
+apply this feature to your deployments will not impact future
+upgradability of this environment. No extra steps are necessary to
+maintain your Cloud Foundry environment after this GMP is completed.</p>
+
+<p>There is no downtime incurred by applying this feature.</p>
+
+<h1>The Process</h1>
+
+<h2>Determining Eligibility</h2>
+
+<p>Operators who wish to remove all Consul services from their Cloud
+Foundry deployment are only able to do so if their Genesis Cloud
+Foundry is version v1.3. To determine the version of the deployed
+Cloud Foundry environment, run the following command within your
+<code>cf-deployments</code> folder:</p>
+
+<pre><code>genesis info [environment name]
+</code></pre>
+
+<p>Where <code>[environment name]</code> is the name of the Cloud Foundry
+environment you wish to check.</p>
+
+<p>The result will look like this:</p>
+
+<pre><code>CF Deployment for Environment 'genesis-lab'
+
+  Last deployed about 30 minutes ago (08:32PM on Dec 19, 2018 UTC)
+            by David
+        to BOSH genesis-lab
+  based on kit cf/1.3
+          using Genesis v2.6.12
+  with manifest .genesis/manifests/buffalo-lab.yml (redacted)
+</code></pre>
+
+<p>The <code>based on kit</code> line must read <code>cf/1.3</code>. If it does not, please
+upgrade your Cloud Foundry installation with the v1.3 Cloud Foundry
+Genesis Kit before starting.</p>
+
+<p>If your <code>based on kit</code> line reads <code>cf/1.3</code>, and you wish to remove
+Consul entirely, please continue reading this guide.</p>
+
+<h2>Removing Consul</h2>
+
+<p>After ensuring the environment you wish to remove Consul from is on
+v1.3, edit your Genesis Environment Manifest and append
+<code>migrate-1.3-without-consul</code> to the feature list array. The end result
+will be something similar to:</p>
+
+<pre><code>---
+kit:
+  name:   cf
+  version: 1.3
+  features:
+  - local-blobstore
+  - local-ha-db
+  - migrate-1.3-without-consul
+params:
+  env:   genesis-lab
+  [...]
+</code></pre>
+
+<p>Once the feature has been added to your Genesis Environment Manifest,
+apply the changes with a <code>genesis deploy</code>:</p>
+
+<pre><code>genesis deploy [environment name]
+</code></pre>
+
+<p>This will remove any <code>consul_agents</code> colocated on VMs, as well as
+removing all <code>consul_etcd</code> VMs currently deployed. There will be no
+downtime during this deployment.</p>
+
+<h2>Verification &amp; Closing Notes (Final step)</h2>
+
+<p>Once the deployment is complete, you can verify that Consul is no
+longer used in your environment by running:</p>
+
+<pre><code>bosh -e [environment name] -d [deployment name] vms
+</code></pre>
+
+<p>Where <code>[environment name]</code> is the name of your BOSH director alias,
+and <code>[deployment name]</code> is the name of your Cloud Foundry environment.</p>
+
+<p>If you do not see any <code>consul_etcd</code> VMs listed, the feature was
+successfully applied. </p>
+
+<p>It is necessary to keep the <code>migrate-1.3-without-consul</code> feature until
+the v1.4 update is released. Genesis Cloud Foundry Kit v1.4 will
+remind you to remove the feature, as it will no longer be needed.</p>
+
+<h1>Help &amp; Support</h1>
+
+<p>If you have concerns about the impact of this migration process, or
+need assistance running through it, please don't hesitate to <a href="/community#slack">find us
+in #help on Slack</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+	<footer>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4">
+					<a class="logo" href="https://starkandwayne.com/">
+						<img class="logo-white" alt="Stark & Wayne" src="/img/swlogo.png?5" />
+						<p><strong>Genesis</strong> is funded and supported by <strong>Stark &amp; Wayne</strong>, the premier BOSH and Cloud Foundry consulting firm.<br>Stark &amp; Wayne: We Know Cloud.</p>
+					</a>
+				</div>
+
+				<div class="col-md-4">
+					<div class="links">
+						<h5>Genesis</h5>
+						<ul class="list">
+							<li><a href="/download">Download Genesis</a></li>
+							<li><a href="/docs/getting-started">Getting Started</a></li>
+							<li><a href="/docs">Documentation</a></li>
+							<li><a href="/community">Community Support</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="links">
+						<h5>Reference</h5>
+						<ul class="list">
+							<li><a href="#">Genesis CLI</a></li>
+							<li><a href="#">Pipelines</a></li>
+							<li><a href="#">Genesis Kits</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="down-footer">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12">
+						<p>&copy; 2018 Stark &amp; Wayne.  All Rights Reserved.</p>
+						<ul class="footer-menu"></ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<!-- FIXME: these don't exist: -->
+	<!--[if lt IE 9]>
+		<script type="text/javascript" src="/libs/html5shiv/es5-shim.min.js"></script>
+		<script type="text/javascript" src="/libs/html5shiv/html5shiv.min.js"></script>
+		<script type="text/javascript" src="/libs/html5shiv/html5shiv-printshiv.min.js"></script>
+		<script type="text/javascript" src="/libs/respond/respond.min.js"></script>
+	<![endif]-->
+
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+	<script type="text/javascript" src="/js/libs.js?5"></script>
+	<script type="text/javascript" src="/js/common.js?5"></script>
+</body>
+</html>
