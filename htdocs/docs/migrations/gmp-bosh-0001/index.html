@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+
+<title>Genesis</title>
+
+
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/css/libs.css?5">
+<link rel="stylesheet" href="/css/main.css?5">
+<link rel="stylesheet" href="/css/extra.css?5">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="/feed.xml">
+</head>
+<body class="dark-load">
+	<header id="top-nav" class="top-nav page-header">
+		<div class="container">
+			<a class="logo smooth-scroll" href="/">
+				<img class="logo-white" alt="Stark & Wayne" src="/img/logo.png?5" />
+			</a>
+			<nav class="top-menu">
+				<ul class="sf-menu">
+					<li><a href="/">Home</a></li>
+					<li><a href="/blog">Blog</a></li>
+					<li><a href="/download">Download</a></li>
+					<li><a href="/community">Community</a></li>
+					<li><a href="/docs/getting-started">Docs</a></li>
+					<li><a href="/dev">Developers</a></li>
+				</ul>
+			</nav>
+			<div id="mobile-menu">
+				<div class="inner-wrap">
+					<nav>
+						<ul class="nav_menu">
+							<li><a href="/">Home</a></li>
+							<li><a href="/download">Download</a></li>
+							<li><a href="/docs">Documentation</a></li>
+							<li><a href="/dev">Developers</a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<section id="top" class="display-page img-parallax bg-mask background-image"
+         data-image="/img/hbg.jpg">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>GMP-BOSH-0001 - Moving to BOSH Kit v1.3.0+</h1>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page"><a href="javascript:" id="return-to-top"><i class="icon-chevron-up"></i></a><div id="container" class="container">
+    <div class="row">
+      <div class="col-md-3 toc" style="position: sticky; top: 0px;">
+        
+      </div>
+      <div class="col-md-8 col-md-push-1">
+        <div class="content">
+          <h1>Overview</h1>
+
+<p>With this release (v1.3.0), we're moving more components over to using
+pre-compiled releases. However, their version numbers have not changed for
+some of the releases from the previous kit version(as they represent the
+same version of the software, just precompiled). This causes the manifest
+release version specification methods we typically rely on to not upload the
+new versions of the release if a source version of that release version is
+already in your BOSH director. This causes release->stemcell mismatches. In
+short, you'll need to upload these releases yourself.</p>
+
+<h1>Impact</h1>
+
+<p>This won't break anything in your system. You'll likely just fail to deploy
+initially. You may see a message such as:
+```
+Can't use release 'bpm/0.12.3'. It references packages without source code and are not compiled against stemcell 'bosh-vsphere-esxi-ubuntu-xenial-go_agent/170.16':</p>
+
+<ul>
+<li><p>'bpm/d139b63561eaa3893976416be9668dea539bf17d'</p></li>
+<li><p>'golang/27413c6b5a88ea20a24a9eed74d4b090b7b88331'</p></li>
+</ul>
+
+<p>Can't use release 'credhub/2.0.2'. It references packages without source code and are not compiled against stemcell 'bosh-vsphere-esxi-ubuntu-xenial-go_agent/170.16':</p>
+
+<ul>
+<li><p>'configurator/d19e331ac9c867c132d19426007802f86070526a'</p></li>
+<li><p>'credhub/62f912abb406d6d9b49393be629713fd407328c7'</p></li>
+<li><p>'golang-1.9-linux/8d6c67abda8684ce454f0bc74050a213456573ff'</p></li>
+<li><p>'openjdk_1.8.0/4d45452ce6bd79122873640ac63cae4d9b419ed4'
+```</p></li>
+</ul>
+
+<h1>The Process</h1>
+
+<p><code>
+export BOSH_ENVIRONMENT="&lt;your-env&gt;"
+bosh upload-release https://s3.amazonaws.com/bosh-compiled-release-tarballs/credhub-2.0.2-ubuntu-xenial-170.9-20181126-235205-877343813-20181126235215.tgz --sha1 c1759ba08a927cd8b4476baefe5f803cbb95d515
+bosh upload-release https://s3.amazonaws.com/bosh-compiled-release-tarballs/bpm-0.12.3-ubuntu-xenial-170.9-20181126-234429-76772131-20181126234436.tgz --sha1 1cc709f4be6fb2ec7ea3205d81ecad7039a979b4
+</code></p>
+
+<h1>Help &amp; Support</h1>
+
+<p>If you have concerns about the impact of this migration process, or need
+assistance running through it, please don't hesitate to
+<a href="/community#slack">find us in #help on Slack</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+	<footer>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4">
+					<a class="logo" href="https://starkandwayne.com/">
+						<img class="logo-white" alt="Stark & Wayne" src="/img/swlogo.png?5" />
+						<p><strong>Genesis</strong> is funded and supported by <strong>Stark &amp; Wayne</strong>, the premier BOSH and Cloud Foundry consulting firm.<br>Stark &amp; Wayne: We Know Cloud.</p>
+					</a>
+				</div>
+
+				<div class="col-md-4">
+					<div class="links">
+						<h5>Genesis</h5>
+						<ul class="list">
+							<li><a href="/download">Download Genesis</a></li>
+							<li><a href="/docs/getting-started">Getting Started</a></li>
+							<li><a href="/docs">Documentation</a></li>
+							<li><a href="/community">Community Support</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="links">
+						<h5>Reference</h5>
+						<ul class="list">
+							<li><a href="#">Genesis CLI</a></li>
+							<li><a href="#">Pipelines</a></li>
+							<li><a href="#">Genesis Kits</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="down-footer">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12">
+						<p>&copy; 2018 Stark &amp; Wayne.  All Rights Reserved.</p>
+						<ul class="footer-menu"></ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<!-- FIXME: these don't exist: -->
+	<!--[if lt IE 9]>
+		<script type="text/javascript" src="/libs/html5shiv/es5-shim.min.js"></script>
+		<script type="text/javascript" src="/libs/html5shiv/html5shiv.min.js"></script>
+		<script type="text/javascript" src="/libs/html5shiv/html5shiv-printshiv.min.js"></script>
+		<script type="text/javascript" src="/libs/respond/respond.min.js"></script>
+	<![endif]-->
+
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+	<script type="text/javascript" src="/js/libs.js?5"></script>
+	<script type="text/javascript" src="/js/common.js?5"></script>
+</body>
+</html>
