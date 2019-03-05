@@ -52,7 +52,7 @@
   <div class="container">
     <div class="row">
       <div class="col-md-12">
-        <h1>GMP-BOSH-0001 - Moving to BOSH Kit v1.3.0+</h1>
+        <h1>GMP-BOSH-0001 - BPM Release Collision</h1>
       </div>
     </div>
   </div>
@@ -80,32 +80,20 @@ short, you'll need to upload these releases yourself.</p>
 <h1>Impact</h1>
 
 <p>This won't break anything in your system. You'll likely just fail to deploy
-initially. You may see a message such as:
-```
-Can't use release 'bpm/0.12.3'. It references packages without source code and are not compiled against stemcell 'bosh-vsphere-esxi-ubuntu-xenial-go_agent/170.16':</p>
+initially. You may see a message such as:</p>
 
-<ul>
-<li><p>'bpm/d139b63561eaa3893976416be9668dea539bf17d'</p></li>
-<li><p>'golang/27413c6b5a88ea20a24a9eed74d4b090b7b88331'</p></li>
-</ul>
+<pre><code>Can't use release 'bpm/0.12.3'. It references packages without source code and are not compiled against stemcell 'bosh-vsphere-esxi-ubuntu-xenial-go_agent/170.16':
 
-<p>Can't use release 'credhub/2.0.2'. It references packages without source code and are not compiled against stemcell 'bosh-vsphere-esxi-ubuntu-xenial-go_agent/170.16':</p>
+ - 'bpm/d139b63561eaa3893976416be9668dea539bf17d'
 
-<ul>
-<li><p>'configurator/d19e331ac9c867c132d19426007802f86070526a'</p></li>
-<li><p>'credhub/62f912abb406d6d9b49393be629713fd407328c7'</p></li>
-<li><p>'golang-1.9-linux/8d6c67abda8684ce454f0bc74050a213456573ff'</p></li>
-<li><p>'openjdk_1.8.0/4d45452ce6bd79122873640ac63cae4d9b419ed4'
-```</p></li>
-</ul>
+ - 'golang/27413c6b5a88ea20a24a9eed74d4b090b7b88331'
+</code></pre>
 
 <h1>The Process</h1>
 
-<p><code>
-export BOSH_ENVIRONMENT="&lt;your-env&gt;"
-bosh upload-release https://s3.amazonaws.com/bosh-compiled-release-tarballs/credhub-2.0.2-ubuntu-xenial-170.9-20181126-235205-877343813-20181126235215.tgz --sha1 c1759ba08a927cd8b4476baefe5f803cbb95d515
+<pre><code>export BOSH_ENVIRONMENT="&lt;your-env&gt;"
 bosh upload-release https://s3.amazonaws.com/bosh-compiled-release-tarballs/bpm-0.12.3-ubuntu-xenial-170.9-20181126-234429-76772131-20181126234436.tgz --sha1 1cc709f4be6fb2ec7ea3205d81ecad7039a979b4
-</code></p>
+</code></pre>
 
 <h1>Help &amp; Support</h1>
 
