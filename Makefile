@@ -25,4 +25,4 @@ staging:
 prod:
 	cf push -f cf/manifest.yml
 
-.PHONY: buidl theme demo local check staging prod
+.PHONY: build theme demo local check staging prod
