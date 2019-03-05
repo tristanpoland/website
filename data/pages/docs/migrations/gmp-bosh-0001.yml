@@ -31,7 +31,7 @@ initially. You may see a message such as:
 
 # The Process
 
-    export BOSH_ENVIRONMENT="<your-env>"
+    export BOSH_ENVIRONMENT="YOUR-ENVIRONMENT-HERE"
     bosh upload-release https://s3.amazonaws.com/bosh-compiled-release-tarballs/bpm-0.12.3-ubuntu-xenial-170.9-20181126-234429-76772131-20181126234436.tgz --sha1 1cc709f4be6fb2ec7ea3205d81ecad7039a979b4 
 
 # Help & Support
