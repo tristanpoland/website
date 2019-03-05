@@ -53,6 +53,7 @@ pushd $REPO_ROOT
 	make
 popd
 
+(set -x; cd ${REPO_ROOT}; git status --porcelain)
 if [[ -n "$(cd ${REPO_ROOT}; git status --porcelain)" ]]; then
 	pushd ${REPO_ROOT}
 
@@ -63,6 +64,7 @@ if [[ -n "$(cd ${REPO_ROOT}; git status --porcelain)" ]]; then
 		git config --global user.name "CI Bot"
 	fi
 
+	(set -x; git status)
 	git merge --no-edit ${BRANCH}
 	git add -A
 	git status
