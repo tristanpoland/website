@@ -19,6 +19,19 @@ Genesis Kit it applies to.  Migration Process numbers will not be
 intentionally reused.  Indeed, they are intended to be used in reference
 documentation (like Github release notes).
 
+# BOSH
+
+The following migration processes apply to the Genesis BOSH Kit, for
+deploying a BOSH director.
+
+## GMP-BOSH-0001 - BPM Release Collision
+
+If the BOSH director deploying this BOSH already has bpm 0.12.3 on it, you
+may run into a collision as this kit attempts to change it to a precompiled
+release. In that case, the release needs to be manually uploaded.
+
+Read the [full details of **GMP-BOSH-0001 - BPM Release Collision**](/docs/migrations/gmp-bosh-0001).
+
 # Cloud Foundry
 
 The following migration processes apply to the Genesis CF Kit, for deploying
