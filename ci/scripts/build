@@ -12,15 +12,6 @@ header() {
 	echo
 }
 
-header "Installing some helpful utilities..."
-apt-get update && apt-get install -y curl
-
-curl -L -o /usr/bin/spruce https://github.com/geofffranks/spruce/releases/download/v1.18.2/spruce-linux-amd64
-chmod 0755 /usr/bin/spruce
-
-curl -L -o /usr/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-chmod 0755 /usr/bin/jq
-
 VERSION=$(cat releases/version)
 CURRENT_VERSION=$(spruce json $REPO_ROOT/data/releases | jq -r .latest)
 RELEASE="https://github.com/starkandwayne/genesis/releases/tag/$(cat releases/tag)"
@@ -53,7 +44,7 @@ pushd $REPO_ROOT
 	make
 popd
 
-(set -x; cd ${REPO_ROOT}; git status --porcelain)
+header "Committing Changes (if any) Back Upstream"
 if [[ -n "$(cd ${REPO_ROOT}; git status --porcelain)" ]]; then
 	pushd ${REPO_ROOT}
 
@@ -64,7 +55,6 @@ if [[ -n "$(cd ${REPO_ROOT}; git status --porcelain)" ]]; then
 		git config --global user.name "CI Bot"
 	fi
 
-	(set -x; git status)
 	git merge --no-edit ${BRANCH}
 	git add -A
 	git status
