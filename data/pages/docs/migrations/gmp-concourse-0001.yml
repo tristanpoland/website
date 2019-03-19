@@ -39,8 +39,8 @@ but they check for membership of different orgs or teams.
 verify different space membership.
 
 Additionally, teams that are configured with basic auth will need to have their
-users added manually using the add_local_users property of the ATC. The user named
-Concourse that is configured with the kit in Vault will be seeded for you automatically.
+users added manually using the `add_local_users` property of the ATC. The user named
+`concourse` that is configured with the kit in Vault will be seeded for you automatically.
 
 # The Process
 
@@ -55,7 +55,7 @@ Basically, if you miss a step and the migration fails, it'll be nice to be able 
 the previous kit version and slap the backup in place.
 
 As an aside, if you have configured a SHIELD backup for this node, you may need to change
-your pg_bindir property of your target after the upgrade, as the Postgres folder will change
+your `pg_bindir` property of your target after the upgrade, as the Postgres folder will change
 paths due to the Postgres upgrade.
 
 ## Checking if you have a problem to fix
@@ -65,12 +65,15 @@ migration.
 
 If you're still reading, then it's time to get on the Concourse db VM and take a look at the
 ATC database. SSH in:
+
     bosh -e <your-env> -d <your-concourse-deployment> ssh db
 
 PSQL into the DB:
+
     /var/vcap/packages/postgres-<your-postgres-version>/bin/psql -U atc
 
 Get the team configurations:
+
     select * from teams;
 
 If any of the teams auth configurations fulfill the qualities described in the Impact section,
