@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+
+<title>Genesis</title>
+
+
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/css/libs.css?5">
+<link rel="stylesheet" href="/css/main.css?5">
+<link rel="stylesheet" href="/css/extra.css?5">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="/feed.xml">
+</head>
+<body class="dark-load">
+	<header id="top-nav" class="top-nav page-header">
+		<div class="container">
+			<a class="logo smooth-scroll" href="/">
+				<img class="logo-white" alt="Stark & Wayne" src="/img/logo.png?5" />
+			</a>
+			<nav class="top-menu">
+				<ul class="sf-menu">
+					<li><a href="/">Home</a></li>
+					<li><a href="/blog">Blog</a></li>
+					<li><a href="/download">Download</a></li>
+					<li><a href="/community">Community</a></li>
+					<li><a href="/docs/getting-started">Docs</a></li>
+					<li><a href="/dev">Developers</a></li>
+				</ul>
+			</nav>
+			<div id="mobile-menu">
+				<div class="inner-wrap">
+					<nav>
+						<ul class="nav_menu">
+							<li><a href="/">Home</a></li>
+							<li><a href="/download">Download</a></li>
+							<li><a href="/docs">Documentation</a></li>
+							<li><a href="/dev">Developers</a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<section id="top" class="display-page img-parallax bg-mask background-image"
+         data-image="/img/hbg.jpg">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>GMP-CONCOURSE-0001 - Concourse 4 Upgrade</h1>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="page"><a href="javascript:" id="return-to-top"><i class="icon-chevron-up"></i></a><div id="container" class="container">
+    <div class="row">
+      <div class="col-md-3 toc" style="position: sticky; top: 0px;">
+        
+      </div>
+      <div class="col-md-8 col-md-push-1">
+        <div class="content">
+          <h1>Overview</h1>
+
+<p>Concourse Genesis Kit v3.0.0 is the first kit that crosses the barrier from
+Concourse version 3 to 4. This carries with it some underlying changes to the
+way authorization works in Concourse. While the kit provides a reasonable layer
+of abstraction for most of these changes, you may still need to make changes to
+your existing Concourse deployment in order for the migration to go cleanly.</p>
+
+<h1>Impact</h1>
+
+<p>If your configuration fulfills any of the following criteria, then the database
+migration associated with this upgrade will fail:</p>
+
+<ul>
+<li>Two teams are configured with the same basic auth username</li>
+<li>Two teams are configured with Github Auth, but they point to different OAuth
+applications within Github. </li>
+<li>Two teams are configured with Github Auth, but they point to different Github
+instances (e.g. public Github and an enterprise deployment, or two enterprise deployments)</li>
+<li>Two teams are configured with CF Auth, but they point to different Cloud
+Foundry deployments</li>
+<li>If you're using Bitbucket auth - sorry, it's not supported in Concourse 4. You'll
+need to consider a different authentication type.</li>
+</ul>
+
+<p>Things that should not affect this migration:</p>
+
+<ul>
+<li>Two teams are configured with Basic auth, but they have different users.</li>
+<li>Two teams are configured with Github auth against the same OAuth provider,
+but they check for membership of different orgs or teams.</li>
+<li>Two teams are configured with CF Auth against the same Cloud Foundry but
+verify different space membership.</li>
+</ul>
+
+<p>Additionally, teams that are configured with basic auth will need to have their
+users added manually using the add<em>local</em>users property of the ATC. The user named
+Concourse that is configured with the kit in Vault will be seeded for you automatically.</p>
+
+<h1>The Process</h1>
+
+<h2>Take a Backup</h2>
+
+<p>First off, take a backup of the <code>atc</code> database. If you don't already have SHIELD
+doing that, then consider having SHIELD do that. If for some reason that isn't an
+option, you can use the pg_dump at <code>/var/vcap/packages/postgres-&lt;version-number&gt;/bin/pg_dump</code>
+on the db node to create a backup.</p>
+
+<p>Basically, if you miss a step and the migration fails, it'll be nice to be able to fall back to
+the previous kit version and slap the backup in place.</p>
+
+<p>As an aside, if you have configured a SHIELD backup for this node, you may need to change
+your pg_bindir property of your target after the upgrade, as the Postgres folder will change
+paths due to the Postgres upgrade.</p>
+
+<h2>Checking if you have a problem to fix</h2>
+
+<p>For starters, if you only have one team then you don't have a problem. Stop reading and do the
+migration.</p>
+
+<p>If you're still reading, then it's time to get on the Concourse db VM and take a look at the
+ATC database. SSH in:
+    bosh -e <your-env> -d <your-concourse-deployment> ssh db</p>
+
+<p>PSQL into the DB:
+    /var/vcap/packages/postgres-<your-postgres-version>/bin/psql -U atc</p>
+
+<p>Get the team configurations:
+    select * from teams;</p>
+
+<p>If any of the teams auth configurations fulfill the qualities described in the Impact section,
+you'll need to reconfigure your teams using the Fly CLI. </p>
+
+<h2>Fixing your configuration with the Fly CLI</h2>
+
+<p>Target your Concourse's main team with Fly, and for each team take the action related to your
+issue. All of these will need to be done with set-team. Properties are not upserted, so when calling
+set-team, make sure you provide the entire team configuration.</p>
+
+<ul>
+<li>If multiple teams have the same basic auth user, change all but one of the
+team's users to a different username using the "--basic-auth-*" flags. You can 
+always change it back after the migration.</li>
+<li>If teams reference different Github OAuth applications, migrate them all to
+using one with the "--github-auth-*" flags. If there's only one Github that
+you're referencing, this should not be an issue. You may need to grant the
+OAuth app access to query org or team membership in orgs with more secretive
+privacy settings. You may also want to revoke all user tokens from the OAuth
+application you're migrating to - if users only allowed the application access
+to view the organizations revelant to that particular application's domain,
+then they will not get authorized for non-granted domains. Revoking their token
+will give them a chance to grant more access to the OAuth app, as it will cause
+them to go through the initial authorization flow again.</li>
+<li>If you can't merge OAuth applications, or you're referencing multiple Github
+instances, then you'll need to make separate Concourse deployments for each
+unmergeable zone.</li>
+<li>For CF, if you're referencing multiple Cloud Foundries, you'll need a separate
+Concourse deployments for each Cloud Foundry you want to auth to.</li>
+</ul>
+
+<h2>Seeding local users</h2>
+
+<p>If you have basic auth users other than the default "concourse" user, then you'll need
+seed them into the ATC manually in the environment manifest.</p>
+
+<pre><code>instance_groups:
+- name: web
+  jobs:
+  - name: atc
+    properties:
+      add_local_users:
+      - (( append ))
+      - username:$2$12$bcryptOfPassword
+      - username2:$2$12$bcryptOfPassword2
+</code></pre>
+
+<p>If you want an easy way to make the bcrypts of each password, put them in the Vault with
+"safe" and use "safe fmt" to make a bcrypt for each. </p>
+
+<h1>Help &amp; Support</h1>
+
+<p>If you have concerns about the impact of this migration process, or need
+assistance running through it, please don't hesitate to
+<a href="/community#slack">find us in #help on Slack</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+	<footer>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4">
+					<a class="logo" href="https://starkandwayne.com/">
+						<img class="logo-white" alt="Stark & Wayne" src="/img/swlogo.png?5" />
+						<p><strong>Genesis</strong> is funded and supported by <strong>Stark &amp; Wayne</strong>, the premier BOSH and Cloud Foundry consulting firm.<br>Stark &amp; Wayne: We Know Cloud.</p>
+					</a>
+				</div>
+
+				<div class="col-md-4">
+					<div class="links">
+						<h5>Genesis</h5>
+						<ul class="list">
+							<li><a href="/download">Download Genesis</a></li>
+							<li><a href="/docs/getting-started">Getting Started</a></li>
+							<li><a href="/docs">Documentation</a></li>
+							<li><a href="/community">Community Support</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="links">
+						<h5>Reference</h5>
+						<ul class="list">
+							<li><a href="#">Genesis CLI</a></li>
+							<li><a href="#">Pipelines</a></li>
+							<li><a href="#">Genesis Kits</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="down-footer">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12">
+						<p>&copy; 2018 Stark &amp; Wayne.  All Rights Reserved.</p>
+						<ul class="footer-menu"></ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<!-- FIXME: these don't exist: -->
+	<!--[if lt IE 9]>
+		<script type="text/javascript" src="/libs/html5shiv/es5-shim.min.js"></script>
+		<script type="text/javascript" src="/libs/html5shiv/html5shiv.min.js"></script>
+		<script type="text/javascript" src="/libs/html5shiv/html5shiv-printshiv.min.js"></script>
+		<script type="text/javascript" src="/libs/respond/respond.min.js"></script>
+	<![endif]-->
+
+	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+	<script type="text/javascript" src="/js/libs.js?5"></script>
+	<script type="text/javascript" src="/js/common.js?5"></script>
+</body>
+</html>
