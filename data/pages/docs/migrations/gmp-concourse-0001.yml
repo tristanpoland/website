@@ -70,7 +70,7 @@ ATC database. SSH in:
 
 PSQL into the DB:
 
-    /var/vcap/packages/postgres-<your-postgres-version>/bin/psql -U atc
+    /var/vcap/packages/postgres-&lt;your-postgres-version&gt;/bin/psql -U atc
 
 Get the team configurations:
 
