@@ -102,8 +102,8 @@ verify different space membership.</li>
 </ul>
 
 <p>Additionally, teams that are configured with basic auth will need to have their
-users added manually using the add<em>local</em>users property of the ATC. The user named
-Concourse that is configured with the kit in Vault will be seeded for you automatically.</p>
+users added manually using the <code>add_local_users</code> property of the ATC. The user named
+<code>concourse</code> that is configured with the kit in Vault will be seeded for you automatically.</p>
 
 <h1>The Process</h1>
 
@@ -118,7 +118,7 @@ on the db node to create a backup.</p>
 the previous kit version and slap the backup in place.</p>
 
 <p>As an aside, if you have configured a SHIELD backup for this node, you may need to change
-your pg_bindir property of your target after the upgrade, as the Postgres folder will change
+your <code>pg_bindir</code> property of your target after the upgrade, as the Postgres folder will change
 paths due to the Postgres upgrade.</p>
 
 <h2>Checking if you have a problem to fix</h2>
@@ -127,14 +127,20 @@ paths due to the Postgres upgrade.</p>
 migration.</p>
 
 <p>If you're still reading, then it's time to get on the Concourse db VM and take a look at the
-ATC database. SSH in:
-    bosh -e <your-env> -d <your-concourse-deployment> ssh db</p>
+ATC database. SSH in:</p>
 
-<p>PSQL into the DB:
-    /var/vcap/packages/postgres-<your-postgres-version>/bin/psql -U atc</p>
+<pre><code>bosh -e &lt;your-env&gt; -d &lt;your-concourse-deployment&gt; ssh db
+</code></pre>
 
-<p>Get the team configurations:
-    select * from teams;</p>
+<p>PSQL into the DB:</p>
+
+<pre><code>/var/vcap/packages/postgres-&lt;your-postgres-version&gt;/bin/psql -U atc
+</code></pre>
+
+<p>Get the team configurations:</p>
+
+<pre><code>select * from teams;
+</code></pre>
 
 <p>If any of the teams auth configurations fulfill the qualities described in the Impact section,
 you'll need to reconfigure your teams using the Fly CLI. </p>
