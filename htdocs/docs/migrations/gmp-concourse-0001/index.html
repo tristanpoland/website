@@ -111,7 +111,7 @@ users added manually using the <code>add_local_users</code> property of the ATC.
 
 <p>First off, take a backup of the <code>atc</code> database. If you don't already have SHIELD
 doing that, then consider having SHIELD do that. If for some reason that isn't an
-option, you can use the pg_dump at <code>/var/vcap/packages/postgres-&lt;version-number&gt;/bin/pg_dump</code>
+option, you can use the pg_dump at <code>/var/vcap/packages/postgres-&amp;lt;version-number&amp;gt;/bin/pg_dump</code>
 on the db node to create a backup.</p>
 
 <p>Basically, if you miss a step and the migration fails, it'll be nice to be able to fall back to
@@ -129,7 +129,7 @@ migration.</p>
 <p>If you're still reading, then it's time to get on the Concourse db VM and take a look at the
 ATC database. SSH in:</p>
 
-<pre><code>bosh -e &lt;your-env&gt; -d &lt;your-concourse-deployment&gt; ssh db
+<pre><code>bosh -e &amp;lt;your-env&amp;gt; -d &amp;lt;your-concourse-deployment&amp;gt; ssh db
 </code></pre>
 
 <p>PSQL into the DB:</p>
