@@ -4,6 +4,7 @@ title:  Genesis Documentation
 url:    /docs/index.html
 format: markdown
 --- |-
+- [About Genesis](/docs/about)
 - [Getting Started](/docs/getting-started)
 - [Operators' Manual](/docs/manual)
 - [Migration Processes](/docs/migrations)
