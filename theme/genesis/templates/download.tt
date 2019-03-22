@@ -40,7 +40,7 @@
 
           <h1 id="older">Older Genesis Releases</h1>
           [% for release in all %][% if release.version != latest %]
-          <h2 id="v[% release.version %]">SHIELD v[% release.version %]</h2>
+          <h2 id="v[% release.version %]">Genesis v[% release.version %]</h2>
           [% filter markdown %][% release.notes %][% end %]
           <a href="[% release.url %]" target="_blank">Download v[% release.version %] from Github</a>
           [% end %][% end %]
