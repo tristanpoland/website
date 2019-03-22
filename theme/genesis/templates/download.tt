@@ -15,7 +15,6 @@
       <div class="col-md-3 toc">
         <ul>
           <li><a href="#latest">Latest Release ([% latest %])</a></li>
-          <li><a href="#source">Build From Source</a></li>
           <li><a href="#older">Older Releases</a>
             <ul>
               [% for release in all %][% if release.version != latest %]
@@ -33,10 +32,6 @@
             [% filter markdown %][% release.notes %][% end %]
             <a href="[% release.url %]" target="_blank">Download v[% release.version %] from Github</a>
           [% end %][% end %]
-
-          <h1>Build From Source</h1>
-
-          <p>... we're still working on this one ... <!-- FIXME --></p>
 
           <h1 id="older">Older Genesis Releases</h1>
           [% for release in all %][% if release.version != latest %]
