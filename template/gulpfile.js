@@ -36,4 +36,4 @@ gulp.task('scripts', function() {
 		.pipe(gulp.dest('../htdocs/js/'));
 });
 
-gulp.task('default', ['styles', 'scripts']);
+//gulp.task('default', ['styles', 'scripts']);

@@ -7,7 +7,7 @@ build:
 	./bin/verse build
 
 theme:
-	cd template && gulp
+	cd template && gulp styles && gulp scripts
 	make build
 
 demo: build
