@@ -222,6 +222,10 @@ need to be access by application containers, or the outside world, directly.
   </tbody>
 </table>
 
+That's a minimum of seventeen (17) IPs.  In lab / sandbox environments, we
+recommend at least a `/27` (30 hosts) network, and in larger environments
+that may see scaling, try a `/26` (62 hosts) or a `/25` (126 hosts).
+
 ### Edge Network
 
 This network exists as a separate contiguous blog of IPs to allow for
@@ -254,6 +258,11 @@ of the Cloud.
   </tbody>
 </table>
 
+At the low end of the scaling spectrum, you're looking at a minimum of four
+(4) IPs, so a `/29` is workable.  In larger environments, where you're going
+to scale the gorouters to handle more concurrent connections, we generally
+recommend a `/27` (30 hosts).
+
 ### Database Network
 
 The database is cordoned off in its own network to ensure that the highest
@@ -275,6 +284,8 @@ sensitive data of a Cloud Foundry instance.
     </tr>
   </tbody>
 </table>
+
+A `/30` (2 hosts) ought to suffice for this.
 
 ### Runtime Network
 
@@ -298,6 +309,11 @@ from the rest of the infrastructure as needed.
   </tbody>
 </table>
 
+The size of your runtime network is driven entirely by the size of your
+Cloud Foundry, and how many applications you are running.  We recommend
+starting with a `/25` (126 hosts) for lab / sandbox environments, and
+scaling up to as large as you need &mdash; usually a `/24` through a `/20`
+(or beyond).
 
 # The Operations Tier
 
