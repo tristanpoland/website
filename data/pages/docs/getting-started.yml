@@ -171,7 +171,7 @@ need to be access by application containers, or the outside world, directly.
       <td>API</td>
       <td>2+</td>
       <td>The Cloud Controller API itself.  Scale this horizontally
-      to acheive more a more responsive CLI experience.
+      to achieve more a more responsive CLI experience.
       <em>Hosted behind gorouter.</em></td>
     </tr>
 
@@ -186,31 +186,32 @@ need to be access by application containers, or the outside world, directly.
     <tr>
       <td>Doppler</td>
       <td>2+</td>
-      <td>Part of the Cloud Founry Logging subystem.</td>
+      <td>Part of the Cloud Foundry Logging subystem.</td>
     </tr>
 
     <tr>
       <td>Syslogger</td>
       <td>2+</td>
-      <td>Part of the Cloud Founry Logging subystem.</td>
+      <td>Part of the Cloud Foundry Logging subystem.</td>
     </tr>
 
     <tr>
       <td>LTC</td>
       <td>2+</td>
-      <td><em>none</em></td>
+      <td>Part of the Cloud Foundry Logging subystem.</td>
     </tr>
 
     <tr>
       <td>BBS</td>
       <td>2+</td>
-      <td><em>none</em></td>
+      <td>The bulletin board system, where Diego stores all of its state
+      information.</td>
     </tr>
 
     <tr>
       <td>Diego</td>
       <td>2+</td>
-      <td>This is <stronng>not</strong> the Diego runtime (cells); this is
+      <td>This is <strong>not</strong> the Diego runtime (cells); this is
       the non-BBS bits of Diego that constitute the brains of Diego.</td>
     </tr>
 
@@ -227,7 +228,7 @@ need to be access by application containers, or the outside world, directly.
 
 This network exists as a separate contiguous blog of IPs to allow for
 different firewalling.  Outside load balancers need to be able to talk to
-the virtual machiens in this network, since they form the <em>perimeter</em>
+the virtual machines in this network, since they form the <em>perimeter</em>
 of the Cloud.
 
 <table class="listing">
