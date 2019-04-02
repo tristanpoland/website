@@ -18,7 +18,7 @@ cards:
   - title: Flexible
     icon:  loop
     blurb: |
-      Leveraging Spruce, Genesis affords you and your operations team unprecedented flexibility in tailoring environment-specific configuration, while still being able to rely on a base of best practices.
+      Leveraging Spruce, Genesis affords you and your operations team unprecedented flexibility in tailoring environment-specific configuration, while still being able to rely on best practices.
   - title: Cloud-Native
     icon:  cloud-upload
     blurb: |
