@@ -248,7 +248,7 @@ of the Cloud.
     <tr>
       <td>Access</td>
       <td>2+</td>
-      <td>Provides <tt>cf ssh</tt> access to application containers
+      <td>Provides <kbd>cf ssh</kbd> access to application containers
       in Diego; scales as the number of these requests increases,
       which means you probably won't need to scale it very often.</td>
     </tr>
@@ -293,7 +293,8 @@ from the rest of the infrastructure as needed.
     <tr>
       <td>Diego Cell</td>
       <td>3+</td>
-      <td><em>none</em></td>
+      <td>This <strong>will</strong> scale as you need more space to host
+      application containers.</td>
     </tr>
   </tbody>
 </table>
