@@ -27,15 +27,15 @@
       <div class="col-md-8 col-md-push-1">
         <div class="content">
           <span id="v[% latest %]"></span>
-          <h1 id="latest">Genesis v[% latest %]</h1>
+          <h2 id="latest">Genesis v[% latest %]</h2>
           [% for release in all %][% if release.version == latest %]
             [% filter markdown %][% release.notes %][% end %]
             <a href="[% release.url %]" target="_blank">Download v[% release.version %] from Github</a>
           [% end %][% end %]
 
-          <h1 id="older">Older Genesis Releases</h1>
+          <h2 id="older">Older Genesis Releases</h2>
           [% for release in all %][% if release.version != latest %]
-          <h2 id="v[% release.version %]">Genesis v[% release.version %]</h2>
+          <h3 id="v[% release.version %]">Genesis v[% release.version %]</h3>
           [% filter markdown %][% release.notes %][% end %]
           <a href="[% release.url %]" target="_blank">Download v[% release.version %] from Github</a>
           [% end %][% end %]

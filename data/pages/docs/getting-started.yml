@@ -3,6 +3,8 @@
 title:  Getting Started
 url:    /docs/getting-started/index.html
 format: markdown
+replace:
+  "--": "&mdash"
 --- |-
 
 # Plan The Environments
@@ -14,30 +16,474 @@ with it.
 We prefer a little more planning up-front, to save a lot of rework later on
 down the line.
 
+# How Many, and Where?
 
-# A Place To Start
+How many Cloud Foundries do you want to run?  We recommend, at a
+minimum, the following:
 
-## Provisioning a Bastion Host
+  1. **Sandbox** - A small environment for you and your immediate team to
+     experiment with.
 
-## Installing Genesis
+  2. **Development** - Some place for your application developers to play,
+     before they get to production.
+
+  3. **Production** - The real deal; where all the magic happens.  Deploy
+     often to keep it updated, but don't touch it until you've experimented
+     in lower environments.
+
+You might want these other environments too:
+
+  4. **QA** - Somewhere in between dev and prod lies QA, where end-to-end
+     testing by skilled human beings occurs.
+
+  5. **Staging** - Between QA and prod, staging provides an environment for
+     staging your production changes.  If you can justify the cost, treating
+     this environment as a copy of production that you route traffic to
+     lends itself to blue/green methodologies on a grand scale.
+
+It's also 100% okay to have more than one of each of these.  Multiple
+production environments, in different clouds or in different geographic
+regions (or both!) can be useful for different markets, or for geo-routed
+services.  If you outgrow a dev environment, you can also spin up another.
+The important part is to _think about it_ and have a plan.
+
+# Networks and Sizing
+
+A crucial aspect of planning your environments is understanding how many
+networks you have / need, and how big they ought to be.
+
+## The Operations Tier
+
+Normally, an operations tier can get away with a single `/24` (254 hosts),
+`/25` (126 hosts) or even a `/26` (62 hosts) network.
+
+<table class="listing">
+  <thead><tr>
+    <th>Component</th>
+    <th># of IPs</th>
+    <th>Notes</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td>Bastion Host</td>
+      <td>1</td>
+      <td>
+        <p>This IP must be statically assigned, before BOSH is stood up.
+           (Terraform will normally do this for you).
+           For that reason, you will need to reserve it from the network
+           definitions in your cloud-config, so that BOSH doesn't try to
+           hand it out to a VM that it deploys.</p>
+       </td>
+    </tr>
+
+    <tr>
+      <td>proto-BOSH</td>
+      <td>1</td>
+      <td>
+        <p>This IP must be statically assigned, before BOSH is stood up.
+           This is done during configuration of the proto-BOSH Genesis
+           environment.</p>
+       </td>
+    </tr>
+
+    <tr>
+      <td>Vault</td>
+      <td>3</td>
+      <td>
+        <p>Vault is a 3-node Consul-cluster.</p>
+       </td>
+    </tr>
+
+    <tr>
+      <td>SHIELD</td>
+      <td>1</td>
+      <td>
+        <p></p>
+       </td>
+    </tr>
+
+    <tr>
+      <td>Prometheus</td>
+      <td>1</td>
+      <td>
+        <p></p>
+       </td>
+    </tr>
+
+    <tr>
+      <td>Concourse</td>
+      <td>5+</td>
+      <td>
+        <p>A minimum of three (3) VMs must be deployed (the TSA+ATC, the database,
+           and one worker).  We recommend at least two workers, preferably three,
+           which brings you to five (5) IPs total.</p>
+       </td>
+    </tr>
+  </tbody>
+</table>
+
+At a minimum, the recommended configuration needs **12** IPs.  Which means
+the _smallest_ network you can shoehorn an operations tier into is a `/28`
+(14 hosts).  You will probably want to reserve more, to allow for future
+expansion.
+
+## Cloud Foundry
+
+The Cloud Foundry Genesis Kit deploys across four networks:
+
+  - **internal** - Contains the core bits and pieces of Cloud Foundry,
+    including UAA, CAPI, etc.
+
+  - **edge** - The externally-facing parts of Cloud Foundry, on the
+    perimeter of the architecture.
+
+  - **runtime** - Diego, where the application containers run.  This is
+    split off from the rest of the core to allow firewalls to be placed
+    around the runtime and keep CF applications from abusing access to
+    things like CAPI or the UAA.
+
+  - **db** - The internal database, if one is deployed.
+
+The sizes of each of these four networks depends on how big you need to make
+the overall Cloud Foundry installation.
+
+### Internal Network
+
+Most of the managerial parts of Cloud Foundry exist in the _internal_
+network.  These are components that need to talk to one another, but do not
+need to be access by application containers, or the outside world, directly.
+
+<table class="listing">
+  <thead><tr>
+    <th>Component</th>
+    <th># of IPs</th>
+    <th>Notes</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td>NATS</td>
+      <td>2+</td>
+      <td>The NATS message bus is still used for router advertisements.
+      Scaling it horizontally only adds redundancy.</td>
+    </tr>
+
+    <tr>
+      <td>API</td>
+      <td>2+</td>
+      <td>The Cloud Controller API itself.  Scale this horizontally
+      to acheive more a more responsive CLI experience.
+      <em>Hosted behind gorouter.</em></td>
+    </tr>
+
+    <tr>
+      <td>UAA</td>
+      <td>2+</td>
+      <td>The authorization and authentication server.  Scale this
+      horizontally for faster login / account rights lookups.
+      <em>Hosted behind gorouter.</em></td>
+    </tr>
+
+    <tr>
+      <td>Doppler</td>
+      <td>2+</td>
+      <td>Part of the Cloud Founry Logging subystem.</td>
+    </tr>
+
+    <tr>
+      <td>Syslogger</td>
+      <td>2+</td>
+      <td>Part of the Cloud Founry Logging subystem.</td>
+    </tr>
+
+    <tr>
+      <td>LTC</td>
+      <td>2+</td>
+      <td><em>none</em></td>
+    </tr>
+
+    <tr>
+      <td>BBS</td>
+      <td>2+</td>
+      <td><em>none</em></td>
+    </tr>
+
+    <tr>
+      <td>Diego</td>
+      <td>2+</td>
+      <td>This is <stronng>not</strong> the Diego runtime (cells); this is
+      the non-BBS bits of Diego that constitute the brains of Diego.</td>
+    </tr>
+
+    <tr>
+      <td>Smoke Tests (errand)</td>
+      <td>1</td>
+      <td>This "VM" doesn't exist unless you are running the smoke-tests
+      errand (which you should), but you need to plan for it.</td>
+    </tr>
+  </tbody>
+</table>
+
+### Edge Network
+
+This network exists as a separate contiguous blog of IPs to allow for
+different firewalling.  Outside load balancers need to be able to talk to
+the virtual machiens in this network, since they form the <em>perimeter</em>
+of the Cloud.
+
+<table class="listing">
+  <thead><tr>
+    <th>Component</th>
+    <th># of IPs</th>
+    <th>Notes</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td>gorouter</td>
+      <td>2+</td>
+      <td>The routing layer, for getting HTTP(S) requests and TCP
+      connections to the appropriate Diego container.  Scales with
+      the cluster as the number of concurrent requests per second grows.</td>
+    </tr>
+
+    <tr>
+      <td>Access</td>
+      <td>2+</td>
+      <td>Provides <tt>cf ssh</tt> access to application containers
+      in Diego; scales as the number of these requests increases,
+      which means you probably won't need to scale it very often.</td>
+    </tr>
+  </tbody>
+</table>
+
+### Database Network
+
+The database is cordoned off in its own network to ensure that the highest
+level of firewall protections can be afforded to the VMs that store the
+sensitive data of a Cloud Foundry instance.
+
+<table class="listing">
+  <thead><tr>
+    <th>Component</th>
+    <th># of IPs</th>
+    <th>Notes</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td>DB</td>
+      <td>1-2</td>
+      <td>The PostgreSQL database instance(s).  For local non-HA mode, you
+      only need one IP.  If you opt for HA, you need two.</td>
+    </tr>
+  </tbody>
+</table>
+
+### Runtime Network
+
+All of the applications that will be pushed into Cloud Foundry will execute
+on the VMs in the <em>runtime network</em>, to allow them to be sequestered
+from the rest of the infrastructure as needed.
+
+<table class="listing">
+  <thead><tr>
+    <th>Component</th>
+    <th># of IPs</th>
+    <th>Notes</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td>Diego Cell</td>
+      <td>3+</td>
+      <td><em>none</em></td>
+    </tr>
+  </tbody>
+</table>
+
 
 # The Operations Tier
 
+The first thing we need to install is the operations tier.  This includes
+things like our Vault, the Concourse installation, and proto-BOSH.  The rest
+of this guide assumes you have a bastion host inside your IaaS network, or
+appropriate firewall rules / security groups in place to allow all of the
+access you need.  It also assumes that you have Genesis installed.
+
 ## Bootstrapping proto-BOSH
+
+The first thing we're going to need is a Vault.  But since we use BOSH (via
+a Genesis Kit) to deploy it, we're going to need a BOSH director first.  We
+can create one (referred to as a _proto-BOSH_) using Genesis, but then we
+are at an impasse -- we need a Vault to generate and store credentials for
+this proto-BOSH, but we need the proto-BOSH to deploy the Vault.
+
+Enter `safe local`.
+
+With [safe](https://github.com/starkandwayne/safe/releases), you can set up
+a local, ephemeral Vault instance and begin to use it in place of the actual
+Vault you'll deploy soon.
+
+    $ safe local --memory
+    Now targeting (temporary) toughened-refuge at http://127.0.0.1:8201
+    This Vault is MEMORY-BACKED!
+    If you want to retain your secrets be sure to safe export.
+    Ctrl-C to shut down the Vault
+
+The name of your local Vault will vary.
+
+**Note:** the local Vault runs in the foreground, so you will want to either
+run it under something like [tmux][tmux], or open up another terminal shell
+/ SSH session.
+
+Once the local Vault is up and running, we can interact with it via `safe`:
+
+    $ safe tree
+    $ safe paths
+
+You're now ready to configure and deploy your proto-BOSH, via the **BOSH**
+Genesis Kit.  Kits roll up most of the tedious bits of configuring BOSH
+releases into usable deployments.  They can be a bit opinionated at times,
+but we think that makes for better software and systems.
+
+    $ mkdir ~/ops
+    $ cd ~/ops
+    $ genesis init -k bosh
+    Downloading Genesis kit bosh (latest version)...
+
+    Initialized empty Genesis repository in /home/u/ops/bosh-deployments
+    using the bosh/1.3.0 kit.
+
+The `genesis init` command creates a _deployments_ directory for the type of
+thing you are deploying (in our case, BOSH), and then downloads a Genesis
+Kit from GitHub.
+
+Next, we need to write an _environment_ file for our new BOSH director.
+
+    $ cd bosh-deployments
+    $ genesis new ops
+
+Genesis will then ask a whole bunch of (pertinent) questions about your
+configuration, infrastructure / cloud provider, and your preferences.
+First up, Genesis needs to know what Vault to store your credentials in:
+
+    Known Vault targets - current target indicated with a (*):
+    (*) toughened-refuge    (insecure) http://127.0.0.1:8201
+
+    Which Vault would you like to target?
+    > toughened-refuge
+    Now targeting init at http://127.0.0.1:8201
+
+The next question is about _proto-BOSH_ vs. _regular BOSH_.  We are
+deploying a proto-BOSH:
+
+    Is this a proto-BOSH director?
+    [y|n] > y
+
+After that, Genesis asks a series of questions about the networking for this
+director.  These answers will vary based on your IaaS and networking
+choices.
+
+To deploy, just run:
+
+    $ genesis deploy ops
+
+When that finishes, follow the on-screen instructions and log into the BOSH
+director:
+
+    $ genesis do ops -- login
+    Running login addon for ops
+    Logging you in as user 'admin'...
+    Using environment 'https://10.4.0.4:25555'
+
+    Email (): admin
+    Password ():
+
+    Successfully authenticated with UAA
+
+    Succeeded
+
+Before we can start using our new proto-BOSH, we need to [upload
+stemcells][bosh-sc] and [install a cloud-config][bosh-cc].  Please refer to
+the appropriate [bosh.io][bosh-io] documentation.
+
 
 ## Installing the Vault
 
+Equipped with our brand new proto-BOSH, we can now deploy our Vault, and
+move all of the credentials and X.509 certificates into that.
+
+    $ cd ~/ops
+    $ genesis init -k vault
+    Downloading Genesis kit vault (latest version)...
+
+    Initialized empty Genesis repository in /home/u/ops/vault-deployments
+    using the vault/1.4.0 kit.
+
+As before, we're going to create a new **environment** for Genesis:
+
+    $ cd ~/ops/vault-deployments
+    $ genesis new ops
+    Now targeting toughened-refuge at http://127.0.0.1:8201
+
+    Setting up new environment ops...
+
+    Is this your Genesis Vault (for storing deployment credentials)?
+    [y|n] > y
+
+Make sure to answer **y** when asked if this Vault will store your Genesis
+credentials (because it will!)
+
+Now we can deploy it (from `~/ops/vault-deployments`):
+
+    $ genesis deploy ops
+
+Once it's up and running, the last step is to initialize the Vault and get
+it ready for production use.
+
+    $ genesis do ops -- init
+
+
+## Switching Vaults
+
+Now that we have our actual Vault up and running, we need to get the secrets
+that we put into our ephemeral Vault into our persistent, production Vault.
+
+Thankfully, `safe` can help us out here too:
+
+    $ safe -T toughened-refuge export |\
+      safe -T ops-vault import
+
+Tada!
+
+
 ## Deploying SHIELD
 
-## A CI/CD Concourse
+Now that you've got data (Vault stuff _AND_ BOSH stuff!) you're going to
+want a way to back that up.  For that, we have the **SHIELD** Genesis Kit:
 
-## Monitoring (Optional)
+    $ cd ~/ops
+    $ genesis init -k shield
+    Downloading Genesis shield vault (latest version)...
 
-# Sandbox Environment
+    Initialized empty Genesis repository in /home/u/ops/shield-deployments
+    using the shield/0.5.0 kit.
 
-## An Environment BOSH
+Again, we're going to create a new **environment** for Genesis:
 
-## Deploying Cloud Foundry
+    $ cd ~/ops/shield-deployments
+    $ genesis new ops
+    Now targeting ops at https://10.4.0.6
+
+    Setting up new environment ops...
+
+    What IP address would you like to deploy SHIELD on?
+    > 10.4.0.77
+
+    Would you like to authenticate against an OAuth2 endpoint (Github / UAA)?
+    [y|n] > n
+
+And finally, deploy:
+
+    $ genesis deploy ops
+
 
 # Where To From Here?
 
@@ -46,3 +492,7 @@ get an idea of what else you can deploy into your infrastructure.
 
 
 [kits]: /docs/kits
+[tmux]: https://github.com/tmux/tmux/releases
+[bosh-io]: https://bosh.io/docs/
+[bosh-cc]: https://bosh.io/docs/update-cloud-config/
+[bosh-sc]: https://bosh.io/docs/uploading-stemcells/

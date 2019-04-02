@@ -25,11 +25,11 @@
 			<nav class="top-menu">
 				<ul class="sf-menu">
 					<li><a href="/">Home</a></li>
-					<li><a href="/blog">Blog</a></li>
+            <!--<li><a href="/blog">Blog</a></li>-->
 					<li><a href="/download">Download</a></li>
 					<li><a href="/community">Community</a></li>
 					<li><a href="/docs/getting-started">Docs</a></li>
-					<li><a href="/dev">Developers</a></li>
+          <!--<li><a href="/dev">Developers</a></li>-->
 				</ul>
 			</nav>
 			<div id="mobile-menu">
@@ -39,7 +39,7 @@
 							<li><a href="/">Home</a></li>
 							<li><a href="/download">Download</a></li>
 							<li><a href="/docs">Documentation</a></li>
-							<li><a href="/dev">Developers</a></li>
+              <!--<li><a href="/dev">Developers</a></li>-->
 						</ul>
 					</nav>
 				</div>
@@ -88,9 +88,9 @@
       <div class="col-md-8 col-md-push-1">
         <div class="content">
           <span id="v2.6.12"></span>
-          <h1 id="latest">Genesis v2.6.12</h1>
+          <h2 id="latest">Genesis v2.6.12</h2>
           
-            <h3>Bug Fixes</h3>
+            <h4>Bug Fixes</h4>
 
 <ul>
 <li>CI pipelines no longer bail out when trying to determine their
@@ -99,10 +99,10 @@ BOSH alias, because of some unfortunate interactions.</li>
             <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.12" target="_blank">Download v2.6.12 from Github</a>
           
 
-          <h1 id="older">Older Genesis Releases</h1>
+          <h2 id="older">Older Genesis Releases</h2>
           
-          <h2 id="v2.6.11">Genesis v2.6.11</h2>
-          <h3>Improvements</h3>
+          <h3 id="v2.6.11">Genesis v2.6.11</h3>
+          <h4>Improvements</h4>
 
 <ul>
 <li>Kits can now check that the required number of static_ips in each network
@@ -111,8 +111,8 @@ are available using the <code>cloud_config_needs static_ips &lt;network_name&gt;
 </ul>
           <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.11" target="_blank">Download v2.6.11 from Github</a>
           
-          <h2 id="v2.6.10">Genesis v2.6.10</h2>
-          <h3>Bug Fixes</h3>
+          <h3 id="v2.6.10">Genesis v2.6.10</h3>
+          <h4>Bug Fixes</h4>
 
 <ul>
 <li><p>Accessing a Vault over HTTP/2 now works. Previously our regex was strictly
@@ -125,8 +125,8 @@ didn't have a cloud-config to base spruce merges off of.</p></li>
 </ul>
           <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.10" target="_blank">Download v2.6.10 from Github</a>
           
-          <h2 id="v2.6.9">Genesis v2.6.9</h2>
-          <h3>Bug Fixes</h3>
+          <h3 id="v2.6.9">Genesis v2.6.9</h3>
+          <h4>Bug Fixes</h4>
 
 <ul>
 <li><p><code>genesis embed</code> now properly handles packed (2.6+) genesis
@@ -139,8 +139,8 @@ piepline.</p></li>
 </ul>
           <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.9" target="_blank">Download v2.6.9 from Github</a>
           
-          <h2 id="v2.6.8">Genesis v2.6.8</h2>
-          <h3>Improvements</h3>
+          <h3 id="v2.6.8">Genesis v2.6.8</h3>
+          <h4>Improvements</h4>
 
 <ul>
 <li><p>Certificates in kit.yml can now have subject alt names that
@@ -153,8 +153,8 @@ user-provided external domains, optionally.</p></li>
 </ul>
           <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.8" target="_blank">Download v2.6.8 from Github</a>
           
-          <h2 id="v2.6.7">Genesis v2.6.7</h2>
-          <h3>Bug Fixes</h3>
+          <h3 id="v2.6.7">Genesis v2.6.7</h3>
+          <h4>Bug Fixes</h4>
 
 <ul>
 <li>Handle proxy-injected headers when downloading assets via curl.
@@ -164,8 +164,8 @@ This no longer confounds genesis.</li>
 </ul>
           <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.7" target="_blank">Download v2.6.7 from Github</a>
           
-          <h2 id="v2.6.6">Genesis v2.6.6</h2>
-          <h3>Bug Fixes</h3>
+          <h3 id="v2.6.6">Genesis v2.6.6</h3>
+          <h4>Bug Fixes</h4>
 
 <ul>
 <li><p>Fixed bug with some older kits validating against vault paths and keys.</p></li>
@@ -174,15 +174,15 @@ STDERR so addon output can be safely piped to other commands.</p></li>
 </ul>
           <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.6" target="_blank">Download v2.6.6 from Github</a>
           
-          <h2 id="v2.6.5">Genesis v2.6.5</h2>
-          <h3>Improvements</h3>
+          <h3 id="v2.6.5">Genesis v2.6.5</h3>
+          <h4>Improvements</h4>
 
 <ul>
 <li>Improved lookup command to be able to handle accessing array elements by
 index or by element hash match (ie <code>myarray[somekey=specific-value]</code>)</li>
 </ul>
 
-<h3>Bug Fixes</h3>
+<h4>Bug Fixes</h4>
 
 <ul>
 <li>Restored <code>vaulted()</code> subroutine: fixes error in <code>vault_path</code> and 
@@ -212,12 +212,12 @@ index or by element hash match (ie <code>myarray[somekey=specific-value]</code>)
 						<ul class="list">
 							<li><a href="/download">Download Genesis</a></li>
 							<li><a href="/docs/getting-started">Getting Started</a></li>
-							<li><a href="/docs">Documentation</a></li>
 							<li><a href="/community">Community Support</a></li>
 						</ul>
 					</div>
 				</div>
 
+        <!--
 				<div class="col-md-4">
 					<div class="links">
 						<h5>Reference</h5>
@@ -228,6 +228,7 @@ index or by element hash match (ie <code>myarray[somekey=specific-value]</code>)
 						</ul>
 					</div>
 				</div>
+        -->
 			</div>
 		</div>
 

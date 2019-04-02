@@ -38,7 +38,7 @@ sub v {
 	     +  $rev;
 }
 
-$_->{notes} =~ s/^#/###/gm for @{$releases->{all}};
+$_->{notes} =~ s/^#/####/gm for @{$releases->{all}};
 $releases->{all} = [sort { v($b->{version}) cmp v($a->{version}) } @{$releases->{all}}];
 render $releases,
 	using  => 'download.tt',
