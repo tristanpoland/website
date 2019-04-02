@@ -14,7 +14,7 @@
                   <a class="btn white-btn large-btn"
                      href="/docs/getting-started">Get Started</a>
                   <a class="btn dark-btn large-btn"
-                     href="https://starkandwayne.activehosted.com/f/24">Contact us</a>
+                     href="https://starkandwayne.com/contact-us-genesis/">Contact us</a>
                 </div>
               </div>
             </div>
@@ -103,7 +103,7 @@
         <div class="center">
           <p>[% page.attrs.copy.enterprise %]</p>
           <div class="buttons-section" style="margin-top: 45px">
-            <a class="btn large-btn white-btn" href="https://starkandwayne.activehosted.com/f/24">Contact Us</a>
+            <a class="btn large-btn white-btn" href="https://starkandwayne.com/contact-us-genesis/">Contact Us</a>
           </div>
         </div>
       </div>
