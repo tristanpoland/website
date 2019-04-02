@@ -283,6 +283,10 @@ need to be access by application containers, or the outside world, directly.</p>
   </tbody>
 </table>
 
+<p>That's a minimum of seventeen (17) IPs.  In lab / sandbox environments, we
+recommend at least a <code>/27</code> (30 hosts) network, and in larger environments
+that may see scaling, try a <code>/26</code> (62 hosts) or a <code>/25</code> (126 hosts).</p>
+
 <h3>Edge Network</h3>
 
 <p>This network exists as a separate contiguous blog of IPs to allow for
@@ -315,6 +319,11 @@ of the Cloud.</p>
   </tbody>
 </table>
 
+<p>At the low end of the scaling spectrum, you're looking at a minimum of four
+(4) IPs, so a <code>/29</code> is workable.  In larger environments, where you're going
+to scale the gorouters to handle more concurrent connections, we generally
+recommend a <code>/27</code> (30 hosts).</p>
+
 <h3>Database Network</h3>
 
 <p>The database is cordoned off in its own network to ensure that the highest
@@ -336,6 +345,8 @@ sensitive data of a Cloud Foundry instance.</p>
     </tr>
   </tbody>
 </table>
+
+<p>A <code>/30</code> (2 hosts) ought to suffice for this.</p>
 
 <h3>Runtime Network</h3>
 
@@ -359,6 +370,12 @@ from the rest of the infrastructure as needed.</p>
   </tbody>
 </table>
 
+<p>The size of your runtime network is driven entirely by the size of your
+Cloud Foundry, and how many applications you are running.  We recommend
+starting with a <code>/25</code> (126 hosts) for lab / sandbox environments, and
+scaling up to as large as you need &mdash; usually a <code>/24</code> through a <code>/20</code>
+(or beyond).</p>
+
 <h1>The Operations Tier</h1>
 
 <p>The first thing we need to install is the operations tier.  This includes
@@ -372,7 +389,7 @@ access you need.  It also assumes that you have Genesis installed.</p>
 <p>The first thing we're going to need is a Vault.  But since we use BOSH (via
 a Genesis Kit) to deploy it, we're going to need a BOSH director first.  We
 can create one (referred to as a <em>proto-BOSH</em>) using Genesis, but then we
-are at an impasse &amp;mdash we need a Vault to generate and store credentials for
+are at an impasse &mdash; we need a Vault to generate and store credentials for
 this proto-BOSH, but we need the proto-BOSH to deploy the Vault.</p>
 
 <p>Enter <code>safe local</code>.</p>
@@ -381,7 +398,7 @@ this proto-BOSH, but we need the proto-BOSH to deploy the Vault.</p>
 a local, ephemeral Vault instance and begin to use it in place of the actual
 Vault you'll deploy soon.</p>
 
-<pre><code>$ safe local &amp;mdashmemory
+<pre><code>$ safe local --memory
 Now targeting (temporary) toughened-refuge at http://127.0.0.1:8201
 This Vault is MEMORY-BACKED!
 If you want to retain your secrets be sure to safe export.
@@ -455,7 +472,7 @@ choices.</p>
 <p>When that finishes, follow the on-screen instructions and log into the BOSH
 director:</p>
 
-<pre><code>$ genesis do ops &amp;mdash login
+<pre><code>$ genesis do ops -- login
 Running login addon for ops
 Logging you in as user 'admin'...
 Using environment 'https://10.4.0.4:25555'
@@ -508,7 +525,7 @@ credentials (because it will!)</p>
 <p>Once it's up and running, the last step is to initialize the Vault and get
 it ready for production use.</p>
 
-<pre><code>$ genesis do ops &amp;mdash init
+<pre><code>$ genesis do ops -- init
 </code></pre>
 
 <h2>Switching Vaults</h2>
