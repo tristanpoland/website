@@ -3,8 +3,6 @@
 title:  Getting Started
 url:    /docs/getting-started/index.html
 format: markdown
-replace:
-  "--": "&mdash"
 --- |-
 
 # Plan The Environments
@@ -314,7 +312,7 @@ access you need.  It also assumes that you have Genesis installed.
 The first thing we're going to need is a Vault.  But since we use BOSH (via
 a Genesis Kit) to deploy it, we're going to need a BOSH director first.  We
 can create one (referred to as a _proto-BOSH_) using Genesis, but then we
-are at an impasse -- we need a Vault to generate and store credentials for
+are at an impasse &mdash; we need a Vault to generate and store credentials for
 this proto-BOSH, but we need the proto-BOSH to deploy the Vault.
 
 Enter `safe local`.
