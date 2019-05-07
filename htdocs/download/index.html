@@ -63,9 +63,11 @@
     <div class="row">
       <div class="col-md-3 toc">
         <ul>
-          <li><a href="#latest">Latest Release (2.6.13)</a></li>
+          <li><a href="#latest">Latest Release (2.6.14)</a></li>
           <li><a href="#older">Older Releases</a>
             <ul>
+              
+              <li><a href="#v2.6.13">2.6.13</a></li>
               
               <li><a href="#v2.6.12">2.6.12</a></li>
               
@@ -89,10 +91,36 @@
       </div>
       <div class="col-md-8 col-md-push-1">
         <div class="content">
-          <span id="v2.6.13"></span>
-          <h2 id="latest">Genesis v2.6.13</h2>
+          <span id="v2.6.14"></span>
+          <h2 id="latest">Genesis v2.6.14</h2>
           
-            <h4>Feature: Better Integration of Safe</h4>
+            <h4>Improvements</h4>
+
+<ul>
+<li><code>prompt_for</code> not treats any non-option arguments as individual lines, making
+it easy to have multiple-line prompts in BASH.</li>
+</ul>
+
+<h4>Bug Fixes</h4>
+
+<ul>
+<li>Temporary directory for <code>offer_environment_editor</code> helper now works on Linux</li>
+<li>Fixed misnamed method call in <code>ci-pipeline-deploy</code></li>
+<li>Updated ci pipeline to resolve cyclic runaway on rc version bumps</li>
+</ul>
+
+<h4>Software Updates</h4>
+
+<ul>
+<li>Bumped dependency on <code>spruce</code> to 1.20.0 to support kv v2 backends.</li>
+</ul>
+            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.14" target="_blank">Download v2.6.14 from Github</a>
+          
+
+          <h2 id="older">Older Genesis Releases</h2>
+          
+          <h3 id="v2.6.13">Genesis v2.6.13</h3>
+          <h4>Feature: Better Integration of Safe</h4>
 
 <p>Since inception, Genesis has used your local <code>safe</code> target to determine what
 vault is being used for the environment secrets.  If you only have a single
@@ -288,10 +316,7 @@ trace mode.</p></li>
 <li><p>Trace and debug output will always be in color, even if redirect.  To turn
 off color, use --no-color or set NOCOLOR environment variable to 'y'</p></li>
 </ul>
-            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.13" target="_blank">Download v2.6.13 from Github</a>
-          
-
-          <h2 id="older">Older Genesis Releases</h2>
+          <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.13" target="_blank">Download v2.6.13 from Github</a>
           
           <h3 id="v2.6.12">Genesis v2.6.12</h3>
           <h4>Bug Fixes</h4>
