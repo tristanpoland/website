@@ -63,11 +63,11 @@
     <div class="row">
       <div class="col-md-3 toc">
         <ul>
-          <li><a href="#latest">Latest Release (2.6.14)</a></li>
+          <li><a href="#latest">Latest Release (2.6.13)</a></li>
           <li><a href="#older">Older Releases</a>
             <ul>
               
-              <li><a href="#v2.6.13">2.6.13</a></li>
+              <li><a href="#v2.6.14">2.6.14</a></li>
               
               <li><a href="#v2.6.12">2.6.12</a></li>
               
@@ -91,36 +91,10 @@
       </div>
       <div class="col-md-8 col-md-push-1">
         <div class="content">
-          <span id="v2.6.14"></span>
-          <h2 id="latest">Genesis v2.6.14</h2>
+          <span id="v2.6.13"></span>
+          <h2 id="latest">Genesis v2.6.13</h2>
           
-            <h4>Improvements</h4>
-
-<ul>
-<li><code>prompt_for</code> not treats any non-option arguments as individual lines, making
-it easy to have multiple-line prompts in BASH.</li>
-</ul>
-
-<h4>Bug Fixes</h4>
-
-<ul>
-<li>Temporary directory for <code>offer_environment_editor</code> helper now works on Linux</li>
-<li>Fixed misnamed method call in <code>ci-pipeline-deploy</code></li>
-<li>Updated ci pipeline to resolve cyclic runaway on rc version bumps</li>
-</ul>
-
-<h4>Software Updates</h4>
-
-<ul>
-<li>Bumped dependency on <code>spruce</code> to 1.20.0 to support kv v2 backends.</li>
-</ul>
-            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.14" target="_blank">Download v2.6.14 from Github</a>
-          
-
-          <h2 id="older">Older Genesis Releases</h2>
-          
-          <h3 id="v2.6.13">Genesis v2.6.13</h3>
-          <h4>Feature: Better Integration of Safe</h4>
+            <h4>Feature: Better Integration of Safe</h4>
 
 <p>Since inception, Genesis has used your local <code>safe</code> target to determine what
 vault is being used for the environment secrets.  If you only have a single
@@ -316,7 +290,231 @@ trace mode.</p></li>
 <li><p>Trace and debug output will always be in color, even if redirect.  To turn
 off color, use --no-color or set NOCOLOR environment variable to 'y'</p></li>
 </ul>
-          <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.13" target="_blank">Download v2.6.13 from Github</a>
+            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.13" target="_blank">Download v2.6.13 from Github</a>
+          
+            <h4>Feature: Better Integration of Safe</h4>
+
+<p>Since inception, Genesis has used your local <code>safe</code> target to determine what
+vault is being used for the environment secrets.  If you only have a single
+vault, this is fine.</p>
+
+<p>However, some systems have multiple <code>safe</code> targets, and if you switch targets,
+you may inadvertantly try to use a vault where your environment's targets are
+not located, or worse, write, delete or overwrite secrets in the wrong
+vault.</p>
+
+<p>Furthermore, when repositories are used on more than one system, there is no
+mechanism to convey what <code>safe</code> target needs to be used for that repository.</p>
+
+<p>As of this release, you can now <em>register</em> the correct vault with a deployment
+repository, so that it always uses that vault, regardless of what the local
+safe configuration has as the target.</p>
+
+<p>To provide this behaviour, the following changes have been made:</p>
+
+<ul>
+<li><p><code>genesis init</code> will ask for the user to select a vault from their safe
+targets list.  Alternatively, the correct safe target can be passed in via
+the --vault <target> option.</p></li>
+<li><p><code>genesis new</code> no longer prompts for the vault when creating a new
+environment.</p></li>
+<li><p>When using a repository on a new system, if the registered vault is not
+known, or if there are multiple targets for the registered vault url,
+instructions will be provided instructing the user how to ensure the
+correct vault is available.</p></li>
+<li><p>To view and manage what vault is registered, the <code>genesis secrets-provider</code>
+command is used.  Without any arguments it displays the status of the
+registered vault.</p></li>
+</ul>
+
+<p>```
+$ genesis secrets-provider</p>
+
+<p>Secrets provider for concourse deployment at /path/to/concourse-deployments:
+         Type: Safe/Vault
+          URL: http://127.0.0.1:8201 (insecure)
+  Local Alias: toughened-coffer
+       Status: ok
+```</p>
+
+<p>With the -i|--interactive option, it will provide you with the same menu of
+  valid safe targets that is presented when creating a new repository.  The
+  selected target will then be registered to the repository.  Similarly, you
+  can skip the menu and just specify the target name or full url as an
+  argument.</p>
+
+<p>Finally, the -c|--clear option can be used to remove the registered safe,
+  and put the deployment repository in Legacy mode.  While this is highly not
+  recommended, if you <strong>need</strong> to use the old model of relying on the system-
+  targetted safe, this can be used.</p>
+
+<ul>
+<li><p>The deployment repository configuration file <code>.genesis/config</code> is updated
+when <code>genesis secrets-provider</code> is called with an argument, and should not
+be edited by hand.  If there is a use-case for need to change this file
+manually, please open an issue.</p></li>
+<li><p>You must have at least one safe target with a unique url.  Normally, when
+initially deploying your first BOSH and Vault using genesis, you will stand
+up a local vault using <code>safe local -m</code>, then once the permanent Vault is in
+place, you will move your secrets to that Vault, and then update your
+registered secrets provider to point to the permanent Vault.</p>
+
+<p>More information on the design of and reason for this change can be found at
+https://trello.com/c/n4WhOC6p</p></li>
+</ul>
+
+<p><strong>Note on Legacy Mode:</strong></p>
+
+<p>All existing deployment repositories will run in Legacy mode until you use
+<code>genesis secrets-provider</code> to register a vault with them.  While in Legacy
+mode, the --vault option is valid for the <code>new</code>, <code>check-secrets</code>, <code>add-secrets</code>,
+<code>rotate-secrets</code> and <code>secrets</code> subcommands to specify the safe target you want
+to use.  The <code>new</code> subcommand will error if in Legacy mode and no <code>--vault</code>
+option is provided.  All other command will use whatever the current vault
+being used by the system for determining what vault to access.</p>
+
+<p><strong>Note on valid safe targets:</strong></p>
+
+<p>For a safe target to qualify for a registered vault, it must be the
+only target that uses its url (this is due to how safe associates the
+authentication token).  If you have multiple aliases for a given URL, remove
+the duplicates, or if you need separate alais, use /etc/hosts to create unique
+domain names that can be used as the host.</p>
+
+<h4>Improvements</h4>
+
+<ul>
+<li><p>Creating new environment will now warn you that existing secrets exist under
+the path set for the environment.  You will then be prompted to allow them
+to be deleted, or abort the creation of the environment.  This serves two
+purposes: It informs you in case you're accidentally about to overwrite
+existing secrets, and ensures there are no out-dated secrets left around in
+the case that you intended to over-write them.</p></li>
+<li><p>Reorganized environment file for future improvements.  Introduced new
+<code>genesis</code> top-level key to hold Genesis-level values, leaving <code>params</code> for
+kit-level values.  This moves <code>params.env</code> to <code>genesis.env</code>, and
+<code>params.vault</code> to <code>genesis.secrets_path</code>.  Existing kits that make use of
+<code>params.env</code> will continue to be supported (see below in Kit Authorship
+Improvments)</p></li>
+<li><p><code>genesis download</code> is now <code>genesis fetch-kit</code>, and supports fetching new
+versions of local kits without having to specify any arguments.</p></li>
+<li><p>Cleaned up check and deployment interface to move towards a more standardized
+output.</p></li>
+<li><p>BOSH connection checks now first check if the host and port are reachable
+and listening rather than hanging while attempting to connect.</p></li>
+</ul>
+
+<h4>Kit Authorship Improvements</h4>
+
+<ul>
+<li><p>Improved validation when compiling kits.</p>
+
+<p><strong>Breaking Change:</strong>  <code>genesis compile-kit</code> will now error if you are using
+legacy keywords in your kit.yml, such as <code>subkits</code> and <code>params</code>.  If you are
+maintaining a legacy kit and need to compile a new version, you may use the
+<code>-f</code> option to force the compilation, but be warned, this will bypass all
+the validation.  It is recommended instead to bring your kit up to the
+latest standards.</p></li>
+<li><p>Kit's <code>genesis_version_minimum</code> now means both <em>I need this version of
+Genesis</em> (original intention) as well as <em>I fully support this verison of
+Genesis.</em> This means it can be used to deprecate or protect from deprecation
+features that are introduced in new versions of Genesis.</p>
+
+<p>For example, kits that don't specify a <code>genesis_version_minimum</code> of 2.6.13
+will not be expected to support the new <code>genesis.env</code> environment parameter,
+so Genesis will auto-populate the <code>params.env</code> for them, ensuring that any
+reliance on this does not break existing kits.</p></li>
+<li><p>Added <code>genesis_config_block</code> helper to print the <code>genesis:</code> block to standard
+output, so it can be redirected into the environment file being constructed
+by the <code>new</code> hook.  Use this instead of constructing it yourself to ensure
+future compatability without having to update your kit (further changes in
+this area are coming).</p></li>
+<li><p>Added <code>bullet</code> hooks helper to print green checkmark (<code>bullet "√"</code>) or red X
+(<code>bullet "x"</code>) in the same style that <code>genesis check-secrets</code> uses.</p></li>
+<li><p><code>prompt_for line</code> helper can now accept an empty response by using the
+<code>--default ''</code> option.</p></li>
+<li><p>Improved <code>cloud_config_needs</code>:</p>
+
+<ul>
+<li><p>Now uses same green checkmark/red x that check-secrets uses. <em>(uses
+<code>bullet</code> helper above)</em></p></li>
+<li><p><code>static_ip</code> checks for both valid static ip ranges as well as sufficient
+counts.</p></li>
+</ul></li>
+<li><p>Added the following environment variables for use in hooks:</p>
+
+<ul>
+<li><p><code>SAFE_TARGET</code> - while not to be directly used, this ensures all safe calls
+will target the environments registered vault.</p></li>
+<li><p><code>GENESIS_TOPDIR</code> - for kits that alter $HOME, this will point back to the
+Genesis top directory (usually ~/.geese) even after $HOME is changed.</p></li>
+</ul></li>
+</ul>
+
+<h4>Kit Deprecations</h4>
+
+<ul>
+<li><p>Setting your kit to use <code>genesis_version_minimum</code> of 2.6.13 (or higher) have
+the following changes.</p>
+
+<ul>
+<li><p>The root path, env name and vault prefix will no longer be provided as
+positional arguments to the <code>hooks/new</code> script.  Instead, the script must
+make use of the <code>GENESIS_ROOT</code>, <code>GENESIS_ENVIRONMENT</code>, and
+<code>GENESIS_SECRETS_PATH</code> environment variables respectively.</p></li>
+<li><p><code>params.env</code> will no longer be provided in the environment file stack.</p></li>
+</ul></li>
+</ul>
+
+<h4>Bug Fixes</h4>
+
+<ul>
+<li><p><code>genesis deploy</code> checks presence of secrets prior to trying to build a
+manifest</p></li>
+<li><p>CA Certs specified in kits honour <code>valid_for</code> and <code>names</code> properties.  Names
+are added as Subject Alternative Names.</p></li>
+<li><p>Fixed error in minimum Genesis version specification in generated template
+and validation.</p></li>
+</ul>
+
+<h4>Developer Support</h4>
+
+<ul>
+<li><p>Improved output for trace and debug output so its move visually obvious.</p></li>
+<li><p>Added <code>dump_var</code> function that will dump the contents of one or more
+variables when in debug or trace mode (as per Data::Dumper)</p></li>
+<li><p>Added <code>dump_stack</code> function that will dump the stack trace when in debug or
+trace mode.</p></li>
+<li><p>Trace and debug output will always be in color, even if redirect.  To turn
+off color, use --no-color or set NOCOLOR environment variable to 'y'</p></li>
+</ul>
+            <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.13" target="_blank">Download v2.6.13 from Github</a>
+          
+
+          <h2 id="older">Older Genesis Releases</h2>
+          
+          <h3 id="v2.6.14">Genesis v2.6.14</h3>
+          <h4>Improvements</h4>
+
+<ul>
+<li><code>prompt_for</code> not treats any non-option arguments as individual lines, making
+it easy to have multiple-line prompts in BASH.</li>
+</ul>
+
+<h4>Bug Fixes</h4>
+
+<ul>
+<li>Temporary directory for <code>offer_environment_editor</code> helper now works on Linux</li>
+<li>Fixed misnamed method call in <code>ci-pipeline-deploy</code></li>
+<li>Updated ci pipeline to resolve cyclic runaway on rc version bumps</li>
+</ul>
+
+<h4>Software Updates</h4>
+
+<ul>
+<li>Bumped dependency on <code>spruce</code> to 1.20.0 to support kv v2 backends.</li>
+</ul>
+          <a href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.14" target="_blank">Download v2.6.14 from Github</a>
           
           <h3 id="v2.6.12">Genesis v2.6.12</h3>
           <h4>Bug Fixes</h4>
