@@ -59,7 +59,12 @@
       "notes": "# Bug Fixes\n\n- Fixes code-order bug in `ci-pipeline-deploy` that was introduced in v2.6.13\n  that caused an invalid `.saferc` that was missing the vault token to be used\n  in the pipeline.\n",
       "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.15",
       "version": "2.6.15"
+    },
+    {
+      "notes": "# Bug Fixes\n\n- Fixes error in ci-pipeline-deploy when skip verify is false\n",
+      "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.16",
+      "version": "2.6.16"
     }
   ],
-  "latest": "2.6.15"
+  "latest": "2.6.16"
 }
