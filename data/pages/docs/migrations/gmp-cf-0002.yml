@@ -7,6 +7,11 @@ toplinks: yes
 sticknav: yes
 --- |-
 
+_Note: previously, this GMP had stated that 1.4.0 of the Cloud Foundry Genesis
+Kit would be when the Consul components were officially removed.  1.4.0 was
+released on May 2nd, 2019, without this removal.  This GMP has been updated
+to instead target the 1.5.0 release._
+
 # Overview
 
 With BOSH DNS a mature product and an integral component in many BOSH
@@ -22,7 +27,7 @@ virtual machines. This is the second step of the two-step phase, which
 enables a zero-downtime upgrade path from Consul DNS to BOSH DNS.
 
 However, if an operator wishes to remove all Consul related services
-from their Cloud Foundry deployment without waiting for v1.4, they may
+from their Cloud Foundry deployment without waiting for v1.5, they may
 do so with a temporary feature flag implemented just for v1.3 called
 `migrate-1.3-without-consul`. This GMP will explain the steps
 necessary to use this feature.
@@ -112,7 +117,7 @@ If you do not see any `consul_etcd` VMs listed, the feature was
 successfully applied. 
 
 It is necessary to keep the `migrate-1.3-without-consul` feature until
-the v1.4 update is released. Genesis Cloud Foundry Kit v1.4 will
+the v1.5 update is released. Genesis Cloud Foundry Kit v1.5 will
 remind you to remove the feature, as it will no longer be needed.
 
 # Help & Support
