@@ -506,7 +506,12 @@ And finally, deploy:
 You might want to check out the [list of available Genesis Kits][kits] to
 get an idea of what else you can deploy into your infrastructure.
 
+# Genesis Migrations
 
+Occasionally, upgrades to kits require additional manual steps to complete successfully.
+Guides to these migrations can be found [here][migrations]. 
+
+[migrations]: /docs/migrations
 [kits]: /docs/kits
 [tmux]: https://github.com/tmux/tmux/releases
 [bosh-io]: https://bosh.io/docs/
