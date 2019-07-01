@@ -166,6 +166,44 @@ apply the changes with a <code>genesis deploy</code>:</p>
 removing all <code>consul_etcd</code> VMs currently deployed. There will be no
 downtime during this deployment.</p>
 
+<h2>Deployments With Multiple Cell Instance Groups</h2>
+
+<p>If your deployment has multiple instance groups for cells (possibly for
+isolation segments), then you will need to add additional DNS aliases,
+or else the Auctioneer will not be able to locate Rep instances on the
+additional instance groups. As a result, applications will not be deployed
+to the additional cell instance groups.</p>
+
+<p>To map the correct DNS aliases to the additional cell instance groups, add
+the following to your environment file.</p>
+
+<pre><code>addons:
+- name: bosh-dns-aliases
+    jobs:
+    - name: bosh-dns-aliases
+        release: bosh-dns-aliases
+        properties:
+            aliases:
+            - domain: '_.cell.service.cf.internal'
+                targets:
+                - (( append ))
+                - query: '_'
+                    instance_group: extra-cell-instance-group-1-name
+                    deployment: (( grab name ))
+                    network: (( grab params.cf_runtime_network ))
+                    domain: bosh
+                - query: '_'
+                    instance_group: extra-cell-instance-group-2-name
+                    deployment: (( grab name ))
+                    network: (( grab params.cf_runtime_network ))
+                    domain: bosh
+</code></pre>
+
+<p>Add a block under the targets array for each additional instance
+group that you have. Change the instance_group value to the name
+of each additional cell instance group. To be clear, you do not
+need to add one for the instance group named cell.</p>
+
 <h2>Verification &amp; Closing Notes (Final step)</h2>
 
 <p>Once the deployment is complete, you can verify that Consul is no
