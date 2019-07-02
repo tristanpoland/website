@@ -114,26 +114,26 @@ to the additional cell instance groups.
 To map the correct DNS aliases to the additional cell instance groups, add
 the following to your environment file.
 
-  addons:
-  - name: bosh-dns-aliases
-    jobs:
-    - name: bosh-dns-aliases
-      release: bosh-dns-aliases
-      properties:
-        aliases:
-        - domain: '_.cell.service.cf.internal'
-          targets:
-          - (( append ))
-          - query: '_'
-            instance_group: extra-cell-instance-group-1-name
-            deployment: (( grab name ))
-            network: (( grab params.cf_runtime_network ))
-            domain: bosh
-          - query: '_'
-            instance_group: extra-cell-instance-group-2-name
-            deployment: (( grab name ))
-            network: (( grab params.cf_runtime_network ))
-            domain: bosh
+	addons:
+	- name: bosh-dns-aliases
+	  jobs:
+	  - name: bosh-dns-aliases
+	    release: bosh-dns-aliases
+	    properties:
+	      aliases:
+	      - domain: '_.cell.service.cf.internal'
+	        targets:
+	        - (( append ))
+	        - query: '_'
+	          instance_group: extra-cell-instance-group-1-name
+	          deployment: (( grab name ))
+	          network: (( grab params.cf_runtime_network ))
+	          domain: bosh
+	        - query: '_'
+	          instance_group: extra-cell-instance-group-2-name
+	          deployment: (( grab name ))
+	          network: (( grab params.cf_runtime_network ))
+	          domain: bosh
 
 Add a block under the targets array for each additional instance
 group that you have. Change the instance\_group value to the name
