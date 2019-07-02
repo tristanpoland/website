@@ -136,7 +136,7 @@ the following to your environment file.
 	          domain: bosh
 
 Add a block under the targets array for each additional instance
-group that you have. Change the instance\_group value to the name
+group that you have. Change the `instance\_group` value to the name
 of each additional cell instance group. To be clear, you do not
 need to add one for the instance group named cell.
 
