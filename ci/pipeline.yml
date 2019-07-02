@@ -19,9 +19,12 @@ meta:
 jobs:
   - name: build
     plan:
-      - aggregate:
-        - get: changes
+      - in_parallel:
+        - get: git-trigger
+          resource: changes
           trigger: true
+        - get: changes
+          resource: code
         - get: releases
           trigger: true
       - task: build
@@ -62,7 +65,7 @@ jobs:
           repository: pushme/changes
   - name: staging
     plan:
-      - aggregate:
+      - in_parallel:
         -  get: code
            passed: [build]
            trigger: true
@@ -103,7 +106,7 @@ jobs:
             text:     'Staged changes at <http://staging.genesisproject.io>.  After review, you can <https://pipes.starkandwayne.com/teams/main/pipelines/genesisproject.io|publish them (to production).>'
   - name: prod
     plan:
-      - aggregate:
+      - in_parallel:
         - { get: code, passed: [staging] }
       - task: build
         config:
