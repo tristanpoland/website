@@ -167,6 +167,7 @@ resources:
     private_key: (( grab meta.github.website.private_key ))
     ignore_paths:
       - htdocs
+      - blogs
 
 - name: code
   type: git
