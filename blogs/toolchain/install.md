@@ -7,7 +7,7 @@ binary and putting it into your path.
 
 ## Table of Contents
 
-* [genesis](#genesis-bosh-spruce-and-safe)
+* [genesis, bosh, spruce, and safe](#genesis-bosh-spruce-and-safe)
 * [jq](#jq)
 * [vault](#vault)
 * [cf](#cf)
