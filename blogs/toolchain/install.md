@@ -26,7 +26,7 @@ sudo apt-get install genesis
 ## jq
 
 ```
-apt-get install jq
+sudo apt-get install jq
 ```
 
 <a name="vault"></a>
