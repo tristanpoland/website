@@ -86,142 +86,56 @@ subscription_id = "01234567-89ab-cdef-0123-456789abcdef"
 tenant_id       = "01234567-89ab-cdef-0123-456789abcdef"
 client_id       = "01234567-89ab-cdef-0123-456789abcdef"
 client_secret   = "supersecret"
+resource_group_name = "genesis"
+location = "East US"
+starting_address = "10.0.0.0"
+dns_servers = ["1.1.1.1", "1.0.0.1"]
+ssh_keys = [ "ssh-rsa ..." ]
+bastion_username = "ubuntu"
 ```
 
-You should substitute the placeholder values with the values you noted down
-earlier.
+The `subscription_id`, `tenant_id`, `client_id`, and `client_secret` were all
+values that you should have taken note of while making your app registration.
+The `resource_group_name` is the name of the resource group that you'd like
+Terraform to create. 
 
-Now, create another file - `azure.tf`. This will be our main configuration file.
-Here, we need to define our provider. We give it the information it needs to
-authenticate and target our subscription. The following block can likely be
-pasted in verbatim.
+The `location` is the Azure location that you wish resources to be created in. 
 
-```hcl
-variable "subscription_id" {}
-variable "tenant_id"       {}
-variable "client_id"       {}
-variable "client_secret"   {}
+The `starting_address` is the first address of a `/16` range you'd like the
+network to use. Try to select a range that isn't in use elsewhere in your
+subscription, in case you ever decide to peer the networks.
 
-provider "azurerm" {
-	subscription_id = "${var.subscription_id}"
-	tenant_id       = "${var.tenant_id}"
-	client_id       = "${var.client_id}"
-	client_secret   = "${var.client_secret}"
-}
+`dns_servers` are the default dns servers that will be used by resources in the
+network. By default, its set to use the public Cloudflare servers.
+
+`ssh_keys` are the public keys that will be put on in the `authorized_keys`
+file of the bastion box that gets created. You'll need to provide one in order
+to log in.
+
+Once configured, run the following from the directory with your `azure.tf` and
+`terraform.tfvars` file.
+
 ```
-If you're unfamiliar with Terraform, take note of the `${foo}` syntax. This is how
-you reference values from elsewhere in the document. The `var` prefix means
-that the value was defined in a variable block, but you may also see `data`, if
-something is referenced in a data block.
-
-## Making a Resource Group
-
-A resource group is a organizational tool for all of the objects you want to
-make in Azure. VMs, Virtual Networks, IPs, and just about anything else you can
-create get associated with a resource group. We need to make one. 
-
-You can call yours whatever you want, but I'm going to call mine `genesis-doc`.
-Append the resource group your `azure.tf` file:
-
-```hcl
-resource "azurerm_resource_group" "genesis" {
-	name      = "genesis-doc"
-	location  = "East US"
-}
+terraform apply
 ```
 
-The name should be whatever you want to call it. The location should be whereever
-you want your objects to exist. The Azure reference for available region names
-can be found [here](https://azure.microsoft.com/en-us/global-infrastructure/regions/).
+Take note of the output variables after a successful apply, as they contain the
+answers to many of the questions that Genesis will ask you later.
 
-## Setting Up Your Network
+## Setting Up Your Bastion Host
 
-A virtual network in Azure is a virtual address space that can be split into
-subnets.  I am going to create mine at `10.0.0.0/16`. Depending on your
-anticipated needs, you may need to make a larger or smaller address space.
-Additionally, if somebody in your workspace is already using a particular
-range, you may want to start your range at a different point in order to avoid
-address collisions should you ever peer the networks.
-
-Here's an example of a virtual network definition:
-
-```hcl
-resource "azurerm_virtual_network" "genesis-bosh-east" {
-  name          = "genesis-bosh-east"
-  location      = "${azurerm_resource_group.genesis-doc.location}"
-  resource_group_name = "${azurerm_resource_group.genesis-doc.name}"
-  address_space = ["10.0.0.0/16"]
-  dns_servers   = ["1.1.1.1", "1.0.0.1"]
-}
-```
-
-You can, again, give it any name you want. The address space should be set
-according to what your needs are.  For DNS servers, I've opted for Cloudflare's
-public DNS, but if you have a preference or some DNS servers internal to your
-network already, you can set the DNS settings to point to those instead.
-
-We now need to slice a subnet out of that address space for our control plane. 
-A `/24` is usually suitable, so that's what I'll be making. Again, this can be
-changed to your unique needs.
-
-```hcl
-resource "azurerm_subnet" "genesis-bosh-east-controlplane" {
-  name                 = "genesis-bosh-east-controlplane-subnet"
-  resource_group_name  = "${azurerm_resource_group.genesis-doc.name}"
-  virtual_network_name = "${azurerm_virtual_network.genesis-bosh-east.name}"
-  address_prefix       = "10.0.0.0/24"
-}
-```
-
-And for now, we'll also need to give the subnet a security group. The default
-rules block all access from the internet, but allow all traffic outbound to
-the internet. They also allow bidirectional traffic within the virtual network.
-There's a fair chance that your current jumpbox is not located in the virtual
-network, so we'll need to make a special rule that allows traffic from your
-jumpbox in the network security group we create.
-
-After defining the network security group, you'll create an association between
-the security group and the subnet to apply it.
-
-```hcl
-resource "azurerm_network_security_group" "controlplane" {
-  name     = "genesis-controlplane-sg"
-  location = "${azurerm_resource_group.genesis-doc.location}"
-  resource_group_name = "${azurerm_resource_group.genesis-doc.name}"
-
-  security_rule {
-    name                       = "allow_jumpbox_access"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "1.2.3.4/32"
-    destination_address_prefix = "*"
-  }
-}
-
-resource "azurerm_subnet_network_security_group_association" "genesis-bosh-east-controlplane-sg-a" {
-  subnet_id   = "${azurerm_subnet.genesis-bosh-east-controlplane.id}"
-  network_security_group_id = "${azurerm_network_security_group.controlplane.id}"
-}
-```
-
-The source address prefix uses `1.2.3.4` as a placeholder; you'll need to provide your own jumpbox
-IP address instead.
-
-Once done, if everything was configured properly, you can run `terraform apply`.
-Carefully read the changelog that is presented by Terraform, and enter `yes` if
-you find everything suitable. Terraform will then create all of the things that
-were defined in the configuration file.
+Once your bastion box is created, you should be able to ssh into it if you
+configured your Terraform file properly. Once inside, you'll need to install
+the tools needed for Genesis. For instructions on how to install these tools,
+see [this document](https://github.com/genesis-community/website/blob/master/blogs/toolchain/install.md).
 
 ## Starting a Local Vault Instance
 
 We use the [Safe CLI](https://github.com/starkandwayne/safe) to interact with
-Vault in general. In this case, we're going to use it to quickly set up a
-temporary local Vault instance that Genesis can use until we set up a permanent
-Vault instance later.
+Vault in general. You should have it installed after after following the
+instructions on setting up your bastion host. We're going to use Safe to
+quickly set up a temporary local Vault instance that Genesis can use until we
+are able to set up a permanent Vault through BOSH at a later time.
 
 To do this, open a separate shell session / tmux pane on the jumpbox and run 
 
@@ -229,8 +143,8 @@ To do this, open a separate shell session / tmux pane on the jumpbox and run
 safe local --memory
 ```
 
-Safe will output the target name of the new Vault and authenticate to it
-automatically.
+Safe will output the target name of the new Vault, target it, and authenticate
+to it automatically.
 
 ## Configuring a New BOSH Installation
 
@@ -255,89 +169,95 @@ genesis new snw-eastus-controlplane
 ```
 
 You'll now be walked through a series of questions about the deployment you're
-about to make.
+about to make. The prompts will look something like the following:
 
-Of note, if this is your first BOSH, then this _is_ a Proto-BOSH director. 
+```
+ubuntu@bastion:~/deployments/bosh-deployments$ genesis new snw-eastus-controlplane
+Setting up new environment snw-eastus-controlplane...
 
-You'll then be prompted for the desired static IP. When choosing the static IP,
-know that the first (x.x.x.0) and last (x.x.x.255) IP of the subnet are
-reserved for the network address and broadcast addresses respectively. The
-second (x.x.x.1) is reserved for your subnet gateway (take note of this -
-you'll need it for one of the prompts). Additionally, the x.x.x.2 and x.x.x.3
-address are reserved as well for Azure services.  This means that the first
-available IP in our example subnet is `10.0.0.4`. We will use that for our BOSH
-director in our example. 
+Using vault at http://127.0.0.1:8201.
+Verifying availability...ok
 
-When prompted for which IaaS this BOSH will use - if you've read this far, it's
-probably Microsoft Azure.
 
-You will then be prompted for the same service principal information that you
-put into your `tfvars` file earlier (client id, client secret, tenant id, and
-subscription id). Take each of those values as your answers as prompted by
-Genesis.
+Is this a proto-BOSH director?
+[y|n] > y
 
-You will then be prompted for the names of the resource group, network security group,
-virtual network, and subnet. You can get each of these from the name field for the
-`azurerm_resource_group`, `azurerm_network_security_group`, `azurerm_virtual_network`, and
-`azurerm_subnet` blocks respectively in your Terraform configuration file.
+What static IP do you want to deploy this BOSH director on?
+> 10.0.0.5
 
-## The Environment File
+What network should this BOSH director exist in (in CIDR notation)?
+> 10.0.0.0/24
 
-Genesis will create an environment file that looks roughly like this:
+What default gateway (IP address) should this BOSH director use?
+> 10.0.0.1
 
-```yml
-kit:
-  name:    bosh
-  version: 1.4.0
-  features:
-    - azure
-    - proto
+What DNS servers should BOSH use? (leave value empty to end)
+1st value > 1.1.1.1
+2nd value > 1.0.0.1
+3rd value >
 
-params:
-  env:   snw-eastus-controlplane
+What IaaS will this BOSH director orchestrate?
+  1) VMWare vSphere
+  2) Amazon Web Services
+  3) Microsoft Azure
+  4) Google Cloud Platform
+  5) OpenStack
+  6) BOSH Warden
 
-  # These properties definte the host-level networking for a proto-BOSH.
-  # Environmental BOSHes can depend on their parent BOSH cloud-config,
-  # but for proto- environments, we have to specify these.
-  #
-  static_ip:       10.0.0.4
-  subnet_addr:     10.0.0.0/24
-  default_gateway: 10.0.0.1
-  dns:
-    - 1.1.1.1
-    - 1.0.0.1
+Select choice > Microsoft Azure
 
-  # BOSH on Azure needs to know what resource groups to use when
-  # deploying VMs, as well as what default security group to apply
-  # to VMs that do not otherwise specify them.
-  #
-  # Azure credentials are stored in the Vault at
-  #   secret/snw/eastus/controlplane/bosh/azure
-  #
-  azure_resource_group: genesis-doc
-  azure_default_sg:     genesis-controlplane-sg
+What is your Azure Client ID?
+> 01234567-89ab-cdef-0123-456789abcdef
+What is your Azure Client Secret?
+client_secret [hidden]:
+client_secret [confirm]:
 
-  # The following configuration is only necessary for proto-BOSH
-  # deployments, since environment BOSHes will derive their networking
-  # and resource groups from their parent BOSH cloud-config.
-  #
-  azure_virtual_network: genesis-bosh-east
-  azure_subnet_name:     genesis-bosh-east-controlplane-subnet
+
+What is your Azure Tenant ID?
+> 01234567-89ab-cdef-0123-456789abcdef
+
+What is your Azure Subscription ID?
+> 01234567-89ab-cdef-0123-456789abcdef
+
+What Azure Resource Group will BOSH be deploying VMs into?
+> genesis
+
+What security group should be used as the BOSH default security group?
+> genesis-sg
+
+What is the name of your Azure Virtual Network?
+> genesis-network
+
+What is the name of the Azure subnet that the BOSH will be placed in?
+> genesis-controlplane-subnet
+
+Would you like to edit the environment file?
+[y|n] > n
+ - auto-generating credentials (in secret/snw/eastus/controlplane/bosh)...
+ - auto-generating certificates (in secret/snw/eastus/controlplane/bosh)...
+New environment snw-eastus-controlplane provisioned!
+
+To deploy, run this:
+
+  genesis deploy 'snw-eastus-controlplane'
+
 ```
 
-This is the configuration file that tells genesis how you want your BOSH deployed.
-Some of the answers you gave to the prompts will end up in here. Some of the more
-security-sensitive answers you gave will be stored in the Vault instead and only
-pulled down at deployment time. As a result, this file should be safe to store
-in source control.
+Of note, if this is your first BOSH, then this _is_ a Proto-BOSH director.
+Also, if you've read this far, the IaaS you're targeting is likely Microsoft
+Azure. The remaining answers can be found in the outputs of your Terraform
+apply or in your `terraform.tfvars` file.
 
-## Generating Secrets
+The command will then spend some time generating certificates and secrets for
+the deployment to use. These will get stored in the Vault and made accessible
+by the `safe` utility.
 
-After you finish answering all of the prompts, Genesis will take some time to
-generate numerous credentials for you. These include various passwords and
-certificates that the BOSH director will use. These can be viewed in the Vault
-by using `safe get`. To view a layout of created secrets, you can use the
-`safe tree` command.
+An environment file named after your environment name (e.g.
+`snw-eastus-controlplane.yml`) will be created. This contains all non-sensitive
+information about your deployment. It is safe to store in version control. If
+you needed to change anything about your deployment, you would make your changes
+in this file. For the purpose of this tutorial, we will assume that the defaults
+are fine and that you don't need to make changes to this file.
 
 ## Deploying BOSH
 
@@ -345,5 +265,22 @@ by using `safe get`. To view a layout of created secrets, you can use the
 genesis deploy snw-eastus-controlplane
 ```
 
-Substitute `snw-eastus-controlplane` with the name of your environment. Genesis
-should handle the rest of the deployment for you.
+Substitute `snw-eastus-controlplane` with the name of your environment (the
+argument you gave to `genesis new`). Genesis should handle the rest of the
+deployment for you.
+
+To log in to the BOSH director, you can run:
+
+```
+genesis do snw-eastus-controlplane -- alias
+genesis do snw-eastus-controlplane -- login
+```
+
+Substitute snw-eastus-controlplane with your own environment name.
+
+## Next Steps
+
+If you're building out a full environment, at this point you should be looking
+to deploy a permanent Vault. With your new BOSH. We're working on making a document
+on this in-particular, and this section will be updated with a link to that once it
+is completed.
