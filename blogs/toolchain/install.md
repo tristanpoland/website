@@ -11,6 +11,7 @@ binary and putting it into your path.
 * [jq](#jq)
 * [vault](#vault)
 * [cf](#cf)
+* [git](#git)
 
 <a name="genesis-bosh-spruce-and-safe"></a>
 ## Genesis, BOSH, Spruce, and Safe
@@ -61,4 +62,18 @@ wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key |
 echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
 sudo apt-get update
 sudo apt-get install cf-cli
+```
+
+<a name="git"></a>
+## Git
+
+You likely already have Git installed on whatever Linux box you're on. This section is a reminder
+that you'll need to configure your email and name with Git in order to use it. Genesis requires
+that git is configured in order to initialize a new deployment directory.
+
+You'll need to run:
+
+```
+git config --global user.name "Your Name"
+git config --global user.email "Your Email"
 ```
