@@ -1,5 +1,19 @@
 # Deploying a BOSH to Microsoft Azure Using Genesis and Terraform
 
+## Table of Contents
+
+* [Introduction](#introduction)
+* [Prerequisites](#prerequisites)
+* [Getting Automation Credentials](#getting-automation-credentials)
+* [Setting Up Terraform](#setting-up-terraform)
+* [Setting Up Your Bastion Host](#setting-up-your-bastion-host)
+* [Starting a Local Vault Instance](#starting-a-local-vault-instance)
+* [Deploying a New Proto-BOSH](#deploying-a-new-proto-bosh)
+* [Logging Into BOSH](#logging-into-bosh)
+* [Generating and Uploading a Cloud Config](#generating-and-uploading-a-cloud-config)
+* [Next Steps](#next-steps)
+
+<a name="introduction"></a>
 ## Introduction
 
 BOSH can be an effective way to manage your infrastructure, but before you
@@ -9,6 +23,7 @@ up an automation account, using Terraform to configure Azure all the way up
 to making a network for your new BOSH director, and using Genesis to quickly
 configure and deploy your BOSH director.
 
+<a name="prerequisites"></a>
 ## Prerequisites
 
 This post does not cover the installation of the Genesis toolchain (genesis,
@@ -20,6 +35,7 @@ over the subscription in order to make automation credentials. If you don't
 have these privileges, you'll need somebody to take the steps in the next
 section for you.
 
+<a name="getting-automation-credentials"></a>
 ## Getting Automation Credentials
 
 App registrations in Azure are automation accounts. We're going to need one of
@@ -65,6 +81,7 @@ so, click on `Access Control (IAM)` on the sidebar, and then `Add a role
 assignment`. Search for and select the name of the application you previously
 created, and give it the role of `Contributor`.
 
+<a name="setting-up-terraform"></a>
 ## Setting up Terraform
 
 Now that we have automation credentials, we can start standing up
@@ -107,6 +124,7 @@ terraform apply
 Take note of the output variables after a successful apply, as they contain the
 answers to many of the questions that Genesis will ask you later.
 
+<a name="setting-up-your-bastion-host"></a>
 ## Setting Up Your Bastion Host
 
 Once your bastion box is created, you should be able to ssh into it if you
@@ -114,6 +132,7 @@ configured your Terraform file properly. Once inside, you'll need to install
 the tools needed for Genesis. For instructions on how to install these tools,
 see [this document](https://github.com/genesis-community/website/blob/master/blogs/toolchain/install.md).
 
+<a name="starting-a-local-vault-instance"></a>
 ## Starting a Local Vault Instance
 
 We use the [Safe CLI](https://github.com/starkandwayne/safe) to interact with
@@ -131,7 +150,8 @@ safe local --memory
 Safe will output the target name of the new Vault, target it, and authenticate
 to it automatically.
 
-## Configuring a New BOSH Installation
+<a name="deploying-a-new-proto-bosh"></a>
+## Deploying a New Proto-BOSH
 
 Navigate to the directory in which you would like to store the Genesis
 deployment directory and run 
@@ -244,7 +264,7 @@ you needed to change anything about your deployment, you would make your changes
 in this file. For the purpose of this tutorial, we will assume that the defaults
 are fine and that you don't need to make changes to this file.
 
-## Deploying BOSH
+You should now be able to run
 
 ```
 genesis deploy snw-eastus-controlplane
@@ -253,6 +273,9 @@ genesis deploy snw-eastus-controlplane
 Substitute `snw-eastus-controlplane` with the name of your environment (the
 argument you gave to `genesis new`). Genesis should handle the rest of the
 deployment for you.
+
+<a name="logging-into-bosh"></a>
+## Logging Into BOSH
 
 To log in to the BOSH director, you can run:
 
@@ -263,6 +286,63 @@ genesis do snw-eastus-controlplane -- login
 
 Substitute snw-eastus-controlplane with your own environment name.
 
+
+<a name="generating-and-uploading-a-cloud-config"></a>
+## Generating and Uploading a Cloud Config
+
+The BOSH cloud config contains shared information about all the deployments
+you'll be deploying to your control plane environment. This includes the
+network IP allocations, VM sizes, disk sizes, availability zone configurations,
+and compilation VM configuration.
+
+We've provided a spruce file which, when merged with a YAML configuration file,
+will generate a working cloud config for you. Take the `cloud_config.yml` file
+from the 
+[terraform repo](https://github.com/genesis-community/terraforms/tree/master/controlplane/azure)
+and copy it into a folder on your bastion box. Also copy the `cloud_config_meta.yml.example`
+file into a file called `cloud_config_meta.yml`. That file should look something like this:
+
+```yml
+meta:
+  vnet:
+    name: genesis-network
+  subnet:
+    name: genesis-subnet
+  dns_servers:
+  - 1.1.1.1
+  - 1.0.0.1
+  ip_prefix: "10.0.0."
+```
+
+The values need to be changed to match your Azure configuration.
+`meta.vnet.name` and `meta.subnet.name` are the name of your Azure virtual
+network and subnet as printed out by Terraform, respectively.
+`meta.dns_servers` is the array of DNS servers you configured that were also
+output by Terraform.
+
+`meta.ip_prefix` is a bit of a kludge due to limitations in how spruce works.
+Give it the first three octets of the network address of your controlplane
+subnet, ending with a `.`.
+
+Once that's put together, run 
+
+```
+spruce merge --prune meta cloud_config.yml cloud_config_meta.yml > controlplane.yml
+```
+
+Put that output `controlplane.yml` file into a place where you'd like to keep
+the offline versions of your BOSH cloud configs (preferably in a Git repo).
+
+Make sure that you're logged into bosh. Then run
+
+```
+bosh -e snw-eastus-controlplane update-cloud-config controlplane.yml
+```
+
+Where `snw-eastus-controlplane` is whatever you called your controlplane
+environment. Now your cloud config should be uploaded and ready to go.
+
+<a name="next-steps"></a>
 ## Next Steps
 
 If you're building out a full environment, at this point you should be looking
