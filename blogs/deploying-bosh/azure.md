@@ -71,28 +71,13 @@ Now that we have automation credentials, we can start standing up
 infrastructure using Terraform. Terraform binaries and documentation can be
 found at [https://terraform.io](https://terraform.io).
 
-Terraform works using a series of plugins they call "providers." For Azure, we
-will be primarily using the `azurerm` (Azure Resource Manager) provider.
+We've already made a basic Terraform file for you that can stand up your
+control plane if given a few extra parameters. You can find that file
+[here](https://github.com/genesis-community/terraforms/tree/master/controlplane/azure).
 
-First, make a file called `terraform.tfvars`. A `tfvars` file is a place where
-we can store secrets separate from the main configuration file. At a later time,
-you may want to store these in a more secure location (such as Vault). For now,
-though, just make sure this file does not get checked into source control.
-
-In this `terraform.tfvars` file, define the following variables:
-
-```hcl
-subscription_id = "01234567-89ab-cdef-0123-456789abcdef"
-tenant_id       = "01234567-89ab-cdef-0123-456789abcdef"
-client_id       = "01234567-89ab-cdef-0123-456789abcdef"
-client_secret   = "supersecret"
-resource_group_name = "genesis"
-location = "East US"
-starting_address = "10.0.0.0"
-dns_servers = ["1.1.1.1", "1.0.0.1"]
-ssh_keys = [ "ssh-rsa ..." ]
-bastion_username = "ubuntu"
-```
+There is also a `terraform.tfvars.example` file in that directory that can be
+used as a basis for creating your `terraform.tfvars` file. It contains all of
+the possible parameters you can specify for your deployment.
 
 The `subscription_id`, `tenant_id`, `client_id`, and `client_secret` were all
 values that you should have taken note of while making your app registration.
