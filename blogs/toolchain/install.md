@@ -86,6 +86,13 @@ Your system may not have a C compiler installed by default. You'll need this in 
 packages for your proto BOSH. You can get the compiler tools from apt:
 
 ```
-sudo apt-get update
-sudo apt-get install build-essential
+sudo apt-get update && \
+sudo apt-get install \
+    build-essential \
+    zlibc \
+    zlib1g-dev \
+    ruby \
+    ruby-dev \
+    openssl \
+    libssl-dev \
 ```
