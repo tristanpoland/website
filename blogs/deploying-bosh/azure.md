@@ -299,8 +299,10 @@ We've provided a spruce file which, when merged with a YAML configuration file,
 will generate a working cloud config for you. Take the `cloud_config.yml` file
 from the 
 [terraform repo](https://github.com/genesis-community/terraforms/tree/master/controlplane/azure)
-and copy it into a folder on your bastion box. Also copy the `cloud_config_meta.yml.example`
-file into a file called `cloud_config_meta.yml`. That file should look something like this:
+and copy it into a temporary location on your jumpbox. Call this copy
+`cloud_config.yml` as well. Also copy the `cloud_config_meta.yml.example` file
+into a file called `cloud_config_meta.yml`. That file should look something
+like this:
 
 ```yml
 meta:
@@ -327,7 +329,8 @@ subnet, ending with a `.`.
 Once that's put together, run 
 
 ```
-spruce merge --prune meta cloud_config.yml cloud_config_meta.yml > controlplane.yml
+mkdir director-configs
+spruce merge --prune meta cloud_config.yml cloud_config_meta.yml > director-configs/controlplane.yml
 ```
 
 Put that output `controlplane.yml` file into a place where you'd like to keep
