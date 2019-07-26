@@ -12,6 +12,7 @@ binary and putting it into your path.
 * [vault](#vault)
 * [cf](#cf)
 * [git](#git)
+* [build tools](#build-tools)
 
 <a name="genesis-bosh-spruce-and-safe"></a>
 ## Genesis, BOSH, Spruce, and Safe
@@ -76,4 +77,15 @@ You'll need to run:
 ```
 git config --global user.name "Your Name"
 git config --global user.email "Your Email"
+```
+
+<a name="build-tools"></a>
+## Build Tools
+
+Your system may not have a C compiler installed by default. You'll need this in order to compile
+packages for your proto BOSH. You can get the compiler tools from apt:
+
+```
+sudo apt-get update
+sudo apt-get install build-essential
 ```
