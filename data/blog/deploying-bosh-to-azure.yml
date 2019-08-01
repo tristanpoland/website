@@ -1,5 +1,22 @@
-# Deploying a BOSH to Microsoft Azure Using Genesis and Terraform
+# vim:ft=markdown:tw=76
+title:     Deploying a BOSH to Microsoft Azure Using Genesis and Terraform
+permalink: deploying-bosh-to-azure
+format:    markdown
+featured:  yes
+dated:     1 Aug 2019
+author:    tmitchell
 
+#header:    francesco-gallaroti-72602.jpg
+#credit:
+#  text:    "Francesco Gallarotti (@gallarotti), via Unsplash"
+#  url:     https://unsplash.com/@gallarotti
+
+abstract: |
+  FIXME - MARKETING ABSTRACT NEEDED STILL
+--- |-
+FIXME - TEASER NEEDED STILL
+
+--- |-
 ## Table of Contents
 
 * [Introduction](#introduction)

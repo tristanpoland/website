@@ -1,5 +1,23 @@
-# Installing the Genesis Toolchain on Linux
+# vim:ft=markdown:tw=76
+title:     Installing the Genesis Toolchain on Linux
+permalink: installing-genesis-on-linux
+format:    markdown
+featured:  yes
+dated:     1 Aug 2019
+author:    tmitchell
 
+#header:    francesco-gallaroti-72602.jpg
+#credit:
+#  text:    "Francesco Gallarotti (@gallarotti), via Unsplash"
+#  url:     https://unsplash.com/@gallarotti
+
+abstract: |
+  FIXME - MARKETING ABSTRACT NEEDED STILL
+
+--- |-
+FIXME - TEASER NEEDED STILL
+
+--- |-
 There are a series of tools you'll need in order to work with Genesis. This is
 a compilation of how to download and install each of those tools. Most of these
 are static Go binaries, and therefore usually only require downloading the
