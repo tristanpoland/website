@@ -122,3 +122,8 @@ table.gmp-matrix td.kits {
   -ms-flex-direction: column;
   flex-direction: column;
 }
+
+@media print {
+  header, footer { display: none; }
+  section#top { background: none; }
+}
