@@ -83,71 +83,50 @@
     <div class="row">
       <div class="col-md-10 col-md-push-1">
         <div class="content">
-        	<h2>Table of Contents</h2>
+        	<h2>Introduction</h2>
 
-<ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#prerequisites">Prerequisites</a></li>
-<li><a href="#getting-automation-credentials">Getting Automation Credentials</a></li>
-<li><a href="#setting-up-terraform">Setting Up Terraform</a></li>
-<li><a href="#setting-up-your-bastion-host">Setting Up Your Bastion Host</a></li>
-<li><a href="#starting-a-local-vault-instance">Starting a Local Vault Instance</a></li>
-<li><a href="#deploying-a-new-proto-bosh">Deploying a New Proto-BOSH</a></li>
-<li><a href="#logging-into-bosh">Logging Into BOSH</a></li>
-<li><a href="#generating-and-uploading-a-cloud-config">Generating and Uploading a Cloud Config</a></li>
-<li><a href="#next-steps">Next Steps</a></li>
-</ul>
+<p>BOSH is an effective way to manage your infrastructure and Azure is a great
+infrastructure to manage, but before you have a BOSH director, you need to
+bootstrap Azure to a point where you can deploy a BOSH Director to it.
+Namely, we need an Azure app registration to use as an automation account,
+a properly configured virtual network, and a virtual machine inside the
+network from which we can deploy the BOSH director.</p>
 
-<p><a name="introduction"></a></p>
+<h2>Getting Azure Situated</h2>
 
-<h2>Introduction</h2>
+<p>Both Terraform and BOSH perform tasks without user input, and therefore they
+require an automation account that can access the resources they need to
+manipulate. Azure implements these in the form of what they call App
+Registrations. In order to create one, you will need access to create
+accounts in Azure Active Directory; if you do not have this access, you will
+need to have somebody create the App Registration for you.</p>
 
-<p>BOSH can be an effective way to manage your infrastructure, but before you
-have a BOSH director, you've got to bootstrap your infrastructure to a point
-where you can deploy a BOSH Director to it. In this post, we'll cover setting
-up an automation account, using Terraform to configure Azure all the way up
-to making a network for your new BOSH director, and using Genesis to quickly
-configure and deploy your BOSH director.</p>
+<p>Once logged in, navigate to the <code>Azure Active Directory</code> on your sidebar. </p>
 
-<p><a name="prerequisites"></a></p>
+<p><img src="azure-active-directory.png" alt="Azure Active Directory" title=""></p>
 
-<h2>Prerequisites</h2>
+<p>This presents a new sidebar, on which you should navigate to <code>App
+registrations</code>. This will open up yet another bar - this time a horizontal
+one - and you should click on <code>New registration</code> therein.</p>
 
-<p>This post does not cover the installation of the Genesis toolchain (genesis,
-spruce, etc.). It is expected that you have these things installed already.</p>
+<p><img src="app-registration.png" alt="App Registrations" title=""></p>
 
-<p>You'll need to create your own Azure account and subscription (or have your
-organization create one for you). Your account will need ownership privilege
-over the subscription in order to make automation credentials. If you don't
-have these privileges, you'll need somebody to take the steps in the next
-section for you.</p>
+<p><img src="new-registration.png" alt="New Registration" title=""></p>
 
-<p><a name="getting-automation-credentials"></a></p>
+<p>Azure will ask you to provide a display name for the application, the
+account type, and a redirect URI. The display name can be whatever you want
+it to be. The account type will almost always be set to <code>Accounts in this
+organizational directory only</code>, and the redirect URI can be left blank for
+our use cases. The Redirect URI type can be set to web.</p>
 
-<h2>Getting Automation Credentials</h2>
+<p><img src="example-app-registration.png" alt="An Example App Registration" title=""></p>
 
-<p>App registrations in Azure are automation accounts. We're going to need one of
-these so that Terraform and BOSH can authenticate and manipulate resources. To
-create one, first log in to the Azure portal (portal.azure.com).</p>
-
-<p>Once logged in, navigate to the <code>Azure Active Directory</code> on your sidebar. This
-presents a new sidebar, on which you should navigate to <code>App registrations</code>.
-This will open up yet another bar - this time a horizontal one - and you should
-click on <code>New registration</code> therein.</p>
-
-<p>Now you have a small form to complete. It will ask you to provide a display
-name for the application, the account type, and a redirect URI. The display
-name can be whatever you want it to be. The account type will almost always
-be set to <code>Accounts in this organizational directory only</code>, and the redirect
-URI can be left blank for our use cases. The Redirect URI type can be set to
-web.</p>
-
-<p>Once you apply the settings, you should be brought to the app's overview page.
-If you should navigate away for any reason, you can come back to this page by
-finding it in the list of app registrations in the Azure Active Directory panel.
-This page contains a few pieces of information we need. To authenticate as an
-application, we need a set of credentials that Azure refers to as a "service
-principal". This includes the following:</p>
+<p>Once you apply the settings, you should be brought to the app's overview
+page.  If you should find yourself not on this page, you can click on your
+new app in the list of app registrations in the Azure Active Directory
+panel.  This page contains a few pieces of information we need. Because
+we'll be authenticating with an application, we need a set of credentials
+that Azure refers to as a "service principal". This includes the following:</p>
 
 <ul>
 <li>Application ID</li>
@@ -155,23 +134,39 @@ principal". This includes the following:</p>
 <li>Tenant ID</li>
 </ul>
 
-<p>This page contains the application ID and tenant ID. Take note of them, and
-then navigate to <code>Certificates &amp; secrets</code>. Create a new client secret; set the
-expiry to something you're comfortable with (secrets can be rotated at a later
-time). Then, take the output value and note that down as well.</p>
+<p>This page contains the application ID and tenant ID, which you'll need to
+note down somewhere for now.</p>
+
+<p><img src="application-tenant-id.png" alt="Application-and-Tenant-ID" title=""></p>
+
+<p>Navigate to <code>Certificates &amp; secrets</code> on this pages sidebar. </p>
+
+<p><img src="certificates-and-secrets.png" alt="Certificates &amp; Secrets" title=""></p>
+
+<p>We now need to create a new client secret so that we can actually
+authenticate. Set the expiry to something you're comfortable with and then
+take the client secret output that gets generated and note that down as
+well.</p>
+
+<p><img src="new-client-secret.png" alt="New Client Secret" title="">
+<img src="client-secret-form.png" alt="Client Secret Form" title=""></p>
 
 <p>We will also need the ID of the subscription that resources will be created in
 (and billed to). To find the ID, search <code>Subscriptions</code> in the top bar, go to
 the list of subscriptions and select the desired subscription from the list.
 Copy the ID and note it down.</p>
 
+<p><img src="subscription-id.png" alt="Subscription ID" title=""></p>
+
 <p>While you're still on the subscription page, you can give the application
-you created access to create resources in the target subscription. To d
+you created access to create resources in the target subscription. To do
 so, click on <code>Access Control (IAM)</code> on the sidebar, and then <code>Add a role
 assignment</code>. Search for and select the name of the application you previously
 created, and give it the role of <code>Contributor</code>.</p>
 
-<p><a name="setting-up-terraform"></a></p>
+<p><img src="access-control-iam.png" alt="Access Control IAM" title="">
+<img src="add-role-assignment.png" alt="Add Role Assignment" title="">
+<img src="role-assignment-form.png" alt="Role Assignment Form" title=""></p>
 
 <h2>Setting up Terraform</h2>
 
@@ -215,16 +210,12 @@ terraform apply
 <p>Take note of the output variables after a successful apply, as they contain the
 answers to many of the questions that Genesis will ask you later.</p>
 
-<p><a name="setting-up-your-bastion-host"></a></p>
-
 <h2>Setting Up Your Bastion Host</h2>
 
 <p>Once your bastion box is created, you should be able to ssh into it if you
 configured your Terraform file properly. Once inside, you'll need to install
 the tools needed for Genesis. For instructions on how to install these tools,
 see <a href="https://github.com/genesis-community/website/blob/master/blogs/toolchain/install.md">this document</a>.</p>
-
-<p><a name="starting-a-local-vault-instance"></a></p>
 
 <h2>Starting a Local Vault Instance</h2>
 
@@ -242,8 +233,6 @@ safe local --memory
 
 <p>Safe will output the target name of the new Vault, target it, and authenticate
 to it automatically.</p>
-
-<p><a name="deploying-a-new-proto-bosh"></a></p>
 
 <h2>Deploying a New Proto-BOSH</h2>
 
@@ -396,8 +385,6 @@ genesis deploy snw-eastus-controlplane
 argument you gave to <code>genesis new</code>). Genesis should handle the rest of the
 deployment for you.</p>
 
-<p><a name="logging-into-bosh"></a></p>
-
 <h2>Logging Into BOSH</h2>
 
 <p>To log in to the BOSH director, you can run:</p>
@@ -408,8 +395,6 @@ genesis do snw-eastus-controlplane -- login
 </code></p>
 
 <p>Substitute snw-eastus-controlplane with your own environment name.</p>
-
-<p><a name="generating-and-uploading-a-cloud-config"></a></p>
 
 <h2>Generating and Uploading a Cloud Config</h2>
 
@@ -467,8 +452,6 @@ bosh -e snw-eastus-controlplane update-cloud-config controlplane.yml
 
 <p>Where <code>snw-eastus-controlplane</code> is whatever you called your controlplane
 environment. Now your cloud config should be uploaded and ready to go.</p>
-
-<p><a name="next-steps"></a></p>
 
 <h2>Next Steps</h2>
 
