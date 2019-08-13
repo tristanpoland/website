@@ -189,8 +189,7 @@ found at <a href="https://terraform.io">https://terraform.io</a>.</p>
 control plane if given a few extra parameters. You can set up your working
 directory for terraform as follows:</p>
 
-<p>```
- ~/work/repos → git clone git@github.com:genesis-community/terraforms.git
+<pre><code>~/work/repos → git clone git@github.com:genesis-community/terraforms.git
 Cloning into 'terraforms'...
 remote: Enumerating objects: 26, done.
 remote: Counting objects: 100% (26/26), done.
@@ -202,36 +201,34 @@ Resolving deltas: 100% (41/41), done.
  ~/work/repos → cp terraforms/controlplane/azure/azure.tf terraform-work/
  ~/work/repos → cp terraforms/controlplane/azure/terraform.tfvars.example terraform-work/terraform.tfvars
  ~/work/repos → cd terraform-work/
- ~/work/repos/terraform-work → terraform init</p>
+ ~/work/repos/terraform-work → terraform init
 
-<p>Initializing the backend...</p>
+Initializing the backend...
 
-<p>Initializing provider plugins...
+Initializing provider plugins...
 - Checking for available provider plugins...
-- Downloading plugin for provider "azurerm" (terraform-providers/azurerm) 1.32.1...</p>
+- Downloading plugin for provider "azurerm" (terraform-providers/azurerm) 1.32.1...
 
-<p>The following providers do not have any version constraints in configuration,
-so the latest version was installed.</p>
+The following providers do not have any version constraints in configuration,
+so the latest version was installed.
 
-<p>To prevent automatic upgrades to new major versions that may contain breaking
+To prevent automatic upgrades to new major versions that may contain breaking
 changes, it is recommended to add version = "..." constraints to the
 corresponding provider blocks in configuration, with the constraint strings
-suggested below.</p>
+suggested below.
 
-<ul>
-<li>provider.azurerm: version = "~> 1.32"</li>
-</ul>
+* provider.azurerm: version = "~&gt; 1.32"
 
-<p>Terraform has been successfully initialized!</p>
+Terraform has been successfully initialized!
 
-<p>You may now begin working with Terraform. Try running "terraform plan" to see
+You may now begin working with Terraform. Try running "terraform plan" to see
 any changes that are required for your infrastructure. All Terraform commands
-should now work.</p>
+should now work.
 
-<p>If you ever set or change modules or backend configuration for Terraform,
+If you ever set or change modules or backend configuration for Terraform,
 rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
-```</p>
+</code></pre>
 
 <p>Input variables for this deployment can be provided by putting their values
 into the <code>terraform.tfvars</code> file. Minimally, you'll need to edit the
@@ -242,266 +239,262 @@ registration steps. </p>
 <p>Once configured, run <code>terraform apply</code> from the directory with your <code>azure.tf</code> and
 <code>terraform.tfvars</code> file.</p>
 
-<p>```
- ~/work/repos/terraform-work → pwd
+<pre><code>~/work/repos/terraform-work → pwd
 /Users/tom/work/repos/terraform-work
- ~/work/repos/terraform-work → terraform apply</p>
+~/work/repos/terraform-work → terraform apply
 
-<p>An execution plan has been generated and is shown below.
+An execution plan has been generated and is shown below.
 Resource actions are indicated with the following symbols:
-  + create</p>
+  + create
 
-<p>Terraform will perform the following actions:</p>
+Terraform will perform the following actions:
 
-<p># azurerm<em>application</em>security<em>group.bastion will be created
-  + resource "azurerm</em>application<em>security</em>group" "bastion" {
+  # azurerm_application_security_group.bastion will be created
+  + resource "azurerm_application_security_group" "bastion" {
       + id                  = (known after apply)
       + location            = "eastus"
       + name                = "genesis-bastion-asg"
-      + resource<em>group</em>name = "genesis"
+      + resource_group_name = "genesis"
       + tags                = (known after apply)
-    }</p>
+    }
 
-<p># azurerm<em>managed</em>disk.bastion-data will be created
-  + resource "azurerm<em>managed</em>disk" "bastion-data" {
-      + create<em>option        = "Empty"
-      + disk</em>size<em>gb         = 50
+  # azurerm_managed_disk.bastion-data will be created
+  + resource "azurerm_managed_disk" "bastion-data" {
+      + create_option        = "Empty"
+      + disk_size_gb         = 50
       + id                   = (known after apply)
       + location             = "eastus"
       + name                 = "genesis-bastion-data-disk"
-      + resource</em>group<em>name  = "genesis"
-      + source</em>uri           = (known after apply)
-      + storage<em>account</em>type = "Standard_LRS"
+      + resource_group_name  = "genesis"
+      + source_uri           = (known after apply)
+      + storage_account_type = "Standard_LRS"
       + tags                 = (known after apply)
-    }</p>
-
-<p># azurerm<em>network</em>interface.bastion will be created
-  + resource "azurerm<em>network</em>interface" "bastion" {
-      + applied<em>dns</em>servers           = (known after apply)
-      + dns<em>servers                   = (known after apply)
-      + enable</em>accelerated<em>networking = false
-      + enable</em>ip<em>forwarding          = false
-      + id                            = (known after apply)
-      + internal</em>dns<em>name</em>label       = (known after apply)
-      + internal<em>fqdn                 = (known after apply)
-      + location                      = "eastus"
-      + mac</em>address                   = (known after apply)
-      + name                          = "genesis-bastion"
-      + network<em>security</em>group<em>id     = (known after apply)
-      + private</em>ip<em>address            = (known after apply)
-      + private</em>ip<em>addresses          = (known after apply)
-      + resource</em>group<em>name           = "genesis"
-      + tags                          = (known after apply)
-      + virtual</em>machine_id            = (known after apply)</p>
-
-<pre><code>  + ip_configuration {
-      + application_gateway_backend_address_pools_ids = (known after apply)
-      + application_security_group_ids                = (known after apply)
-      + load_balancer_backend_address_pools_ids       = (known after apply)
-      + load_balancer_inbound_nat_rules_ids           = (known after apply)
-      + name                                          = "ipconfig1"
-      + primary                                       = (known after apply)
-      + private_ip_address                            = "10.0.0.4"
-      + private_ip_address_allocation                 = "static"
-      + private_ip_address_version                    = "IPv4"
-      + public_ip_address_id                          = (known after apply)
-      + subnet_id                                     = (known after apply)
     }
-}
-</code></pre>
 
-<p># azurerm<em>network</em>interface<em>application</em>security<em>group</em>association.bastion-asg-nic will be created
-  + resource "azurerm<em>network</em>interface<em>application</em>security<em>group</em>association" "bastion-asg-nic" {
-      + application<em>security</em>group<em>id = (known after apply)
+  # azurerm_network_interface.bastion will be created
+  + resource "azurerm_network_interface" "bastion" {
+      + applied_dns_servers           = (known after apply)
+      + dns_servers                   = (known after apply)
+      + enable_accelerated_networking = false
+      + enable_ip_forwarding          = false
       + id                            = (known after apply)
-      + ip</em>configuration<em>name         = "ipconfig1"
-      + network</em>interface_id          = (known after apply)
-    }</p>
+      + internal_dns_name_label       = (known after apply)
+      + internal_fqdn                 = (known after apply)
+      + location                      = "eastus"
+      + mac_address                   = (known after apply)
+      + name                          = "genesis-bastion"
+      + network_security_group_id     = (known after apply)
+      + private_ip_address            = (known after apply)
+      + private_ip_addresses          = (known after apply)
+      + resource_group_name           = "genesis"
+      + tags                          = (known after apply)
+      + virtual_machine_id            = (known after apply)
 
-<p># azurerm<em>network</em>security<em>group.controlplane will be created
-  + resource "azurerm</em>network<em>security</em>group" "controlplane" {
+      + ip_configuration {
+          + application_gateway_backend_address_pools_ids = (known after apply)
+          + application_security_group_ids                = (known after apply)
+          + load_balancer_backend_address_pools_ids       = (known after apply)
+          + load_balancer_inbound_nat_rules_ids           = (known after apply)
+          + name                                          = "ipconfig1"
+          + primary                                       = (known after apply)
+          + private_ip_address                            = "10.0.0.4"
+          + private_ip_address_allocation                 = "static"
+          + private_ip_address_version                    = "IPv4"
+          + public_ip_address_id                          = (known after apply)
+          + subnet_id                                     = (known after apply)
+        }
+    }
+
+  # azurerm_network_interface_application_security_group_association.bastion-asg-nic will be created
+  + resource "azurerm_network_interface_application_security_group_association" "bastion-asg-nic" {
+      + application_security_group_id = (known after apply)
+      + id                            = (known after apply)
+      + ip_configuration_name         = "ipconfig1"
+      + network_interface_id          = (known after apply)
+    }
+
+  # azurerm_network_security_group.controlplane will be created
+  + resource "azurerm_network_security_group" "controlplane" {
       + id                  = (known after apply)
       + location            = "eastus"
       + name                = "genesis-sg"
-      + resource<em>group</em>name = "genesis"
+      + resource_group_name = "genesis"
       + security_rule       = (known after apply)
       + tags                = (known after apply)
-    }</p>
+    }
 
-<p># azurerm<em>network</em>security<em>rule.allow-bastion-access will be created
-  + resource "azurerm</em>network<em>security</em>rule" "allow-bastion-access" {
+  # azurerm_network_security_rule.allow-bastion-access will be created
+  + resource "azurerm_network_security_rule" "allow-bastion-access" {
       + access                                     = "Allow"
-      + destination<em>application</em>security<em>group</em>ids = (known after apply)
-      + destination<em>port</em>range                     = "22"
+      + destination_application_security_group_ids = (known after apply)
+      + destination_port_range                     = "22"
       + direction                                  = "Inbound"
       + id                                         = (known after apply)
       + name                                       = "allow-bastion-access"
-      + network<em>security</em>group<em>name                = "genesis-sg"
+      + network_security_group_name                = "genesis-sg"
       + priority                                   = 100
       + protocol                                   = "TCP"
-      + resource</em>group<em>name                        = "genesis"
-      + source</em>address<em>prefix                      = "*"
-      + source</em>port_range                          = "*"
-    }</p>
+      + resource_group_name                        = "genesis"
+      + source_address_prefix                      = "*"
+      + source_port_range                          = "*"
+    }
 
-<p># azurerm<em>public</em>ip.bastion will be created
-  + resource "azurerm<em>public</em>ip" "bastion" {
-      + allocation<em>method            = "Static"
+  # azurerm_public_ip.bastion will be created
+  + resource "azurerm_public_ip" "bastion" {
+      + allocation_method            = "Static"
       + fqdn                         = (known after apply)
       + id                           = (known after apply)
-      + idle</em>timeout<em>in</em>minutes      = 4
-      + ip<em>address                   = (known after apply)
-      + ip</em>version                   = "IPv4"
+      + idle_timeout_in_minutes      = 4
+      + ip_address                   = (known after apply)
+      + ip_version                   = "IPv4"
       + location                     = "eastus"
       + name                         = "genesis-bastion-public-ip"
-      + public<em>ip</em>address<em>allocation = (known after apply)
-      + resource</em>group_name          = "genesis"
+      + public_ip_address_allocation = (known after apply)
+      + resource_group_name          = "genesis"
       + sku                          = "Basic"
       + tags                         = (known after apply)
-    }</p>
+    }
 
-<p># azurerm<em>resource</em>group.rg will be created
-  + resource "azurerm<em>resource</em>group" "rg" {
+  # azurerm_resource_group.rg will be created
+  + resource "azurerm_resource_group" "rg" {
       + id       = (known after apply)
       + location = "eastus"
       + name     = "genesis"
       + tags     = (known after apply)
-    }</p>
+    }
 
-<p># azurerm<em>subnet.controlplane will be created
-  + resource "azurerm</em>subnet" "controlplane" {
-      + address<em>prefix            = "10.0.0.0/24"
+  # azurerm_subnet.controlplane will be created
+  + resource "azurerm_subnet" "controlplane" {
+      + address_prefix            = "10.0.0.0/24"
       + id                        = (known after apply)
-      + ip</em>configurations         = (known after apply)
+      + ip_configurations         = (known after apply)
       + name                      = "genesis-controlplane-subnet"
-      + network<em>security</em>group<em>id = (known after apply)
-      + resource</em>group<em>name       = "genesis"
-      + virtual</em>network_name      = "genesis-network"
-    }</p>
+      + network_security_group_id = (known after apply)
+      + resource_group_name       = "genesis"
+      + virtual_network_name      = "genesis-network"
+    }
 
-<p># azurerm<em>subnet</em>network<em>security</em>group<em>association.controlplane will be created
-  + resource "azurerm</em>subnet<em>network</em>security<em>group</em>association" "controlplane" {
+  # azurerm_subnet_network_security_group_association.controlplane will be created
+  + resource "azurerm_subnet_network_security_group_association" "controlplane" {
       + id                        = (known after apply)
-      + network<em>security</em>group<em>id = (known after apply)
-      + subnet</em>id                 = (known after apply)
-    }</p>
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
 
-<p># azurerm<em>virtual</em>machine.bastion will be created
-  + resource "azurerm<em>virtual</em>machine" "bastion" {
-      + availability<em>set</em>id              = (known after apply)
-      + delete<em>data</em>disks<em>on</em>termination = false
-      + delete<em>os</em>disk<em>on</em>termination    = true
+  # azurerm_virtual_machine.bastion will be created
+  + resource "azurerm_virtual_machine" "bastion" {
+      + availability_set_id              = (known after apply)
+      + delete_data_disks_on_termination = false
+      + delete_os_disk_on_termination    = true
       + id                               = (known after apply)
-      + license<em>type                     = (known after apply)
+      + license_type                     = (known after apply)
       + location                         = "eastus"
       + name                             = "genesis-bastion"
-      + network</em>interface<em>ids            = (known after apply)
-      + resource</em>group<em>name              = "genesis"
+      + network_interface_ids            = (known after apply)
+      + resource_group_name              = "genesis"
       + tags                             = (known after apply)
-      + vm</em>size                          = "Standard<em>A2</em>v2"</p>
+      + vm_size                          = "Standard_A2_v2"
 
-<pre><code>  + identity {
-      + identity_ids = (known after apply)
-      + principal_id = (known after apply)
-      + type         = (known after apply)
+      + identity {
+          + identity_ids = (known after apply)
+          + principal_id = (known after apply)
+          + type         = (known after apply)
+        }
+
+      + os_profile {
+          + admin_username = "ubuntu"
+          + admin_password = (sensitive value)
+          + computer_name  = "bastion"
+          + custom_data    = (known after apply)
+        }
+
+      + os_profile_linux_config {
+          + disable_password_authentication = false
+        }
+
+      + storage_data_disk {
+          + caching                   = (known after apply)
+          + create_option             = "Attach"
+          + disk_size_gb              = 50
+          + lun                       = 0
+          + managed_disk_id           = (known after apply)
+          + managed_disk_type         = (known after apply)
+          + name                      = "genesis-bastion-data-disk"
+          + write_accelerator_enabled = false
+        }
+
+      + storage_image_reference {
+          + offer     = "UbuntuServer"
+          + publisher = "Canonical"
+          + sku       = "18.04-LTS"
+          + version   = "latest"
+        }
+
+      + storage_os_disk {
+          + caching                   = "ReadWrite"
+          + create_option             = "FromImage"
+          + disk_size_gb              = (known after apply)
+          + managed_disk_id           = (known after apply)
+          + managed_disk_type         = "Standard_LRS"
+          + name                      = "genesis-bastion-os-disk"
+          + os_type                   = "Linux"
+          + write_accelerator_enabled = false
+        }
     }
 
-  + os_profile {
-      + admin_username = "ubuntu"
-      + admin_password = (sensitive value)
-      + computer_name  = "bastion"
-      + custom_data    = (known after apply)
-    }
-
-  + os_profile_linux_config {
-      + disable_password_authentication = false
-    }
-
-  + storage_data_disk {
-      + caching                   = (known after apply)
-      + create_option             = "Attach"
-      + disk_size_gb              = 50
-      + lun                       = 0
-      + managed_disk_id           = (known after apply)
-      + managed_disk_type         = (known after apply)
-      + name                      = "genesis-bastion-data-disk"
-      + write_accelerator_enabled = false
-    }
-
-  + storage_image_reference {
-      + offer     = "UbuntuServer"
-      + publisher = "Canonical"
-      + sku       = "18.04-LTS"
-      + version   = "latest"
-    }
-
-  + storage_os_disk {
-      + caching                   = "ReadWrite"
-      + create_option             = "FromImage"
-      + disk_size_gb              = (known after apply)
-      + managed_disk_id           = (known after apply)
-      + managed_disk_type         = "Standard_LRS"
-      + name                      = "genesis-bastion-os-disk"
-      + os_type                   = "Linux"
-      + write_accelerator_enabled = false
-    }
-}
-</code></pre>
-
-<p># azurerm<em>virtual</em>network.network will be created
-  + resource "azurerm<em>virtual</em>network" "network" {
-      + address<em>space       = [
+  # azurerm_virtual_network.network will be created
+  + resource "azurerm_virtual_network" "network" {
+      + address_space       = [
           + "10.0.0.0/16",
         ]
-      + dns</em>servers         = [
+      + dns_servers         = [
           + "1.1.1.1",
           + "1.0.0.1",
         ]
       + id                  = (known after apply)
       + location            = "eastus"
       + name                = "genesis-network"
-      + resource<em>group</em>name = "genesis"
-      + tags                = (known after apply)</p>
+      + resource_group_name = "genesis"
+      + tags                = (known after apply)
 
-<pre><code>  + subnet {
-      + address_prefix = (known after apply)
-      + id             = (known after apply)
-      + name           = (known after apply)
-      + security_group = (known after apply)
+      + subnet {
+          + address_prefix = (known after apply)
+          + id             = (known after apply)
+          + name           = (known after apply)
+          + security_group = (known after apply)
+        }
     }
-}
-</code></pre>
 
-<p># random<em>string.bastion</em>password will be created
-  + resource "random<em>string" "bastion</em>password" {
+  # random_string.bastion_password will be created
+  + resource "random_string" "bastion_password" {
       + id          = (known after apply)
       + length      = 32
       + lower       = true
-      + min<em>lower   = 0
-      + min</em>numeric = 0
-      + min<em>special = 0
-      + min</em>upper   = 0
+      + min_lower   = 0
+      + min_numeric = 0
+      + min_special = 0
+      + min_upper   = 0
       + number      = true
       + result      = (known after apply)
       + special     = false
       + upper       = true
-    }</p>
+    }
 
-<p>Plan: 13 to add, 0 to change, 0 to destroy.</p>
+Plan: 13 to add, 0 to change, 0 to destroy.
 
-<p>Do you want to perform these actions?
+Do you want to perform these actions?
   Terraform will perform the actions described above.
-  Only 'yes' will be accepted to approve.</p>
+  Only 'yes' will be accepted to approve.
 
-<p>Enter a value: yes</p>
+  Enter a value: yes
 
-<p>... many creation lines ...</p>
+... many creation lines ...
 
-<p>Apply complete! Resources: 12 added, 0 changed, 0 destroyed.</p>
+Apply complete! Resources: 12 added, 0 changed, 0 destroyed.
 
-<p>Outputs:</p>
+Outputs:
 
-<p>bastion-box-ip-address = 13.82.181.177
+bastion-box-ip-address = 13.82.181.177
 bastion-box-username = ubuntu
 bastion-box-password = abCdEfGhiJKLmnoPqRStUvWXyz123456
 dns-servers = [
@@ -515,7 +508,7 @@ subnet-CIDR = 10.0.0.0/24
 subnet-gateway = 10.0.0.1
 subnet-name = genesis-controlplane-subnet
 virtual-network-name = genesis-network
-```</p>
+</code></pre>
 
 <p>Following this command, Terraform will have stood up a resource group,
 virtual network, network security groups, and most importantly, a bastion
@@ -534,41 +527,39 @@ answers to many of the questions that Genesis will ask you later.</p>
 it. The user, password, and ip address can be found in the terraform output
 variables. </p>
 
-<p>```
- ~/work/repos/terraform-work → ssh ubuntu@13.82.181.177
+<pre><code>~/work/repos/terraform-work → ssh ubuntu@13.82.181.177
 The authenticity of host '13.82.181.177 (13.82.181.177)' can't be established.
 ECDSA key fingerprint is SHA256:vvBs1voA6+R6fDyrPf0+YpH1go9HEv3ThxE4ionswR8.
 Are you sure you want to continue connecting (yes/no)? yes
 Warning: Permanently added '13.82.181.177' (ECDSA) to the list of known hosts.
 ubuntu@12.82.181.177's password:
-Welcome to Ubuntu 18.04.2 LTS (GNU/Linux 4.18.0-1024-azure x86_64)</p>
+Welcome to Ubuntu 18.04.2 LTS (GNU/Linux 4.18.0-1024-azure x86_64)
 
-<ul>
-<li>Documentation:  https://help.ubuntu.com</li>
-<li>Management:     https://landscape.canonical.com</li>
-<li><p>Support:        https://ubuntu.com/advantage</p>
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
 
-<p>System information as of Mon Aug 12 16:00:30 UTC 2019</p>
+  System information as of Mon Aug 12 16:00:30 UTC 2019
 
-<p>System load:  0.0               Processes:           121
-Usage of /:   6.3% of 28.90GB   Users logged in:     0
-Memory usage: 10%               IP address for eth0: 10.0.0.4
-Swap usage:   0%</p></li>
-</ul>
+  System load:  0.0               Processes:           121
+  Usage of /:   6.3% of 28.90GB   Users logged in:     0
+  Memory usage: 10%               IP address for eth0: 10.0.0.4
+  Swap usage:   0%
 
-<p>27 packages can be updated.
-16 updates are security updates.</p>
 
-<p>Last login: Mon Aug 12 15:44:03 2019 from 71.186.231.155
-```</p>
+27 packages can be updated.
+16 updates are security updates.
+
+
+Last login: Mon Aug 12 15:44:03 2019 from 71.186.231.155
+</code></pre>
 
 <p>Before proceeding, you will need to set up the basics of your Git config.
 Run the following with the proper values substituted:</p>
 
-<p><code>
-git config --global user.name "YOURNAME"
+<pre><code>git config --global user.name "YOURNAME"
 git config --global user.email "YOUREMAIL"
-</code></p>
+</code></pre>
 
 <h2>Starting a Local Vault Instance</h2>
 
@@ -585,9 +576,8 @@ are able to set up a permanent Vault through BOSH at a later time.</p>
 
 <p>To do this, open a separate shell session / tmux pane on the jumpbox and run </p>
 
-<p><code>
-safe local --memory
-</code></p>
+<pre><code>safe local --memory
+</code></pre>
 
 <p>Safe will output the target name of the new Vault, target it, and authenticate
 to it automatically.</p>
@@ -598,26 +588,24 @@ to it automatically.</p>
 Genesis deployment folders. Then, change to that directory and initialize
 a new Genesis deployment repository:</p>
 
-<p>```
-ubuntu@bastion:~$ mkdir ~/deployments
+<pre><code>ubuntu@bastion:~$ mkdir ~/deployments
 ubuntu@bastion:~$ cd ~/deployments
-ubuntu@bastion:~/deployments$ genesis init bosh -k bosh</p>
+ubuntu@bastion:~/deployments$ genesis init bosh -k bosh
 
-<p>Select Vault:</p>
+Select Vault:
 
-<p>1) inviolable-sanctuary   (insecure) http://127.0.0.1:8201 (default)</p>
+  1) inviolable-sanctuary   (insecure) http://127.0.0.1:8201 (default)
 
-<p>Select choice > inviolable-sanctuary</p>
+Select choice &gt; inviolable-sanctuary
 
-<p>Verifying availability of selected vault...ok</p>
+Verifying availability of selected vault...ok
 
-<p>Downloading Genesis kit bosh (latest version)...</p>
+Downloading Genesis kit bosh (latest version)...
 
-<p>Initialized empty Genesis repository in ./bosh-deployments
+Initialized empty Genesis repository in ./bosh-deployments
  - using vault at http://127.0.0.1:8201 (insecure)
- - using the bosh/1.4.0 kit.</p>
-
-<p>```</p>
+ - using the bosh/1.4.0 kit.
+</code></pre>
 
 <p>Genesis will prompt you at this point about which Vault
 you would like to use. Select the target that was created by <code>safe local</code>.</p>
@@ -635,106 +623,76 @@ in the <code>terraform.tfvars</code> file that you set up in your <code>terrafor
 directory outside of the bastion box. An example of a successful <code>genesis new</code>
 call is seen below. </p>
 
-<p>```
-ubuntu@bastion:~/deployments$ cd bosh-deployments
+<pre><code>ubuntu@bastion:~/deployments$ cd bosh-deployments
 ubuntu@bastion:~/deployments/bosh-deployments$ genesis new test-eastus-controlplane
-Setting up new environment test-eastus-controlplane...</p>
+Setting up new environment test-eastus-controlplane...
 
-<p>Using vault at http://127.0.0.1:8201.
-Verifying availability...ok</p>
+Using vault at http://127.0.0.1:8201.
+Verifying availability...ok
 
-<p>Is this a proto-BOSH director?
-[y|n] > y</p>
 
-<p>What static IP do you want to deploy this BOSH director on?</p>
+Is this a proto-BOSH director?
+[y|n] &gt; y
 
-<blockquote>
-  <p>10.0.0.5</p>
-</blockquote>
+What static IP do you want to deploy this BOSH director on?
+&gt; 10.0.0.5
 
-<p>What network should this BOSH director exist in (in CIDR notation)?</p>
+What network should this BOSH director exist in (in CIDR notation)?
+&gt; 10.0.0.0/24
 
-<blockquote>
-  <p>10.0.0.0/24</p>
-</blockquote>
+What default gateway (IP address) should this BOSH director use?
+&gt; 10.0.0.1
 
-<p>What default gateway (IP address) should this BOSH director use?</p>
+What DNS servers should BOSH use? (leave value empty to end)
+1st value &gt; 1.1.1.1
+2nd value &gt; 1.0.0.1
+3rd value &gt;
 
-<blockquote>
-  <p>10.0.0.1</p>
-</blockquote>
-
-<p>What DNS servers should BOSH use? (leave value empty to end)
-1st value > 1.1.1.1
-2nd value > 1.0.0.1
-3rd value ></p>
-
-<p>What IaaS will this BOSH director orchestrate?
+What IaaS will this BOSH director orchestrate?
   1) VMWare vSphere
   2) Amazon Web Services
   3) Microsoft Azure
   4) Google Cloud Platform
   5) OpenStack
-  6) BOSH Warden</p>
+  6) BOSH Warden
 
-<p>Select choice > Microsoft Azure</p>
+Select choice &gt; Microsoft Azure
 
-<p>What is your Azure Client ID?</p>
-
-<blockquote>
-  <p>01234567-89ab-cdef-0123-456789abcdef
+What is your Azure Client ID?
+&gt; 01234567-89ab-cdef-0123-456789abcdef
 What is your Azure Client Secret?
-client<em>secret [hidden]:
-client</em>secret [confirm]:</p>
-</blockquote>
+client_secret [hidden]:
+client_secret [confirm]:
 
-<p>What is your Azure Tenant ID?</p>
 
-<blockquote>
-  <p>01234567-89ab-cdef-0123-456789abcdef</p>
-</blockquote>
+What is your Azure Tenant ID?
+&gt; 01234567-89ab-cdef-0123-456789abcdef
 
-<p>What is your Azure Subscription ID?</p>
+What is your Azure Subscription ID?
+&gt; 01234567-89ab-cdef-0123-456789abcdef
 
-<blockquote>
-  <p>01234567-89ab-cdef-0123-456789abcdef</p>
-</blockquote>
+What Azure Resource Group will BOSH be deploying VMs into?
+&gt; genesis
 
-<p>What Azure Resource Group will BOSH be deploying VMs into?</p>
+What security group should be used as the BOSH default security group?
+&gt; genesis-sg
 
-<blockquote>
-  <p>genesis</p>
-</blockquote>
+What is the name of your Azure Virtual Network?
+&gt; genesis-network
 
-<p>What security group should be used as the BOSH default security group?</p>
+What is the name of the Azure subnet that the BOSH will be placed in?
+&gt; genesis-controlplane-subnet
 
-<blockquote>
-  <p>genesis-sg</p>
-</blockquote>
-
-<p>What is the name of your Azure Virtual Network?</p>
-
-<blockquote>
-  <p>genesis-network</p>
-</blockquote>
-
-<p>What is the name of the Azure subnet that the BOSH will be placed in?</p>
-
-<blockquote>
-  <p>genesis-controlplane-subnet</p>
-</blockquote>
-
-<p>Would you like to edit the environment file?
-[y|n] > n
+Would you like to edit the environment file?
+[y|n] &gt; n
  - auto-generating credentials (in secret/test/eastus/controlplane/bosh)...
  - auto-generating certificates (in secret/test/eastus/controlplane/bosh)...
-New environment test-eastus-controlplane provisioned!</p>
+New environment test-eastus-controlplane provisioned!
 
-<p>To deploy, run this:</p>
+To deploy, run this:
 
-<p>genesis deploy 'test-eastus-controlplane'</p>
-
-<p>```</p>
+  genesis deploy 'test-eastus-controlplane'
+</code></pre>
 
 <p>The command will then spend some time generating certificates and secrets
 for the deployment to use. These will get stored in the local Vault and made
@@ -745,23 +703,22 @@ accessible by the <code>safe</code> utility.</p>
 information about your deployment. It is safe to store this file in version
 control. To deploy your newly-configured BOSH deployment, you can now run:</p>
 
-<p>```
-ubuntu@bastion:~/deployments$ genesis deploy test-eastus-controlplane
+<pre><code>ubuntu@bastion:~/deployments$ genesis deploy test-eastus-controlplane
   Compiling package 'ruby-2.4-r4/0cdc60ed7fdb326e605479e9275346200af30a25'... Finished (00:05:47)
-  Compiling package 'bosh<em>azure</em>cpi/afc0bf467dd0d4489f757d788065ab4d4f977ce4'... Finished (00:01:55)
+  Compiling package 'bosh_azure_cpi/afc0bf467dd0d4489f757d788065ab4d4f977ce4'... Finished (00:01:55)
   Installing packages... Finished (00:00:01)
   Rendering job templates... Finished (00:00:01)
   Installing job 'azure_cpi'... Finished (00:00:00)
-Finished installing CPI (00:07:45)</p>
+Finished installing CPI (00:07:45)
 
-<p>Starting registry... Finished (00:00:00)
-Uploading stemcell 'bosh-azure-hyperv-ubuntu-xenial-go_agent/315.26'... Finished (00:02:24)</p>
+Starting registry... Finished (00:00:00)
+Uploading stemcell 'bosh-azure-hyperv-ubuntu-xenial-go_agent/315.26'... Finished (00:02:24)
 
-<p>Started deploying
+Started deploying
   Creating VM for instance 'bosh/0' from stemcell 'bosh-stemcell-90cb8ae1-9202-4555-8416-18fe08a1cb19'... Finished (00:02:20)
-  Waiting for the agent on VM 'agent<em>id:16d9e7ca-f62d-442c-43b2-9dd270517140;resource</em>group<em>name:genesis' to be ready... Finished (00:01:00)
+  Waiting for the agent on VM 'agent_id:16d9e7ca-f62d-442c-43b2-9dd270517140;resource_group_name:genesis' to be ready... Finished (00:01:00)
   Creating disk... Finished (00:00:13)
-  Attaching disk 'caching:None;disk</em>name:bosh-disk-data-612ab183-3042-4ec3-a077-e58a4e01ada8;resource<em>group</em>name:genesis' to VM 'agent<em>id:16d9e7ca-f62d-442c-43b2-9dd270517140;resource</em>group<em>name:genesis'... Finished (00:01:07)
+  Attaching disk 'caching:None;disk_name:bosh-disk-data-612ab183-3042-4ec3-a077-e58a4e01ada8;resource_group_name:genesis' to VM 'agent_id:16d9e7ca-f62d-442c-43b2-9dd270517140;resource_group_name:genesis'... Finished (00:01:07)
   Rendering job templates... Finished (00:00:36)
   Compiling package 'golang/b348840d6ee6de87fdd43e4792fdbe1af734039b'... Finished (00:00:49)
   Compiling package 'bpm-runc/cb758414ed267820880c6bf1ca57d7467c2d70bf'... Finished (00:02:02)
@@ -769,58 +726,58 @@ Uploading stemcell 'bosh-azure-hyperv-ubuntu-xenial-go_agent/315.26'... Finished
   Compiling package 'mysql/de7350b5d6d835f758a62c0b3a8f07d3f0150d67abfa0da3967bd1127fada4c6'... Finished (00:00:47)
   Compiling package 'libpq/b3fead55dd7c9fa83be2412b24db84d2b04dbdb5dd0583ee7e9afddbb200659a'... Finished (00:00:23)
   Compiling package 'ruby-2.4-r4/0cdc60ed7fdb326e605479e9275346200af30a25'... Finished (00:02:05)
-  Compiling package 'openjdk</em>1.8.0/d2d85d44c6f0ee050ef1fb0149ce3da575234ad6'... Finished (00:00:12)
+  Compiling package 'openjdk_1.8.0/d2d85d44c6f0ee050ef1fb0149ce3da575234ad6'... Finished (00:00:12)
   Compiling package 'gonats/a32f561770ebdc422c2f9955c7614c23900b9edc62aec51a6b48adc636516802'... Finished (00:00:01)
   Compiling package 's3cli/4b6a4e65f277e1e4cdd9bfd8330de14ea28e9e5762a304f2d3a35f47958d7376'... Finished (00:00:01)
   Compiling package 'nginx/d9c13905876ac2bc3f62657048750257794ecc53121ad7cd92583d3ef292b8b8'... Finished (00:00:48)
   Compiling package 'bpm/d7c8de76cea8201f6cdf37d4f848b0a52c9c5798'... Finished (00:00:12)
-  Compiling package 'uaa<em>utils/90097ea98715a560867052a2ff0916ec3460aabb'... Finished (00:00:00)
+  Compiling package 'uaa_utils/90097ea98715a560867052a2ff0916ec3460aabb'... Finished (00:00:00)
   Compiling package 'director/35121e0b2f3354dcfccbed5ea52ea2ccb14dd0d0b90cdd5c4be0787cbdd96ca6'... Finished (00:01:10)
-  Compiling package 'bosh</em>azure<em>cpi/afc0bf467dd0d4489f757d788065ab4d4f977ce4'... Finished (00:00:48)
+  Compiling package 'bosh_azure_cpi/afc0bf467dd0d4489f757d788065ab4d4f977ce4'... Finished (00:00:48)
   Compiling package 'uaa/58ad7562f1d34ad24256fff92b3a241f8e101a2a'... Finished (00:00:56)
   Compiling package 'postgres-9.4/ee3022bfae2cb7f7454aed9e28fe7715765b9a0086ef2045219f7a4e16baca81'... Finished (00:03:49)
   Compiling package 'bosh-gcscli/a03b1fc29fd357b8e3023193c87ae9ee49db052965efe5b3d9bff3538ed2df4b'... Finished (00:00:01)
   Compiling package 'registry/1d74c7cbca2216cdf7f51bc74eca2c831012dc25b5b53d66b3412042edb032ef'... Finished (00:00:50)
   Compiling package 'credhub/0481a83e36b6179f4fc9f28088c4cd2ac3aa870a'... Finished (00:00:23)
-  Compiling package 'verify</em>multidigest/2405293bf44933ac48362d7e109fc38ea4469b962cf62715533ecca53c28bf7b'... Finished (00:00:01)
+  Compiling package 'verify_multidigest/2405293bf44933ac48362d7e109fc38ea4469b962cf62715533ecca53c28bf7b'... Finished (00:00:01)
   Compiling package 'davcli/100c52066493ef0d766c464c9cdd811c902a555013543bd16b62cf59ba5c72eb'... Finished (00:00:01)
   Compiling package 'lunaclient/b922e045db5246ec742f0c4d1496844942d6167a'... Finished (00:00:03)
   Compiling package 'health_monitor/8f3a84d055a292d385f4f2f0df42ba25eb424ccff6a3854e1209668fec263295'... Finished (00:00:26)
   Updating instance 'bosh/0'... Finished (00:01:58)
   Waiting for instance 'bosh/0' to be running... Finished (00:02:34)
   Running the post-start scripts 'bosh/0'... Finished (00:00:02)
-Finished deploying (00:28:04)</p>
+Finished deploying (00:28:04)
 
-<p>Stopping registry... Finished (00:00:00)
-Cleaning up rendered CPI jobs... Finished (00:00:00)</p>
+Stopping registry... Finished (00:00:00)
+Cleaning up rendered CPI jobs... Finished (00:00:00)
 
-<p>Succeeded</p>
+Succeeded
 
-<p>test-eastus-controlplane BOSH Director deployed!</p>
 
-<p>For details about the deployment, run</p>
+test-eastus-controlplane BOSH Director deployed!
 
-<p>genesis info test-eastus-controlplane</p>
+For details about the deployment, run
 
-<p>To set up a named alias for this director, run</p>
+  genesis info test-eastus-controlplane
 
-<p>genesis do test-eastus-controlplane -- alias</p>
+To set up a named alias for this director, run
 
-<p>To log into the BOSH director, as the admin user, run</p>
+  genesis do test-eastus-controlplane -- alias
 
-<p>genesis do test-eastus-controlplane -- login</p>
+To log into the BOSH director, as the admin user, run
 
-<p>If this is a new BOSH director, you can upload
-stemcells by running</p>
+  genesis do test-eastus-controlplane -- login
 
-<p>genesis do test-eastus-controlplane -- upload-stemcells
-```</p>
+If this is a new BOSH director, you can upload
+stemcells by running
+
+  genesis do test-eastus-controlplane -- upload-stemcells
+</code></pre>
 
 <p>To log in to the BOSH director, you should run:</p>
 
-<p><code>
-genesis do test-eastus-controlplane -- login
-</code></p>
+<pre><code>genesis do test-eastus-controlplane -- login
+</code></pre>
 
 <h2>Uploading Your Cloud Config</h2>
 
@@ -835,9 +792,8 @@ need to do is upload it.</p>
 
 <p>First, make sure that you're logged into bosh. Then run</p>
 
-<p><code>
-bosh -e test-eastus-controlplane update-cloud-config $HOME/deployments/director-configs/controlplane.yml
-</code></p>
+<pre><code>bosh -e test-eastus-controlplane update-cloud-config $HOME/deployments/director-configs/controlplane.yml
+</code></pre>
 
 <p>Now your cloud config should be uploaded and ready to go.</p>
 		</div>
