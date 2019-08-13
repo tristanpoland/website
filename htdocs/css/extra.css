@@ -127,3 +127,11 @@ table.gmp-matrix td.kits {
   header, footer { display: none; }
   section#top { background: none; }
 }
+
+
+.content p img {
+  max-width: 100%;
+}
+.content p > img:first-child:last-child {
+  margin: 3em 0;
+}
