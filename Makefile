@@ -2,27 +2,27 @@
 
 PERL5LIB :=
 
-build:
+build: theme/slick/assets/site.css
 	rm -rf htdocs
 	./bin/verse build
 
-theme:
-	cd template && gulp styles && gulp scripts
-	make build
+rebuild:
+	rm -rf htdocs
+	./bin/verse build
+
+SASS_SRC := theme/slick/src/slick.sass
+SASS_SRC += theme/slick/src/local.sass
+SASS_SRC += theme/slick/src/overrides.sass
+theme/slick/assets/site.css: $(SASS_SRC)
+	sassc theme/slick/src/slick.sass > $@.new
+	mv $@.new $@
 
 demo: build
 	./bin/verse run
-
-local:
-	rm -rf htdocs
-	./bin/verse build --local
-
-check:
-	linkchecker htdocs/index.html  --no-follow-url=http:/
 
 staging:
 	cf push -f cf/manifest-stage.yml
 prod:
 	cf push -f cf/manifest.yml
 
-.PHONY: build theme demo local check staging prod
+.PHONY: build rebuild demo staging prod

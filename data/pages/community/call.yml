@@ -1,0 +1,49 @@
+---
+# vim:ft=markdown:tw=76
+title:    Genesis Roadmap Call
+url:      /community/call/index.html
+format:   markdown
+template: call.tt
+
+next:
+  - id:   20190820
+    date: August 20th, 2019
+previous: []
+--- |-
+
+# Joining the Call
+
+On the third Tuesday of every month, we hold a conference call to discuss
+the Genesis project, and its overall direction.  Topics include latest news,
+development progress, and future direction.
+
+The next Genesis Roadmap Call is
+<br>
+**Tuesday, August 20th** at **11:00am EDT**.
+
+We use zoom: <https://zoom.us/j/7165551212>
+
+You can also call in (the Meeting ID is **716 555 1212**):
+
+- US: **+1 646 876 9923** or **+1 669 900 6833**
+- [International numbers available](https://zoom.us/u/cdjcbHG2o)
+
+Calls are not recorded.
+
+# Agenda for August 20th, 2019
+
+1. Introductions
+
+2. Announcements
+   - Kick off the monthly call (!!)
+   - Genesis v2.7.0
+   - Planned Website Improvements
+
+3. Development Progress Update
+   - [Trello Board][trello] Review
+   - Dev Team Status Report
+
+4. Open Forum
+
+[trello]: https://trello.com/b/HFOPui7k/genesis
+[slack]:  /community#slack

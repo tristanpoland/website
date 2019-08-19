@@ -1,0 +1,67 @@
+.content.downloads > div:nth-child(2)
+  h3
+    border-bottom: none
+  li
+    margin: 1em 0
+    position: relative
+
+    &:before
+      position: absolute
+      left: -15px
+
+.content.downloads
+  a.button
+    float: right
+    clear: both
+  h1
+    margin-top: 5em
+    &:first-child
+      margin-top: 0
+
+.content
+  > div
+    &:first-child li + h2
+      margin-top: 4em
+
+    &:nth-child(2)
+      h1 + h2, h2 + h3
+        padding-top: 1em
+      ul, ol
+        margin: 2em 0
+      li > ul, li > ol, li > p
+        margin: 0.75em 0
+      a
+        color: $primary-color
+        text-decoration: none
+        border-bottom: 1px dotted $primary-color
+
+      h1:first-child,
+      h2:first-child,
+      h3:first-child,
+        padding: 0
+
+.band
+  &.github
+    background-color: #000
+    color: #fff
+
+    img
+      max-width: 241px
+      max-height: 235px
+
+    a, h2 span
+      color: yellow
+      border-color: yellow
+
+  &.trello
+    background-color: green
+    color: #fff
+    flex-direction: row-reverse
+
+    img
+      max-width: 316px
+      max-height: 300px
+
+    a, h2 span
+      color: yellow
+      border-color: yellow

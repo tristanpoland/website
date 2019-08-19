@@ -1,0 +1,14 @@
+  <div class="header">
+    <div>
+      <h1>SHIELD Documentation</h1>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="autotoc-nav">
+    </div>
+
+    <div data-autotoc-headings="h2" data-autotoc-title="Table of Contents" data-autotoc-nav=".autotoc-nav">
+      [% content %]
+    </div>
+  </div>

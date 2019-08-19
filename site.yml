@@ -15,7 +15,7 @@ site:
   title:    Genesis
   subtitle: Cloud Deployments, Done Right
   canon:    https://genesisproject.io
-  theme:    genesis
+  theme:    slick
   buster:   7
 
   # Here you can tell Verse about your Social Media identities;
