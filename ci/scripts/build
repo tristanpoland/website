@@ -32,18 +32,6 @@ if [[ "$CURRENT_VERSION" != "$VERSION" ]]; then
 	mv $REPO_ROOT/data/releases.tmp $REPO_ROOT/data/releases
 fi
 
-header "Building Docs"
-pushd shield-checked-out
-	# see https://gist.github.com/vifo/2718520
-	perl -MCPAN -e 'foreach (@ARGV) { CPAN::Shell->rematein("notest", "install", $_) }' Text::Markdown </dev/null
-	./bin/mkdocs --version $VERSION \
-		--docroot /docs/$VERSION \
-		--output $BASE_DIR/$REPO_ROOT/docs/$VERSION \
-	&& rm -rf $BASE_DIR/$REPO_ROOT/docs/latest \
-	&& cp -a $BASE_DIR/$REPO_ROOT/docs/$VERSION \
-			 $BASE_DIR/$REPO_ROOT/docs/latest
-popd
-
 header "Re-building Website Static Assets"
 pushd $REPO_ROOT
 	make rebuild
