@@ -17,6 +17,7 @@ copy "{root}/content/*"  if exist "{root}/content";
 verse->{site}{cache} = {};
 my $assets = path('{theme}/assets');
 find sub {
+	return unless -f;
 	my $n = $File::Find::name;
 	$n =~ s|^$assets/||;
 	$n =~ s/[^a-z0-9]+/-/g;
