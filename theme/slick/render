@@ -87,4 +87,9 @@ render $releases,
 	using  => 'download.tt',
 	at     => "{site}/download/index.html";
 
+render {},
+	using  => 'nginx.tt',
+	layout => 'empty.tt',
+	at     => '{root}/nginx/conf/include/nginx.conf';
+
 1;

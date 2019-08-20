@@ -1,0 +1,5 @@
+[% for alias in aliases %]
+rewrite ^[% alias.key %]$ [% alias.value %] redirect;
+[% end %]
+
+error_page 404 /404.html;

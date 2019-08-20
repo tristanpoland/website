@@ -1,0 +1,9 @@
+title:  404 Not Found
+url:    /404.html
+format: markdown
+--- |-
+Whoops! Looks like you found a broken link, missing page, or some other bug in our website.
+
+If you don't mind, we'd greatly appreciate it if you could [submit an issue][1] against this website's GitHub repository, so we can make this better for the next visitor.  Thanks!
+
+[1]: https://github.com/genesis-community/website/issues
