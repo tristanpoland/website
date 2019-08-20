@@ -13,14 +13,16 @@ meta:
 
   github:
     website:
-      uri: git@github.com:genesis-community/website
-      branch: master
+      uri:          git@github.com:genesis-community/website
+      master:       master
+      staging:      staging
       private_key:  ((github.private_key))
       access_token: ((github.access_token))
 
     genesis:
-      uri: git@github.com:genesis-community/genesis
-      branch: master
+      uri:          git@github.com:genesis-community/genesis
+      master:       master
+      staging:      staging
       private_key:  ((github.private_key))
       access_token: ((github.access_token))
 
@@ -43,10 +45,9 @@ jobs:
   - name: build
     plan:
       - in_parallel:
-        - get: changes
-          trigger: true
-        - get: releases
-          trigger: true
+        - { get: changes }
+        - { get: releases, trigger: true }
+
       - task: build
         config:
           platform: linux
@@ -71,7 +72,7 @@ jobs:
             CF_SPACE:    (( grab meta.pws.space ))
             REPO_ROOT:   changes
             REPO_OUT:    pushme
-            BRANCH:      (( grab meta.github.website.branch ))
+            BRANCH:      (( grab meta.github.website.master ))
         on_success:
           put: notify
           params:
@@ -86,18 +87,15 @@ jobs:
             message: website build job '$BUILD_JOB_NAME' failed.
             ok:      no
             link:    (( grab meta.shout.links.build ))
-      - put: code
+      - put: master@github
         params:
           rebase: true
           repository: pushme/changes
 
   - name: staging
     plan:
-      - in_parallel:
-        - get: code
-          passed: [build]
-          trigger: true
-      - task: build
+      - { get: staging@github, trigger: true }
+      - task: deploy
         config:
           platform: linux
           image_resource:
@@ -106,7 +104,8 @@ jobs:
               repository: huntprod/verse
               tag:        latest
           inputs:
-            - name: code
+            - name: staging@github
+              path: code
           run:
             path: ./code/ci/scripts/stage
             args: []
@@ -141,9 +140,8 @@ jobs:
 
   - name: prod
     plan:
-      - in_parallel:
-        - { get: code, passed: [staging] }
-      - task: build
+      - { get: master@github, trigger: true }
+      - task: deploy
         config:
           platform: linux
           image_resource:
@@ -152,7 +150,8 @@ jobs:
               repository: huntprod/verse
               tag:        latest
           inputs:
-            - name: code
+            - name: master@github
+              path: code
           run:
             path: ./code/ci/scripts/stage
             args: []
@@ -197,16 +196,23 @@ resources:
     type: git
     source:
       uri:         (( grab meta.github.website.uri ))
-      branch:      (( grab meta.github.website.branch ))
+      branch:      (( grab meta.github.website.master ))
       private_key: (( grab meta.github.website.private_key ))
       ignore_paths:
         - htdocs
 
-  - name: code
+  - name: master@github
     type: git
     source:
       uri:         (( grab meta.github.website.uri ))
-      branch:      (( grab meta.github.website.branch ))
+      branch:      (( grab meta.github.website.master ))
+      private_key: (( grab meta.github.website.private_key ))
+
+  - name: staging@github
+    type: git
+    source:
+      uri:         (( grab meta.github.website.uri ))
+      branch:      (( grab meta.github.website.staging ))
       private_key: (( grab meta.github.website.private_key ))
 
   - name: releases
