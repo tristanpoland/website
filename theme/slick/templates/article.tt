@@ -2,16 +2,24 @@
 
   <div class="header">
     <div>
-      <h1>[% article.attrs.title %]</h1>
-      [% if article.attrs.subtitle %]<h2>[% article.attrs.subtitle %]</h2>[% end %]
+      <h1>The Genesis Blog</h1>
     </div>
   </div>
 
-  <div class="content">
+  <div class="blog content [% article.attrs.class %]">
     <div class="autotoc">
     </div>
 
     <div data-autotoc-headings="h2" data-autotoc-nav=".autotoc">
+      <h1>[% article.attrs.title %]</h1>
+      <p class="meta">[% article.attrs.dated %]</p>
+      [% if article.attrs.header %]
+      <p class="intro">
+        <img src="/blog/header/[% article.attrs.header %]"
+             alt="[% if article.attrs.credit.text %][% article.attrs.credit.text %][% end %]">
+        [% if article.attrs.credit %]<cite>image credit <a target="_blank" href="[% article.attrs.credit.url %]">[% article.attrs.credit.text %]</a></cite>[% end %]
+      </p>
+      [% end %]
       [% article.attrs.body %]
     </div>
   </div>

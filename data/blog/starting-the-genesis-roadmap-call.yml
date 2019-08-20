@@ -1,0 +1,47 @@
+# vim:ft=markdown:tw=76
+title:     Starting the Genesis Roadmap Calls
+permalink: starting-the-genesis-roadmap-calls
+format:    markdown
+featured:  yes
+dated:     Aug 20 2019
+author:    jhunt
+
+class:     nosidebar
+header:    oxana-v-qoAIlAmLJBU-unsplash.jpg
+credit:
+  text:    "oxana v (@arttravelling), via Unsplash"
+  url:     https://unsplash.com/@arttravelling
+
+abstract: |
+  Let's build a community together!  The Genesis Team has just started
+  holding monthly _Roadmap Calls_ to keep interested parties updated
+  and involved in the goings-on of Genesis and officially supported Kits.
+  Come talk to us!
+
+--- |-
+Let's build a community together!  The Genesis Team has just started
+holding monthly _Roadmap Calls_ to keep interested parties updated
+and involved in the goings-on of Genesis and officially supported Kits.
+Come talk to us!
+
+--- |-
+This month (August of 2019), we started holding regularly scheduled _Roadmap
+Calls_, where the developers and release engineers working on Genesis
+provide updates, explain where we are at in the roadmap, where we want to
+go, and answer questions form anyone who pops in.
+
+We'll be holding these calls on the **3rd Tuesday** of every month at **11am
+EDT**.  More details can be found on the [Community Roadmap Call page][1]
+(on genesisproject.io).
+
+We hope that these calls help to put faces to names, and remind everyone
+involves that the people who create Genesis and the people who use Genesis
+are just that: people.  It's all too easy to get lost in the clean lines of
+GitHub and forget that behind those screen names are living, breathing human
+beings.
+
+We also want to have a forum in which to discuss the direction of the
+project, its velocity in pursuing that direction, and more.  So [stop on
+in][1], say hi, and join in the fun!
+
+[1]: https://genesisproject.io/community/call/
