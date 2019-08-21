@@ -23,7 +23,7 @@ FIXME - TEASER NEEDED STILL
 BOSH is an effective way to manage your infrastructure and Azure is a great
 infrastructure to manage, but before you have a BOSH director, you need to
 bootstrap Azure to a point where you can deploy a BOSH Director to it.
-Namely, we need an Azure app registration to use as an automation account,
+Namely, we need an Azure App Registration to use as an automation account,
 a properly configured virtual network, and a virtual machine inside the
 network from which we can deploy the BOSH director.
 
@@ -34,84 +34,18 @@ network from which we can deploy the BOSH director.
 Both Terraform and BOSH perform tasks without user input, and therefore they
 require an automation account that can access the resources they need to
 manipulate. Azure implements these in the form of what they call App
-Registrations. In order to create one, you will need access to create
-accounts in Azure Active Directory; if you do not have this access, you will
-need to have somebody create the App Registration for you.
+Registrations. 
 
-Once logged in, navigate to the `Azure Active Directory` on your sidebar. 
+You will need to create an App Registration, generate a client secret for
+authenticating to that App Registration, and then grant said App
+Registration `Contributor` access to the subscription in which you would like
+resources to be created. During this process, you will need to collect a few
+details:
 
-![Azure Active Directory](azure-active-directory.png)
-
-
-This presents a new sidebar, on which you should navigate to `App
-registrations`. This will open up yet another bar - this time a horizontal
-one - and you should click on `New registration` therein.
-
-![App Registrations](app-registration.png)
-
-![New Registration](new-registration.png)
-
-Azure will ask you to provide a display name for the application, the
-account type, and a redirect URI. The display name can be whatever you want
-it to be. The account type will almost always be set to `Accounts in this
-organizational directory only`, and the redirect URI can be left blank for
-our use cases. The Redirect URI type can be set to web.
-
-![An Example App Registration](example-app-registration.png)
-
-### Putting Together Your Service Principal
-
-If you created the app registration in the steps above, you should be
-brought to the app's overview page. Should you find yourself not on this
-page, you can click on your new app in the list of app registrations in the
-Azure Active Directory panel to go there.
-
-To authenticate as an application, we will need to collect a few data fields
-that, combined, Azure refers to as a "service principal". These include the
-following:
-
-* Application ID
-* Tenant ID
-* Client Secret
-
-All of these can be gathered from the app registration's page. This overview
-landing page contains the application ID and tenant ID, so take note of them
-for now.
-
-![Application-and-Tenant-ID](application-tenant-id.png)
-
-When an app registration is first created, it does not have any client
-secrets, so we'll need to create one. Navigate to `Certificates & secrets`
-on this pages sidebar, and then open up the creation form by clicking on
-"New Client Secret". Fill in the form by setting the expiry to something
-you're comfortable with. Once the form is submitted, take the client secret
-that gets generated and output and note that down alongside your application
-ID and Tenant ID.
-
-![Certificates & Secrets](certificates-and-secrets.png)
-![New Client Secret](new-client-secret.png)
-![Client Secret Form](client-secret-form.png)
-
-### Getting Your Subscription ID
-
-We will also need the ID of the subscription that resources will be created in
-(and billed to). To find the ID, search `Subscriptions` in the top bar, go to
-the list of subscriptions and select the desired subscription from the list.
-Copy the ID and note it down.
-
-![Subscription ID](subscription-id.png)
-
-### Granting Your App Registration Access to the Subscription
-
-From the subscription's overview page, you can give the application you
-created access to create and manipulate resources in the target
-subscription. To do so, click on `Access Control (IAM)` on the sidebar, and
-then on `Add a role assignment`. Search for and select the name of the
-application you previously created, and give it the role of `Contributor`.
-
-![Access Control IAM](access-control-iam.png)
-![Add Role Assignment](add-role-assignment.png)
-![Role Assignment Form](role-assignment-form.png)
+* The App Client ID
+* The client secret that was created
+* The ID of the tenant in which the App was created
+* The ID of the subscription to which the App was granted access
 
 ## Setting up Terraform
 
@@ -182,236 +116,7 @@ Once configured, run `terraform apply` from the directory with your `azure.tf` a
 
     Terraform will perform the following actions:
 
-      # azurerm_application_security_group.bastion will be created
-      + resource "azurerm_application_security_group" "bastion" {
-          + id                  = (known after apply)
-          + location            = "eastus"
-          + name                = "genesis-bastion-asg"
-          + resource_group_name = "genesis"
-          + tags                = (known after apply)
-        }
-
-      # azurerm_managed_disk.bastion-data will be created
-      + resource "azurerm_managed_disk" "bastion-data" {
-          + create_option        = "Empty"
-          + disk_size_gb         = 50
-          + id                   = (known after apply)
-          + location             = "eastus"
-          + name                 = "genesis-bastion-data-disk"
-          + resource_group_name  = "genesis"
-          + source_uri           = (known after apply)
-          + storage_account_type = "Standard_LRS"
-          + tags                 = (known after apply)
-        }
-
-      # azurerm_network_interface.bastion will be created
-      + resource "azurerm_network_interface" "bastion" {
-          + applied_dns_servers           = (known after apply)
-          + dns_servers                   = (known after apply)
-          + enable_accelerated_networking = false
-          + enable_ip_forwarding          = false
-          + id                            = (known after apply)
-          + internal_dns_name_label       = (known after apply)
-          + internal_fqdn                 = (known after apply)
-          + location                      = "eastus"
-          + mac_address                   = (known after apply)
-          + name                          = "genesis-bastion"
-          + network_security_group_id     = (known after apply)
-          + private_ip_address            = (known after apply)
-          + private_ip_addresses          = (known after apply)
-          + resource_group_name           = "genesis"
-          + tags                          = (known after apply)
-          + virtual_machine_id            = (known after apply)
-
-          + ip_configuration {
-              + application_gateway_backend_address_pools_ids = (known after apply)
-              + application_security_group_ids                = (known after apply)
-              + load_balancer_backend_address_pools_ids       = (known after apply)
-              + load_balancer_inbound_nat_rules_ids           = (known after apply)
-              + name                                          = "ipconfig1"
-              + primary                                       = (known after apply)
-              + private_ip_address                            = "10.0.0.4"
-              + private_ip_address_allocation                 = "static"
-              + private_ip_address_version                    = "IPv4"
-              + public_ip_address_id                          = (known after apply)
-              + subnet_id                                     = (known after apply)
-            }
-        }
-
-      # azurerm_network_interface_application_security_group_association.bastion-asg-nic will be created
-      + resource "azurerm_network_interface_application_security_group_association" "bastion-asg-nic" {
-          + application_security_group_id = (known after apply)
-          + id                            = (known after apply)
-          + ip_configuration_name         = "ipconfig1"
-          + network_interface_id          = (known after apply)
-        }
-
-      # azurerm_network_security_group.controlplane will be created
-      + resource "azurerm_network_security_group" "controlplane" {
-          + id                  = (known after apply)
-          + location            = "eastus"
-          + name                = "genesis-sg"
-          + resource_group_name = "genesis"
-          + security_rule       = (known after apply)
-          + tags                = (known after apply)
-        }
-
-      # azurerm_network_security_rule.allow-bastion-access will be created
-      + resource "azurerm_network_security_rule" "allow-bastion-access" {
-          + access                                     = "Allow"
-          + destination_application_security_group_ids = (known after apply)
-          + destination_port_range                     = "22"
-          + direction                                  = "Inbound"
-          + id                                         = (known after apply)
-          + name                                       = "allow-bastion-access"
-          + network_security_group_name                = "genesis-sg"
-          + priority                                   = 100
-          + protocol                                   = "TCP"
-          + resource_group_name                        = "genesis"
-          + source_address_prefix                      = "*"
-          + source_port_range                          = "*"
-        }
-
-      # azurerm_public_ip.bastion will be created
-      + resource "azurerm_public_ip" "bastion" {
-          + allocation_method            = "Static"
-          + fqdn                         = (known after apply)
-          + id                           = (known after apply)
-          + idle_timeout_in_minutes      = 4
-          + ip_address                   = (known after apply)
-          + ip_version                   = "IPv4"
-          + location                     = "eastus"
-          + name                         = "genesis-bastion-public-ip"
-          + public_ip_address_allocation = (known after apply)
-          + resource_group_name          = "genesis"
-          + sku                          = "Basic"
-          + tags                         = (known after apply)
-        }
-
-      # azurerm_resource_group.rg will be created
-      + resource "azurerm_resource_group" "rg" {
-          + id       = (known after apply)
-          + location = "eastus"
-          + name     = "genesis"
-          + tags     = (known after apply)
-        }
-
-      # azurerm_subnet.controlplane will be created
-      + resource "azurerm_subnet" "controlplane" {
-          + address_prefix            = "10.0.0.0/24"
-          + id                        = (known after apply)
-          + ip_configurations         = (known after apply)
-          + name                      = "genesis-controlplane-subnet"
-          + network_security_group_id = (known after apply)
-          + resource_group_name       = "genesis"
-          + virtual_network_name      = "genesis-network"
-        }
-
-      # azurerm_subnet_network_security_group_association.controlplane will be created
-      + resource "azurerm_subnet_network_security_group_association" "controlplane" {
-          + id                        = (known after apply)
-          + network_security_group_id = (known after apply)
-          + subnet_id                 = (known after apply)
-        }
-
-      # azurerm_virtual_machine.bastion will be created
-      + resource "azurerm_virtual_machine" "bastion" {
-          + availability_set_id              = (known after apply)
-          + delete_data_disks_on_termination = false
-          + delete_os_disk_on_termination    = true
-          + id                               = (known after apply)
-          + license_type                     = (known after apply)
-          + location                         = "eastus"
-          + name                             = "genesis-bastion"
-          + network_interface_ids            = (known after apply)
-          + resource_group_name              = "genesis"
-          + tags                             = (known after apply)
-          + vm_size                          = "Standard_A2_v2"
-
-          + identity {
-              + identity_ids = (known after apply)
-              + principal_id = (known after apply)
-              + type         = (known after apply)
-            }
-
-          + os_profile {
-              + admin_username = "ubuntu"
-              + admin_password = (sensitive value)
-              + computer_name  = "bastion"
-              + custom_data    = (known after apply)
-            }
-
-          + os_profile_linux_config {
-              + disable_password_authentication = false
-            }
-
-          + storage_data_disk {
-              + caching                   = (known after apply)
-              + create_option             = "Attach"
-              + disk_size_gb              = 50
-              + lun                       = 0
-              + managed_disk_id           = (known after apply)
-              + managed_disk_type         = (known after apply)
-              + name                      = "genesis-bastion-data-disk"
-              + write_accelerator_enabled = false
-            }
-
-          + storage_image_reference {
-              + offer     = "UbuntuServer"
-              + publisher = "Canonical"
-              + sku       = "18.04-LTS"
-              + version   = "latest"
-            }
-
-          + storage_os_disk {
-              + caching                   = "ReadWrite"
-              + create_option             = "FromImage"
-              + disk_size_gb              = (known after apply)
-              + managed_disk_id           = (known after apply)
-              + managed_disk_type         = "Standard_LRS"
-              + name                      = "genesis-bastion-os-disk"
-              + os_type                   = "Linux"
-              + write_accelerator_enabled = false
-            }
-        }
-
-      # azurerm_virtual_network.network will be created
-      + resource "azurerm_virtual_network" "network" {
-          + address_space       = [
-              + "10.0.0.0/16",
-            ]
-          + dns_servers         = [
-              + "1.1.1.1",
-              + "1.0.0.1",
-            ]
-          + id                  = (known after apply)
-          + location            = "eastus"
-          + name                = "genesis-network"
-          + resource_group_name = "genesis"
-          + tags                = (known after apply)
-
-          + subnet {
-              + address_prefix = (known after apply)
-              + id             = (known after apply)
-              + name           = (known after apply)
-              + security_group = (known after apply)
-            }
-        }
-
-      # random_string.bastion_password will be created
-      + resource "random_string" "bastion_password" {
-          + id          = (known after apply)
-          + length      = 32
-          + lower       = true
-          + min_lower   = 0
-          + min_numeric = 0
-          + min_special = 0
-          + min_upper   = 0
-          + number      = true
-          + result      = (known after apply)
-          + special     = false
-          + upper       = true
-        }
+    ...all of the resources to be created...
 
     Plan: 13 to add, 0 to change, 0 to destroy.
 
@@ -445,8 +150,8 @@ Once configured, run `terraform apply` from the directory with your `azure.tf` a
 Following this command, Terraform will have stood up a resource group,
 virtual network, network security groups, and most importantly, a bastion
 box virtual machine from which you can continue your work. The terraform
-script will additionally install various tools and libraries on the bastion
-box that Genesis, BOSH, and Cloud Foundry need.
+script will also install various tools and libraries on the bastion box that
+Genesis, BOSH, and Cloud Foundry need.
 
 You can see from the example output above (and similarly in your actual
 output) that some output variables are printed at the end of the apply.  You
@@ -456,7 +161,7 @@ answers to many of the questions that Genesis will ask you later.
 ## Setting Up Your Bastion Host
 
 Once your bastion box is created, you can ssh into it to begin working from
-it. The user, password, and ip address can be found in the terraform output
+it. The user, password, and IP address can be found in the terraform output
 variables. 
 
     ~/work/repos/terraform-work → ssh ubuntu@13.82.181.177
@@ -466,22 +171,6 @@ variables.
     Warning: Permanently added '13.82.181.177' (ECDSA) to the list of known hosts.
     ubuntu@12.82.181.177's password:
     Welcome to Ubuntu 18.04.2 LTS (GNU/Linux 4.18.0-1024-azure x86_64)
-
-     * Documentation:  https://help.ubuntu.com
-     * Management:     https://landscape.canonical.com
-     * Support:        https://ubuntu.com/advantage
-
-      System information as of Mon Aug 12 16:00:30 UTC 2019
-
-      System load:  0.0               Processes:           121
-      Usage of /:   6.3% of 28.90GB   Users logged in:     0
-      Memory usage: 10%               IP address for eth0: 10.0.0.4
-      Swap usage:   0%
-
-
-    27 packages can be updated.
-    16 updates are security updates.
-
 
     Last login: Mon Aug 12 15:44:03 2019 from 71.186.231.155
 
@@ -493,39 +182,34 @@ Run the following with the proper values substituted:
 
 ## Starting a Local Vault Instance
 
-Genesis stores its secrets in Vault, a piece of software written by
-Hashicorp. Genesis has opinions about how the Vault should be organized,
-so it's not suggested to colocate the Genesis secret store on a pre-existing
-Vault.
+Genesis stores deployment secrets in Vault, a secure, encrypted-at-rest
+credentials store from Hashicorp. Genesis has opinions about how the
+Vault should be organized, so it's not suggested to colocate the Genesis
+secret store on a pre-existing Vault.
 
-We use the [Safe CLI](https://github.com/starkandwayne/safe) to interact with
-Vault in general. You should have it installed after after following the
-instructions on setting up your bastion host. We're going to use Safe to
-quickly set up a temporary local Vault instance that Genesis can use until we
-are able to set up a permanent Vault through BOSH at a later time.
+We use the [Safe CLI](https://github.com/starkandwayne/safe) to interact
+with Vault in general. The Terraform script has installed it on your bastion
+host. We're going to use `safe` to quickly set up a temporary local Vault
+instance that Genesis can use until we are able to set up a more permanent
+Vault later, via BOSH.
 
-To do this, open a separate shell session / tmux pane on the jumpbox and run 
+`safe` will run this Vault as a foreground process, so you will need to open
+up a separate shell session / tmux pane on the jumpbox and run:
 
-    safe local --memory
+    safe local --memory --as temp-vault
 
 Safe will output the target name of the new Vault, target it, and authenticate
 to it automatically.
 
 ## Deploying a New Proto-BOSH
 
-First, create a `deployments` directory in which to store your various
+First, create an `deployments` directory in which to store your various
 Genesis deployment folders. Then, change to that directory and initialize
 a new Genesis deployment repository:
 
     ubuntu@bastion:~$ mkdir ~/deployments
     ubuntu@bastion:~$ cd ~/deployments
-    ubuntu@bastion:~/deployments$ genesis init bosh -k bosh
-
-    Select Vault:
-
-      1) inviolable-sanctuary   (insecure) http://127.0.0.1:8201 (default)
-
-    Select choice > inviolable-sanctuary
+    ubuntu@bastion:~/deployments$ genesis init bosh -k bosh --vault temp-vault
 
     Verifying availability of selected vault...ok
 
@@ -536,21 +220,16 @@ a new Genesis deployment repository:
      - using the bosh/1.4.0 kit.
 
 
-Genesis will prompt you at this point about which Vault
-you would like to use. Select the target that was created by `safe local`.
-
-`cd` into the newly created directory. Now we need to tell Genesis to
-set up a new proto-BOSH director deployment. The genesis command that does
-this is `genesis new`. Genesis new takes a positional argument which is the
-name of the environment that you're creating the deployment in. We typically
-recommend an `org-site-env` naming scheme. For the purpose of this
-tutorial, we'll call ours `test-eastus-controlplane`. Once you run the
-command, you'll be walked through a series of questions about the deployment
-you're about to make. The answers to most of these questions were output at
-the end of your `terraform apply`. Azure credential information can be found
-in the `terraform.tfvars` file that you set up in your `terraform-work`
-directory outside of the bastion box. An example of a successful `genesis new`
-call is seen below. 
+`cd` into the newly created directory. Now we need to set up a new
+proto-BOSH director deployment using `genesis new`. Genesis new takes a
+positional argument which is the name of the environment that you're
+creating the deployment in. For the purpose of this tutorial, we'll call ours
+`test-eastus-controlplane`. Genesis will walk you through a series of
+questions about the deployment you're about to make. Answers to most of
+these questions were output at the end of your `terraform apply`. Azure
+credential information can be found in the `terraform.tfvars` file that you
+set up in your `terraform-work` directory outside of the bastion box. An
+example of a successful `genesis new` call is seen below. 
 
     ubuntu@bastion:~/deployments$ cd bosh-deployments
     ubuntu@bastion:~/deployments/bosh-deployments$ genesis new test-eastus-controlplane
@@ -563,6 +242,9 @@ call is seen below.
     Is this a proto-BOSH director?
     [y|n] > y
 
+We are deploying this BOSH without the aid of an existing BOSH, so this is a
+Proto-BOSH director
+
     What static IP do you want to deploy this BOSH director on?
     > 10.0.0.5
 
@@ -572,10 +254,19 @@ call is seen below.
     What default gateway (IP address) should this BOSH director use?
     > 10.0.0.1
 
+This network information is output from your Terraform script. Assuming that
+your Terraform script is configured to use the 10.0.0.0/24 CIDR, then the
+gateway would be `10.0.0.1`, and the first available IP (after the network
+address, gateway, Azure reserved IPs, and bastion host) would be 10.0.0.5.
+
     What DNS servers should BOSH use? (leave value empty to end)
     1st value > 1.1.1.1
     2nd value > 1.0.0.1
     3rd value >
+
+Select the DNS servers that you would like this BOSH director and all VMs
+deployed by this BOSH director to use. For this example, we're using
+Cloudflare's public DNS.
 
     What IaaS will this BOSH director orchestrate?
       1) VMWare vSphere
@@ -600,6 +291,12 @@ call is seen below.
     What is your Azure Subscription ID?
     > 01234567-89ab-cdef-0123-456789abcdef
 
+If you've gotten this far into this guide, then you should most likely
+select Microsoft Azure as your infrastructure. The Azure Client ID, Client
+Secret, Tenant ID, and Subscription ID were all things you should have taken
+note of earlier when setting up your App Registration. Also, you should have
+placed this information in your `terraform.tfvars`.
+
     What Azure Resource Group will BOSH be deploying VMs into?
     > genesis
 
@@ -611,6 +308,11 @@ call is seen below.
 
     What is the name of the Azure subnet that the BOSH will be placed in?
     > genesis-controlplane-subnet
+
+These resources should all have been created by your Terraform script. The
+names of the created resources were output at the end of the `terraform apply`.
+All of the names are prefixed with the name you chose for your resource
+group.
 
     Would you like to edit the environment file?
     [y|n] > n
@@ -632,7 +334,7 @@ An environment file named after your environment name (e.g.
 information about your deployment. It is safe to store this file in version
 control. To deploy your newly-configured BOSH deployment, you can now run:
 
-    ubuntu@bastion:~/deployments$ genesis deploy test-eastus-controlplane
+    ubuntu@bastion:~/deployments/bosh-deployments$ genesis deploy test-eastus-controlplane
       Compiling package 'ruby-2.4-r4/0cdc60ed7fdb326e605479e9275346200af30a25'... Finished (00:05:47)
       Compiling package 'bosh_azure_cpi/afc0bf467dd0d4489f757d788065ab4d4f977ce4'... Finished (00:01:55)
       Installing packages... Finished (00:00:01)
@@ -702,9 +404,11 @@ control. To deploy your newly-configured BOSH deployment, you can now run:
 
       genesis do test-eastus-controlplane -- upload-stemcells
 
-To log in to the BOSH director, you should run:
 
-    genesis do test-eastus-controlplane -- login
+To log in to the BOSH director, there is a hook script provided for you by
+genesis. Hook scripts can be run with `genesis do`:
+
+    ubuntu@bastion:~/deployments/bosh-deployments$ genesis do test-eastus-controlplane -- login
 
 ## Uploading Your Cloud Config
 
