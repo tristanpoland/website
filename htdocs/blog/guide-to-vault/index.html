@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+<link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/favicon/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/favicon/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/favicon/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/favicon/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/favicon/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+<link rel="manifest" href="/favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/favicon/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+
+<meta name="twitter:card"       content="summary">
+
+
+<meta property="og:type"        content="article">
+<meta property="og:title"       content="Managing Secrets in Genesis: A Guide to Vault">
+<meta property="og:site_name"   content="Genesis">
+<meta property="og:url"         content="https://genesisproject.io/writings/guide-to-vault.html">
+
+
+<meta property="og:description" content="Vault is an open-source secrets management software. Let's set up one for
+our deployment secrets, shall we?
+">
+
+
+<title>Managing Secrets in Genesis: A Guide to Vault - Genesis</title>
+
+
+<link rel="stylesheet" href="/site.css?4b4881952086ec4adc88c328e3144bdf413704fc">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="/feed.xml">
+</head>
+<body>
+  <header class="top">
+    <img src="/logo.png?ff43466a0e4d90211659736aeee333c9b4d0fa77">
+    <nav>
+      <li><a href="/">Home</a></li>
+      <li><a href="/download/">Download</a></li>
+      <li><a href="/community/">Community</a></li>
+      <li><a href="/docs/">Docs</a></li>
+    </nav>
+  </header>
+
+  
+
+  <div class="header">
+    <div>
+      <h1>The Genesis Blog</h1>
+    </div>
+  </div>
+
+  <div class="blog content ">
+    <div class="autotoc">
+    </div>
+
+    <div data-autotoc-headings="h2" data-autotoc-nav=".autotoc">
+      <h1>Managing Secrets in Genesis: A Guide to Vault</h1>
+      <p class="meta">20 Aug 2019</p>
+      
+      <p class="intro">
+        <img src="/blog/header/jason-roberts-zLtXrNXJpKM-unsplash.jpg"
+             alt="Jason Roberts (@jasonrobertsphotography), via Unsplash">
+        <cite>image credit <a target="_blank" href="https://unsplash.com/@jasonrobertsphotography">Jason Roberts (@jasonrobertsphotography), via Unsplash</a></cite>
+      </p>
+      
+      <p>Vault is an open-source secrets management software. We will talk a bit
+about the problem that secrets present, vault as a solution to that problem,
+and using genesis and safe to implement vault in a deployment. I will also
+assume that you used Genesis to deploy your primary vault as done in any of
+the Deploying Bosh using Genesis posts.</p>
+
+<h2>The Problem with Secrets</h2>
+
+<p>Even a simple software deployment is riddled with secrets. SSH, API, and RSA
+keys, certificates, usernames, passwords - the list goes on. So that begs
+the question, where do we store all of that?</p>
+
+<p>We could hard code them. Make the repo private, only those in your org can
+see it. Great, no problem. Until someone accidentally makes the wrong repo
+public, and your whole deployment is exposed,</p>
+
+<p>Then how about using environment variables? Keep them all local, awesome.
+Well, they are in your environment and you need to share them with the team.
+Oh, we'll just put them in a private repo just for the env vars! Wait, but
+we already ruled that out.</p>
+
+<p>Then lets use a database. That'll do it. As long as you trust your database
+administrator, the database host against online attacks, and that no one can
+get to the physical disks for an offline attack... Okay, lets encrypt the
+data base, but then, what do we do with the encryption key? We could hard
+code it! ...Or make it an environment variable! ...Or Store it in the
+database next to what it is encrypting?</p>
+
+<p>Vault can help with the problem of storing the secrets for the deployment.
+It isn't perfect, there is still the case of the unseal keys, but there are
+solutions in the Vault Genesis kit to help with that as well.</p>
+
+<h2>Basics of Sealing and Unsealing</h2>
+
+<p>Vault encrypts all of its contents and the key is only ever held in memory.
+This means that the vault will automatically "reseal" itself on reboot. What
+if you want to manually seal the vault in a "break glass in case of
+emergency" type of situation. The vault we deployed is by default in <a href="https://www.vaultproject.io/docs/concepts/ha.html">High
+Availability Mode (HA)</a>.
+In our case, there are three instances of the same vault each on their own
+VM. If one is a primary node and if that goes down, there are two redundant
+nodes ready to take over. That means that each vault node needs to be sealed
+starting with the active node, then recursively finding the new active node
+one by one until all are sealed Not too bad in our deployment of 3 nodes. I
+have seen as many as 5 or 7 redundant nodes. Safe makes sealing the entire
+vault easy.</p>
+
+<pre><code>$ safe seal
+sealed https://10.0.0.5:443...
+sealed https://10.0.0.4:443...
+sealed https://10.0.0.6:443...
+</code></pre>
+
+<p>So we can seal a vault manually with safe and we know that the vault will be
+sealed on reboot. What about unsealing?</p>
+
+<p>When the vault is initialized with the Vault Genesis kit, you (hopefully)
+noticed Genesis write this to the terminal:</p>
+
+<pre><code>Unseal Key #1: ~~~ Key 1 ~~~
+Unseal Key #2: ~~~ Key 2 ~~~
+Unseal Key #3: ~~~ Key 3 ~~~
+Unseal Key #4: ~~~ Key 4 ~~~
+Unseal Key #5: ~~~ Key 5 ~~~
+Initial Root Token: ~~~ Token ~~~
+
+Vault initialized with 5 keys and a key threshold of 3. Please
+securely distribute the above keys. When the Vault is re-sealed,
+restarted, or stopped, you must provide at least 3 of these keys
+to unseal it again.
+
+Vault does not store the master key. Without at least 3 keys,
+your Vault will remain permanently sealed.
+</code></pre>
+
+<p>These keys and token are important. The token is used with <code>safe auth</code> to
+authenticate with the vault. This is saved in your <code>.saferc</code>, but would be
+needed if that file is lost or you were allowing another machine access to
+the vault.</p>
+
+<p>As the output above states, three keys must be provided to build the master
+key. This means you can store all those keys yourself, or divide them up -
+give one to yourself, John, Jane, Mary, and Mark.</p>
+
+<p>As long as you have the keys, unsealing with safe is straight forward.</p>
+
+<pre><code>$ safe status
+https://10.0.0.5:443 is sealed
+https://10.0.0.6:443 is sealed
+https://10.0.0.4:443 is sealed
+
+$ safe unseal
+You need 3 key(s) to unseal the vaults.
+
+Key #1:
+Key #2:
+Key #3:
+unsealing https://10.0.0.5:443...
+unsealing https://10.0.0.6:443...
+unsealing https://10.0.0.4:443...
+
+$ safe status
+https://10.0.0.4:443 is unsealed
+https://10.0.0.5:443 is unsealed
+https://10.0.0.6:443 is unsealed
+</code></pre>
+
+<h2>Primary vs Secondary Vault</h2>
+
+<p>When you deploy a vault using the Vault Genesis kit, the first thing it asks is:</p>
+
+<pre><code>Is this your Genesis Vault (for storing deployment credentials)?
+[y|n] &gt;
+</code></pre>
+
+<p>When you select <code>y</code> here, Genesis makes that deployment the primary vault
+for the entire deployment. This will store the creds required to deploy any
+apps - things like creds to access vms to spin up applications, not creds
+for individual applications or users. For example, say the dev team wants to
+store creds for their app in a vault. Naturally, you don't want to give
+every engineer on the dev team access to your primary vault. You would
+command <code>genesis new vault-dev</code>, select <code>n</code> when prompted, deploy with
+<code>genesis deploy vault-dev</code> then that team performs <code>genesis do vault-dev --
+init</code>. It is then up to them to actually manage the vault and its contents.
+But you would still manage the deployment.</p>
+
+<h2>Vault in a Pipeline</h2>
+
+<p>Using Vault in a pipeline can be tough. For example, new stemcells are
+released, the pipeline goes into action and starts with primary vault. The
+vault deployment updates just fine. The pipeline moves to the next
+deployment, asks vault for the creds - vault was just sealed at reboot.</p>
+
+<p>Upon initializing the primary vault with the vault Genesis kit, the unseal
+keys are stored inside the newly initialized vault. That may seem like a
+strange place to store the keys, like locking your keys inside your car.
+This allows Genesis to grab the unseal keys prior to rebooting the vault
+deployment. Genesis then unseals the vault at reboot and the pipeline can
+continue running.</p>
+
+<h2>Working with Multiple Vaults</h2>
+
+<p>If you have multiple deployments, you may be dealing with multiple vaults.
+Safe has a convenient setup for that as well.</p>
+
+<pre><code>$ safe targets
+Known Vault targets - current target indicated with a (*):
+(*) buffalo-lab   (noverify) https://10.128.4.4
+    genesis-ci    (noverify) https://10.128.8.12
+    jumpbox       (insecure) http://10.128.80.192:8200
+</code></pre>
+
+<p>To change targets:</p>
+
+<pre><code>$ safe target genesis-ci
+Now targeting genesis-ci at https://10.128.8.12 (skipping TLS certificate verification)
+
+$ safe targets
+Known Vault targets - current target indicated with a (*):
+    buffalo-lab   (noverify) https://10.128.4.4
+(*) genesis-ci    (noverify) https://10.128.8.12
+    jumpbox       (insecure) http://10.128.80.192:8200
+</code></pre>
+
+<p>To add a new target:</p>
+
+<pre><code>$ safe target my-vault https://vault.ip
+Now targeting my-vault at https://vault.ip
+
+$ safe targets
+Known Vault targets - current target indicated with a (*):
+    buffalo-lab   (noverify) https://10.128.4.4
+    genesis-ci    (noverify) https://10.128.8.12
+    jumpbox       (insecure) http://10.128.80.192:8200
+(*) my-vault                 https://vault.ip
+</code></pre>
+
+<p>Use <code>-k</code> to skip TLS:</p>
+
+<pre><code>$ safe -k target  my-vault-k https://vault.ip
+Now targeting my-vault-k at https://vault.ip
+
+$ safe targets
+Known Vault targets - current target indicated with a (*):
+    buffalo-lab   (noverify) https://10.128.4.4
+    genesis-ci    (noverify) https://10.128.8.12
+    jumpbox       (insecure) http://10.128.80.192:8200
+    my-vault                 https://vault.ip
+(*) my-vault-k    (noverify) https://vault.ip
+</code></pre>
+    </div>
+  </div>
+
+  <footer>
+    <div class="g">
+      <div class="x3">
+        <img src="/swlogo.png?0b567bdcee59ac95e3eaf667ec543ebc1631d6c0">
+
+        <p>Genesis is maintained by Stark &amp; Wayne,
+        a leading Cloud-Native consulting firm.</p>
+      </div>
+
+      <div class="x3">
+        <nav>
+          <li><a href="/">Home</a></li>
+          <li><a href="/download/">Download</a></li>
+          <li><a href="/community/">Community</a></li>
+          <li><a href="/docs/">Docs</a></li>
+        </nav>
+      </div>
+
+      <div class="x3">
+      </div>
+    </div>
+
+    <div class="copyright">
+      <p>Copyright &copy; 2019 The Genesis Authors.  All rights reserved.</p>
+    </div>
+  </footer>
+  <script type="text/javascript" src="/site.js?d2112e355882784cf7f38561cf3ccb0bd5da3111"></script>
+</body>
+</html>
