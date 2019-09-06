@@ -6,9 +6,11 @@ format:   markdown
 template: call.tt
 
 next:
+  - id:   20190917
+    date: September 17th, 2019
+previous:
   - id:   20190820
     date: August 20th, 2019
-previous: []
 --- |-
 
 # Joining the Call
@@ -19,7 +21,7 @@ development progress, and future direction.
 
 The next Genesis Roadmap Call is
 <br>
-**Tuesday, August 20th** at **11:00am EDT**.
+**Tuesday, September 17th** at **11:00am EDT**.
 
 We use zoom: <https://zoom.us/j/7165551212>
 
@@ -30,20 +32,61 @@ You can also call in (the Meeting ID is **716 555 1212**):
 
 Calls are not recorded.
 
-# Agenda for August 20th, 2019
+# Agenda for September 17th, 2019
 
 1. Introductions
 
 2. Announcements
-   - Kick off the monthly call (!!)
-   - Genesis v2.7.0
-   - Planned Website Improvements
+   - Blogs and Docs and Blogs and Docs!
+   - Recent Releases
+   - Upcoming Releases
 
 3. Development Progress Update
    - [Trello Board][trello] Review
    - Dev Team Status Report
 
 4. Open Forum
+
+
+<h2 id="20190820">August 20th, 2018</h2>
+
+These are the notes from our first ever community call, held at 11:00am EDT on
+Tuesday, August 20th, 2019.
+
+## The Website
+
+Our website (this website!), <https://genesisproject.io> just got a snazzy
+new redesign.  Now that the day-to-day annoyance of modifying the website
+content is more well-in-hand, the team expects to start putting up more and
+more blog posts and documentation!
+
+## Blogs, Blogs, and More Docs!
+
+The Genesis Team has been putting forth a concerted effort to write more
+approachable "first timer" content to get people interested in deploying
+Cloud technology like CF, BOSH, and Kubernetes into the Genesis mindset.
+
+Hopefully, by the time of our next Communty Call (September 17th), we'll
+have something more concrete to show off.
+
+## Cloud Foundry Genesis Kit
+
+Work continues on keeping the CF Genesis Kit up-to-date with the most recent
+_stable_ cf-deployment upstream.  Our strategy with CF has been to follow
+the upstream cf-deployment from the community, but discriminate in what we
+ingest to keep with our vision of Cloud Foundry structure.
+
+## CI/CD Pipelines
+
+For those interested, James showed off the internal CI/CD pipelines that the
+Genesis Team uses for release engineering, and talked about the specific
+challenges facing testing at-scale with so many different feature flags,
+IaaS features, and user preferences.
+
+## Concourse v5.4.0 Released!
+
+Lastly (but certainly not leastly) the Concourse Genesis Kit was updated to
+Concourse v5.4.0! 🎉
 
 [trello]: https://trello.com/b/HFOPui7k/genesis
 [slack]:  /community#slack
