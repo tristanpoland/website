@@ -5,17 +5,16 @@ format:    markdown
 featured:  yes
 dated:     1 Aug 2019
 author:    tmitchell
-
-#header:    francesco-gallaroti-72602.jpg
-#credit:
-#  text:    "Francesco Gallarotti (@gallarotti), via Unsplash"
-#  url:     https://unsplash.com/@gallarotti
+header:    genesis-on-azure.png
 
 abstract: |
-  FIXME - MARKETING ABSTRACT NEEDED STILL
+  BOSH is an effective way to manage your infrastructure and Azure is a great
+  infrastructure to manage, but before you have a BOSH director, you need to
+  bootstrap Azure to a point where you can deploy a BOSH Director to it.
 --- |-
-FIXME - TEASER NEEDED STILL
-
+BOSH is an effective way to manage your infrastructure and Azure is a great
+infrastructure to manage, but before you have a BOSH director, you need to
+bootstrap Azure to a point where you can deploy a BOSH Director to it.
 --- |-
 
 ## Introduction

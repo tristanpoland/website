@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+<link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/favicon/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/favicon/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/favicon/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/favicon/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/favicon/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+<link rel="manifest" href="/favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/favicon/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+
+<meta name="twitter:card"       content="summary">
+
+
+<meta property="og:type"        content="article">
+<meta property="og:title"       content="Deploying a BOSH to Google Cloud Platform Using Genesis and Terraform">
+<meta property="og:site_name"   content="Genesis">
+<meta property="og:url"         content="https://genesisproject.io/writings/deploying-bosh-to-gcp.html">
+
+
+<meta property="og:description" content="Do you have a Google Cloud Platform account? Do you wish things were more
+automated and just easier to manage? Want to do that using BOSH, but wish
+there was a simple way to deploy BOSH? Me too. So, let's do that.
+">
+
+
+<title>Deploying a BOSH to Google Cloud Platform Using Genesis and Terraform - Genesis</title>
+
+
+<link rel="stylesheet" href="/site.css?4b4881952086ec4adc88c328e3144bdf413704fc">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="/feed.xml">
+</head>
+<body>
+  <header class="top">
+    <img src="/logo.png?ff43466a0e4d90211659736aeee333c9b4d0fa77">
+    <nav>
+      <li><a href="/">Home</a></li>
+      <li><a href="/download/">Download</a></li>
+      <li><a href="/community/">Community</a></li>
+      <li><a href="/docs/">Docs</a></li>
+    </nav>
+  </header>
+
+  
+
+  <div class="header">
+    <div>
+      <h1>The Genesis Blog</h1>
+    </div>
+  </div>
+
+  <div class="blog content ">
+    <div class="autotoc">
+    </div>
+
+    <div data-autotoc-headings="h2" data-autotoc-nav=".autotoc">
+      <h1>Deploying a BOSH to Google Cloud Platform Using Genesis and Terraform</h1>
+      <p class="meta">1 Aug 2019</p>
+      
+      <p class="intro">
+        <img src="/blog/header/genesis-on-gcp.png"
+             alt="">
+        
+      </p>
+      
+      <p>Do you have a Google Cloud Platform account? Do you wish things were more
+automated and just easier to manage? Want to do that using BOSH, but wish
+there was a simple way to deploy BOSH? Me too. So, let's do that.</p>
+
+<p>Why do we want to use BOSH? What does BOSH offer? </p>
+
+<ul>
+<li>Config Management    - deployments in BOSH are configured using manifest files that allow for easy back up and version control of deployments configurations. </li>
+<li>App Auto Scaling     - BOSH can spin up more or less VMs for an app as necessary. </li>
+<li>VM Health Monitoring - BOSH watches VMs it has deployed and will recreate VMs that fail.  </li>
+<li>Platform Agnostic    - BOSH has support for just about every cloud platform, GCP, AWS, Azure, Vsphere, etc. Your manifests can transfer to other platforms if needed. </li>
+<li>OS management        - OS updates are managed by stemcells that BOSH will manage and use to update VMs automatically</li>
+<li>no transactional admin management - ?</li>
+</ul>
+
+<p>When we are done, you will have a working environment in GCP with a bastion host to access the network, a BOSH director to manage all the deployments, and a secure Vault instance to manage the credentials and certificates for the deployment. To get there, we will use start with terraform to get the infrastructure outlined and bastion host running on GCP, then use that bastion host to deploy the BOSH director, and finally use that BOSH director to deploy Vault.</p>
+
+<p>To get started you need a fresh GCP project with a service account to perform the automation tasks. Create a service account with the following roles: </p>
+
+<ul>
+<li><code>Compute Engine</code> > <code>Computer Admin</code></li>
+<li><code>Service Accounts</code> > <code>Service Account User</code> </li>
+<li><code>Storage</code> > <code>Storage Admin</code></li>
+</ul>
+
+<p>Also, create and save the service account key as json to be used later. </p>
+
+<h2>Getting Started with Terraform</h2>
+
+<p>Terraform is a way to manage infrastructure on GCP. Terraform documentation and binaries can be found at <a href="https://terraform.io">https://terraform.io</a>. Clone <a href="https://github.com/genesis-community/terraforms">this repo</a> to get started</p>
+
+<pre><code>$ git clone https://github.com/genesis-community/terraforms
+</code></pre>
+
+<p>We will be working in the <code>controlplane/gcp</code> area, here you will find a sample config file that is ready to go, only needing a few inputs from you. So make a <code>gcp.tfvars</code> file in the gcp controlplane area.</p>
+
+<pre><code>$ cd terraforms/controlplane/gcp
+$ vim gcp.tfvars
+</code></pre>
+
+<p>Here are the variables that you need to define and what the file should look like:</p>
+
+<pre><code>project_id                  = "your-gcp-project-id"
+service_account_credentials = "path/to/your-sa-creds.json"
+service_account_email       = "your-service-account@google-assigned-email.com"
+
+ssh_creds_pub               = { bastion-user = "~/.ssh/id_rsa.pub" }
+ssh_creds_priv              = { bastion-user = "~/.ssh/id_rsa" }
+</code></pre>
+
+<p>The <code>service_account_creds</code> is the <code>.json</code> downloaded above. </p>
+
+<p>With those set, get things going with the short and sweet:</p>
+
+<pre><code>$ make
+</code></pre>
+
+<p>Terraform will now compile all that information into a plan for GCP. When prompted, type <code>yes</code>. </p>
+
+<pre><code>Plan: 9 to add, 0 to change, 0 to destroy.
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+</code></pre>
+
+<p>At this point, terraform will do what it needs to do and deploy the network, subnet, firewall rules, and the bastion host VM. When the dust settles, there should be a nice output looking something this: </p>
+
+<pre><code>Apply complete! Resources: 9 added, 0 changed, 0 destroyed.
+
+~~~ Terraform raw outputs ~~~
+
+For configuring your proto-BOSH:
+
+  Static IP:             10.0.0.3
+  Range (CIDR):          10.0.0.0/24
+  Gateway:               10.0.0.1
+  DNS:                   169.254.169.254
+
+  GCP Project ID:        your-gcp-project-id
+  Service account Creds: path-to-your-sa-creds.json
+  Network Name:          genesis-bosh-network
+  Subnet Name:           genesis-bosh-subnetwork
+  Availability Zone:     us-east4-a
+
+To access the bastion host:
+
+  ssh -i ~/id_rsa.pub bastion-user@gcp.assigned.ip.addr
+</code></pre>
+
+<p>That output provides the answers to most of questions that Genesis will ask when setting up the proto-BOSH and what you need to ssh to the bastion host. You can easily get that info again using:</p>
+
+<pre><code>$ make info
+</code></pre>
+
+<h2>Setting up the Bastion Host</h2>
+
+<p>The bastion host is the access point to the rest of the network. We will go through the bastion host to access any of our deployments. Access the bastion host using the <code>ssh</code> command printed after the deploy. 
+First thing, setup your git config.</p>
+
+<pre><code>$ git config --global user.name "Your Name"
+$ git config --global user.email "Your Email"
+</code></pre>
+
+<p>This bastion host was a fresh ubuntu VM. As part of the Terraform config, we ran a script that installed what we need to stand up our proto-BOSH using Genesis.</p>
+
+<p>The things installed by this script include <code>bosh</code>,<code>cf</code>, and <code>genesis</code> as well as some other utilities such as <a href="https://github.com/starkandwayne/safe">safe</a>, <a href="https://github.com/geofffranks/spruce">spruce</a>, and <a href="https://github.com/stedolan/jq">jq</a>. </p>
+
+<p>To see what is installed, you can run <code>jumpbox</code> with no arguments.</p>
+
+<pre><code>$ jumpbox
+~~~ jumpbox art ~~~
+&gt;&gt; Checking jumpbox installation
+   jumpbox installed - jumpbox v55
+   ruby installed - ruby 2.3.1p112 (2016-04-26) [x86_64-linux-gnu]
+   bosh installed - version 3.0.1-712bfd7-2018-03-13T23:26:43Z
+   cf installed - cf version 6.46.0+29d6257f1.2019-07-09
+   jq installed - jq-1.5
+   spruce installed - spruce - Version 1.22.0
+   safe installed - safe v1.3.0
+   vault installed - Vault v0.9.6 ('7e1fbde40afee241f81ef08700e7987d86fc7242')
+   genesis installed - Genesis v2.6.17 (6dfca15edc) build 20190719.205359
+   sipcalc installed - sipcalc 1.1.6
+
+   git user.name  is 'Troy Liebel'
+   git user.email is 'tliebel@starkandwayne.com'
+
+   To bootstrap this installation,  try `jumpbox system`
+   To set up your personal environment: `jumpbox user`
+   To update this copy of jumpbox, use: `jumpbox sync`
+   To create a new local user account:  `jumpbox useradd`
+</code></pre>
+
+<h2>Creating a Temporary Vault</h2>
+
+<p>~---------------tmux-----------------</p>
+
+<p><a href="https://www.vaultproject.io/">Vault</a> is useful tool that Genesis taps into to generate and manage SSH keys, certs, and more. Once we get BOSH up and running, we will deploy an instance of Vault to manage those things, but until then we need something to get us started. We can do that by starting a local vault instance. </p>
+
+<p>Use the <a href="https://github.com/starkandwayne/safe">Safe CLI</a> to startup a local instance of Vault.  Open up another shell session, or tmux pane on the bastion host and run:</p>
+
+<pre><code>$ safe local --memory  --as temp-vault
+</code></pre>
+
+<p>Now you have an in-memory Vault instance named <code>temp-vault</code> running and targeted. </p>
+
+<h2>Deploying the Proto-BOSH</h2>
+
+<p>Make a directory <code>deployments</code> to store our Genesis deployments. Then, use Genesis to initialize our BOSH deployment. Use <code>-k</code> to specify the Genesis kit and <code>--vault</code> to specify what vault we want to use. </p>
+
+<pre><code>$ mkdir ~/deployments
+$ cd ~/deployments
+$ genesis init -k bosh --vault temp-vault
+</code></pre>
+
+<p>Genesis will check for the newest kit for bosh and initialize a <code>bosh-deployments</code> repository for us.</p>
+
+<pre><code>Verifying availability of selected vault...ok
+
+Downloading Genesis kit bosh (latest version)...
+
+Initialized empty Genesis repository in ./bosh-deployments
+ - using vault at http://127.0.0.1:8201 (insecure)
+ - using the bosh/1.4.0 kit.
+</code></pre>
+
+<p>Next is to tell Genesis what it has to work with to write an environment file for our BOSH director. The environment file defines the configuration of the network and cloud platform that we are deploying our BOSH director on. </p>
+
+<p>To get started, move into the directory Genesis created and run <code>genesis new</code> with a name for the environment, ie <code>gcp-env</code>. This is our first BOSH, so <code>y</code> when asked if this is a proto-BOSH.</p>
+
+<pre><code>$ cd bosh-deployments
+$ genesis new gcp-env
+Setting up new environment gcp-env...
+
+Using vault at http://127.0.0.1:8201.
+Verifying availability...ok
+
+
+Is this a proto-BOSH director?
+[y|n] &gt; y
+</code></pre>
+
+<p>The info needed to answer just about all of the questions below can be found from the <code>make</code> that we did on your local machine (you can do <code>make info</code> to get that information again). If you did not make any changes to the <code>.tf</code> Terraform config, your answers should be the same as mine for everything except the Project-ID and the GCP credentials. </p>
+
+<p>The first chunk of questions are regarding the networking for the BOSH director.  </p>
+
+<pre><code>What static IP do you want to deploy this BOSH director on?
+&gt; 10.0.0.3
+
+What network should this BOSH director exist in (in CIDR notation)?
+&gt; 10.0.0.0/24
+
+What default gateway (IP address) should this BOSH director use?
+&gt; 10.0.0.1
+</code></pre>
+
+<p>This is the DNS resolver that GCP uses. More info can be found in the <a href="https://cloud.google.com/compute/docs/internal-dns#access_by_internal_DNS">GCP documentation</a>.</p>
+
+<pre><code>What DNS servers should BOSH use? (leave value empty to end)
+1st value &gt; 169.254.169.254
+2nd value &gt;
+</code></pre>
+
+<p>This is where Genesis gets into the GCP specific questions, go ahead and choose item <code>4</code> here.  </p>
+
+<pre><code>What IaaS will this BOSH director orchestrate?
+  1) VMWare vSphere
+  2) Amazon Web Services
+  3) Microsoft Azure
+  4) Google Cloud Platform
+  5) OpenStack
+  6) BOSH Warden
+
+Select choice &gt; 4
+</code></pre>
+
+<p>These are the two questions that are unique to you. The GCP creds are the service account credentials, provide them as the raw json contents of the <code>.json</code> key file.</p>
+
+<pre><code>What is your GCP project ID?
+&gt; your-gcp-project-id
+
+What are your GCP credentials (generally supplied as a JSON block)? (Enter &lt;CTRL-D&gt; to end)
+-------------------------------------------------------------------------------------------
+{
+  ~~~ Service Account creds as raw JSON ~~~
+}
+</code></pre>
+
+<p>Genesis now wants the network, subnetwork, and availability zone for the director to operate on. </p>
+
+<pre><code>What is your GCP network name?
+&gt; genesis-bosh-network
+
+What is your GCP subnetwork name?
+&gt; genesis-bosh-subnetwork
+
+What availability zone do you want the BOSH VM to reside in?
+&gt; us-east4-a
+</code></pre>
+
+<p>We need to give the environment VM at least one tag. ie <code>bosh</code>.</p>
+
+<pre><code>What tags would you like to be set on the BOSH VM? (leave value empty to end)
+1st value &gt; bosh
+2nd value &gt;
+</code></pre>
+
+<p>If you have a desire to look at the environment file at this point, go ahead. Otherwise, the environment file is ready to go without any edits. We can let Genesis take the info we provided and provision the environment.</p>
+
+<pre><code>Would you like to edit the environment file?
+[y|n] &gt; n
+ - auto-generating credentials (in secret/bosh/gcp/bosh)...
+ - auto-generating certificates (in secret/bosh/gcp/bosh)...
+New environment gcp-env provisioned!
+
+To deploy, run this:
+
+  genesis deploy 'gcp-env'
+</code></pre>
+
+<p>With that, Genesis has generated passwords and X.509 certs that the BOSH director needs, added them to the temporary vault and we are ready to deploy our BOSH director. </p>
+
+<pre><code>$ genesis deploy gcp-env
+</code></pre>
+
+<p>This will likely take some time as it needs to compile quite a few packages. </p>
+
+<h2>Preparing the BOSH Director for use</h2>
+
+<p>The BOSH director is now deployed and running, but it needs a two things before we can use it to deploy anything else: an Ubuntu Xenial stemcell and a cloud config. Luckily, we have tools in the BOSH Genesis kit and Terraform makefile to make these things pretty easy for us.</p>
+
+<p>Let's start with logging into our new BOSH director. When the BOSH director finished deploying, Genesis printed a few different command options that are now available to us, including what we need to login. </p>
+
+<pre><code>$ genesis do gcp-env -- login
+
+Using vault at http://127.0.0.1:8201.
+Verifying availability...ok
+
+Running login addon for gcp-env
+Logging you in as user 'admin'...
+Using environment 'https://10.0.0.3:25555'
+
+Email (): admin
+Password ():
+
+Successfully authenticated with UAA
+
+Succeeded
+</code></pre>
+
+<h2>Uploading Stemcells</h2>
+
+<p>Now we can use Genesis' handy <code>upload-stemcells</code> option which is a convenient way to upload stemcells. I chose the latest stemcell that was available at the time. </p>
+
+<pre><code>$ genesis do gcp-env -- upload-stemcells
+
+Using vault at http://127.0.0.1:8201.
+Verifying availability...ok
+
+Running upload-stemcells addon for gcp-env
+
+Select the release family for the google-kvm ubuntu-xenial stemcell you wish to upload:
+  1) 456.x (2 minor versions available)
+  2) 315.x (14 minor versions available)
+  3) 250.x (19 minor versions available)
+  4) 170.x (5 minor versions available)
+
+Select choice &gt; 1
+
+Select one of the available 456.x versions:
+  1) 456.3
+  2) 456.1
+
+Select choice &gt; 1
+
+~~~ Upload Details ~~~
+
+Succeeded
+
+Upload another?
+[y|N] &gt; n
+</code></pre>
+
+<h2>Updating Cloud Config</h2>
+
+<p>BOSH Cloud Configs can be a dense and incomprehensible. To make this better, we have a function in our Genesis Terraform repo that will output a simple cloud config to get us going. </p>
+
+<p>From your local machine, in the terraform directory:</p>
+
+<pre><code>$ make cc
+</code></pre>
+
+<p>Paste that YAML into a file on the bastion host vm, ie <code>cloud-config.yml</code>. Upload that to the BOSH Director.</p>
+
+<pre><code>$ bosh -e gcp-env update-cloud-config cloud-config.yml
+</code></pre>
+
+<p>This cloud config is pretty basic. It defines defaults for the network, vm types, disk, and availability zone. We also defined another network for the Vault that we will be deploying shortly. </p>
+
+<h2>Deploying a Real Vault</h2>
+
+<p>We deployed a local vault in memory, which works great and does everything we need it to do... <em>Except</em> persist outside of the memory of the bastion host, which is a pretty important feature for this entire deployment's credentials. Luckily, we now have a BOSH director that can deploy a Vault for us.</p>
+
+<p>There is a Genesis kit for Vault that will do most of the heavy lifting for us. From the bastion host, move outside the <code>bosh-deployments</code> directory and initialize the new Vault.</p>
+
+<pre><code>$ cd ~/deployments
+$ genesis init -k vault --vault temp-vault
+</code></pre>
+
+<p>The only question this Genesis kit will ask is if this is our Genesis Vault, which it is, so <code>y</code> when prompted.</p>
+
+<pre><code>$ cd vault-deployments
+$ genesis new gcp-env
+</code></pre>
+
+<p>You can try to deploy right now, but Genesis will complain about the AZs. Vault by default looks to be in 3 availability zones. In our case, one AZ is fine for this lab environment. It is worth noting that in prod Vault should be distributed across availability zones to prevent losing all the creds to your entire deployment from a single point of failure. </p>
+
+<p>Open up the <code>gcp-env.yml</code> and add these params:</p>
+
+<pre><code>params:
+  availability_zones: [z1]
+  stemcell_os: ubuntu-xenial
+</code></pre>
+
+<p>We also add the <code>stemcell_os</code> param because the Vault kit might be expecting different stemcells, but the stemcells we gave to BOSH are Xenial. </p>
+
+<p>Now we are ready to deploy. This will also take some time, but slightly less than the proto-BOSH. </p>
+
+<pre><code>$ genesis deploy gcp-env
+</code></pre>
+
+<h2>Transferring Secrets to the new Vault</h2>
+
+<p>We now have a full-fledged Vault instance deployed and ready to go.  Initialize the new Vault.</p>
+
+<pre><code>$ genesis do gcp-env -- init
+</code></pre>
+
+<p>Export all the creds from the local <code>temp-vault</code> to this new Vault.</p>
+
+<pre><code>$ safe -T temp-vault export | safe -T gcp-env import
+</code></pre>
+
+<h2>Showing Genesis the new Vault</h2>
+
+<p>Genesis has a convenient feature as of 2.7 that keeps track of what vault is being used for each deployment. This is great if you are multitasking. For example, you are working in a local dev environment, then switch lanes to deploy an app in your GCP environment. You try deploying, but are still targeting the local vault. Previously, this would blow up as the wrong creds are being used to deploy. Now, Genesis keeps track of this for you and uses the proper vault for your deployment. </p>
+
+<p>Run <code>genesis secrets-provider</code> to see what Genesis is currently using.  </p>
+
+<pre><code>$ genesis secrets-provider
+
+Secrets provider for vault deployment at /home/bastion-user/deployments/vault-deployments:
+         Type: Safe/Vault
+          URL: http://127.0.0.1:8201 (insecure)
+  Local Alias: temp-vault
+       Status: ok
+</code></pre>
+
+<p>As Expected, Genesis is looking to the temp-vault still. We can go ahead and swap that over now.</p>
+
+<pre><code>$ genesis secrets-provider gcp-env
+
+Secrets provider for vault deployment at /home/bastion-user/deployments/vault-deployments:
+         Type: Safe/V
+          URL: https://10.0.0.5 (noverify)
+  Local Alias: gcp-env
+       Status: ok
+</code></pre>
+
+<p>As stated above, this is per deployment. So we have to do the same in the bosh deployment.</p>
+
+<pre><code>$ cd ~/deployments/bosh-deployments
+$ genesis secrets-provider gcp-env
+
+Secrets provider for bosh deployment at /home/bastion-user/deployments/bosh-deployments:
+         Type: Safe/Vault
+          URL: https://10.0.0.5 (noverify)
+  Local Alias: gcp-env
+       Status: ok
+</code></pre>
+
+<p>With all of our secrets <em>safely</em> transferred, we can shut down the temp-vault. </p>
+
+<p>That is a BOSH director primed and ready to deploy whatever you need in GCP! Check out other what other Genesis kits are available at <a href="https://github.com/genesis-community">Genesis Community</a>.  </p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="g">
+      <div class="x3">
+        <img src="/swlogo.png?0b567bdcee59ac95e3eaf667ec543ebc1631d6c0">
+
+        <p>Genesis is maintained by Stark &amp; Wayne,
+        a leading Cloud-Native consulting firm.</p>
+      </div>
+
+      <div class="x3">
+        <nav>
+          <li><a href="/">Home</a></li>
+          <li><a href="/download/">Download</a></li>
+          <li><a href="/community/">Community</a></li>
+          <li><a href="/docs/">Docs</a></li>
+        </nav>
+      </div>
+
+      <div class="x3">
+      </div>
+    </div>
+
+    <div class="copyright">
+      <p>Copyright &copy; 2019 The Genesis Authors.  All rights reserved.</p>
+    </div>
+  </footer>
+  <script type="text/javascript" src="/site.js?d2112e355882784cf7f38561cf3ccb0bd5da3111"></script>
+</body>
+</html>

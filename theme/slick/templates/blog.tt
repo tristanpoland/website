@@ -11,8 +11,12 @@
     <div>
       [% for article in articles %]
       <article>
+        [% if article.attrs.header %]
+        <img src="/blog/header/[% article.attrs.header %]"
+             alt="[% if article.attrs.credit.text %][% article.attrs.credit.text %][% end %]">
+        [% end %]
         <h2>[% article.attrs.title %]</h2>
-        [% filter markdown %][% article.attrs.intro %][% end %]
+        [% filter markdown %][% article.attrs.teaser %][% end %]
 
         <p><a href="/blog/[% article.attrs.permalink %]/">Read More &raquo;</a></p>
       </article>
