@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+<link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/favicon/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/favicon/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/favicon/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/favicon/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/favicon/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+<link rel="manifest" href="/favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/favicon/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+
+<meta name="twitter:card"       content="summary">
+
+
+<meta property="og:type"        content="article">
+<meta property="og:title"       content="Deploying BOSH in vSphere using Genesis">
+<meta property="og:site_name"   content="Genesis">
+<meta property="og:url"         content="https://genesisproject.io/writings/vsphere-lab-1.html">
+
+
+<meta property="og:description" content="Let's walk through spinning up a BOSH director on vSphere using Genesis.
+">
+
+
+<title>Deploying BOSH in vSphere using Genesis - Genesis</title>
+
+
+<link rel="stylesheet" href="/site.css?4b4881952086ec4adc88c328e3144bdf413704fc">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="/feed.xml">
+</head>
+<body>
+  <header class="top">
+    <img src="/logo.png?ff43466a0e4d90211659736aeee333c9b4d0fa77">
+    <nav>
+      <li><a href="/">Home</a></li>
+      <li><a href="/download/">Download</a></li>
+      <li><a href="/community/">Community</a></li>
+      <li><a href="/docs/">Docs</a></li>
+    </nav>
+  </header>
+
+  
+
+  <div class="header">
+    <div>
+      <h1>The Genesis Blog</h1>
+    </div>
+  </div>
+
+  <div class="blog content ">
+    <div class="autotoc">
+    </div>
+
+    <div data-autotoc-headings="h2" data-autotoc-nav=".autotoc">
+      <h1>Deploying BOSH in vSphere using Genesis</h1>
+      <p class="meta">Apr 4 2019</p>
+      
+      <p class="intro">
+        <img src="/blog/header/francesco-gallaroti-72602.jpg"
+             alt="Francesco Gallarotti (@gallarotti), via Unsplash">
+        <cite>image credit <a target="_blank" href="https://unsplash.com/@gallarotti">Francesco Gallarotti (@gallarotti), via Unsplash</a></cite>
+      </p>
+      
+      <p>BOSH is an infrastructure-agnostic VM-management tool that manages the entire lifecycle of your VMs
+and resurrects them if they fail. All of these features come at the cost of complexity.</p>
+
+<p>Enter Genesis. </p>
+
+<p>Genesis is a tool and paradigm for easily managing complex BOSH deployments.
+But you won't have any BOSH deployments if you don't first have BOSH, so 
+Genesis also allows users to easily deploy a BOSH director in the first place.</p>
+
+<p>This blog post will walk you through using genesis to deploy a BOSH director on vSphere.</p>
+
+<h2>Prerequisites</h2>
+
+<p>The prerequisites for following along with these steps are:
+    1.) Access to VCenter. During experimentation, admin credentials are ok. In production, 
+        use a vCenter accout with the [minimum required vSphere Permissions][vsphere-perms]
+    2.) A Linux bastion host running in vSphere that can be accessed via SSH. This host
+        must be able to access the internet and the desired IP of the soon-to-be BOSH director. 
+        We will walk through configuring this bastion host below. </p>
+
+<h2>First Things First: Gathering the necessary information about your VSphere installation</h2>
+
+<p>BOSH requires some basic knowledge about your vSphere installation in
+order to deploy. We'll need to go ahead and jot down that information
+now, so that we can reference it later in this guide.</p>
+
+<p><em>First</em>, you'll need your vCenter hostname (or IP address) and its login credentials.</p>
+
+<p><em>Second</em>, you'll need the name of the cluster that we'll deploy BOSH to. You can find
+this out through the dropdown Menu > Hosts and Clusters and then
+clicking on the Hosts &amp; Clusters page. A list of available clusters
+will populate the page; write down the name of the cluster you wish to
+deploy your BOSH to.</p>
+
+<p><img class="full" src="/blog/vsphere-lab-1/clusters.png"></p>
+
+<p><em>Third</em>, you'll need to get the datastore information by clicking on
+the Datastores tab. A list of available datastores will populate the page;
+write down the name of the datastore you wish to deploy your BOSH within.
+You'll want one with at least a few hundred gigabytes free.</p>
+
+<p><img class="full" src="/blog/vsphere-lab-1/datastore.png"></p>
+
+<p><em>Fourth</em> and finally, you'll need the name of the network that your BOSH director will
+be deployed to and do its own deploying to.</p>
+
+<h2>Setting Up Your Bastion Host</h2>
+
+<p>All of the commands that we'll run to deploy BOSH should be run from a bastion host deployed
+as a VM to your VSphere. This should be built from a Linux image of your choosing. </p>
+
+<p>Once your bastion host is deployed, install all of the tools you'll need by running the following: </p>
+
+<pre><code>sudo curl -o /usr/local/bin/jumpbox https://raw.githubusercontent.com/starkandwayne/jumpbox/master/bin/jumpbox
+sudo chmod 0755 /usr/local/bin/jumpbox
+jumpbox system
+</code></pre>
+
+<p>This installs genesis itself, as well as a few other command line tools that 
+are required, such as <a href="https://github.com/starkandwayne/safe">safe</a>, <a href="https://github.com/geofffranks/spruce">spruce</a>, <a href="https://github.com/stedolan/jq">jq</a>, and
+more. To see a full list of what was installed,
+just run <code>jumpbox</code> with no arguments.</p>
+
+<p>Next, configure git:</p>
+
+<pre><code>git config --global user.name "YOURNAME"
+git config --global user.email "YOUREMAIL"
+</code></pre>
+
+<h2>The Joys of Terminal Multiplexing</h2>
+
+<p>One final note before we jump into BOSH and Genesis: <code>tmux</code> is an
+amazing piece of software.</p>
+
+<p>It's a terminal multiplexer that lets you run lots of terminal
+sessions, across a single SSH link.  If you get disconnected, have to
+reboot your laptop, or just want to unplug for a long weekend, your
+tmux session will still hum along happily on the remote server.</p>
+
+<p>To use tmux, just run <code>tmux</code> from the bastion host (that's important!)</p>
+
+<p>It should look something like this:</p>
+
+<p><img class="full" src="/blog/aws-lab-1/tmux.png"></p>
+
+<p>For the rest of this article, I'm going to assume you're doing
+everything from a tmux session.  There's a <a href="https://jameshunt.us/writings/my-tmux-cheat-sheet.html">tmux cheat sheet</a>
+out there if you aren't 100% comfortable in tmux.</p>
+
+<h2>Running a Local Vault</h2>
+
+<p>Genesis leverages <a href="https://vaultproject.io">Hashicorp Vault</a> to generate and securely
+store passwords, SSH keys, X.509 certificates and more.  Once we get a
+BOSH director up and running (our very next task, actually), we will
+use it to deploy a Vault instance.  Until we get that far, however, we
+need an <em>initial</em> Vault to jumpstart the process.</p>
+
+<p>This is where <code>safe</code> proves valuable.</p>
+
+<p>Safe (an alternative command-line interface for Vault) provides the
+means to run a local Vault instance, on loopback.  It's so easy, we
+won't have to worry about configuration, process management, or
+unsealing / initializing our nascent Vault.</p>
+
+<p>So, without further ado:</p>
+
+<pre><code>$ safe local --memory --as init Now targeting (temporary) init at
+http://127.0.0.1:8201 This Vault is MEMORY-BACKED! If you want to
+retain your secrets be sure to safe export. Ctrl-C to shut down
+the Vault
+</code></pre>
+
+<p>This gives us a <em>memory-backed</em> Vault, named <code>init</code>.  If we kill the
+process, we will lose all the secrets.  That might seem like a bad
+thing, but we only really have to get through two deployments (about 2
+hours wall time), and a memory-backed initial Vault won't leak
+credentials as easily.</p>
+
+<p>Once the local Vault is up and running, we can interact with it via
+<code>safe</code>:</p>
+
+<pre><code>$ safe tree 
+$ safe paths
+</code></pre>
+
+<p>etc.</p>
+
+<p><aside><p><strong>Remember</strong> to always run the initial Vault
+inside of a tmux session.  You don't want to lose all of your
+credentials just because you had to close the lid on your laptop and
+drive home.</p></aside></p>
+
+<h2>Deploying BOSH</h2>
+
+<p>To deploy anything with Genesis, you use a <em>Kit</em>. Kits abstract away the complexity of configuring
+BOSH releases and BOSH manifests. </p>
+
+<p>Specifically, we are going to use the (unsurprisingly-named) <strong>BOSH
+Genesis Kit</strong>.  Since this our first deployment of BOSH, we're going
+to initialize a new set of deployments, using <code>genesis init</code> (remember
+to do this from a <code>tmux</code> session):</p>
+
+<pre><code>$ mkdir ~/ops 
+$ cd ~/ops $ genesis init -k BOSH Downloading
+Genesis kit BOSH (latest version)...
+
+Initialized empty Genesis repository in
+/home/ubuntu/ops/BOSH-deployments using the BOSH/1.2.1 kit.
+</code></pre>
+
+<p>The <code>genesis init</code> command creates a <em>deployments</em> directory for the
+type of thing you are deploying (in our case, BOSH), and then
+downloads a Genesis Kit from GitHub.</p>
+
+<p>Next, we need to write an <em>environment</em> file for our new BOSH
+director.</p>
+
+<pre><code>$ cd BOSH-deployments $ genesis new test-vsphere
+</code></pre>
+
+<p>Genesis will then ask a whole bunch of (pertinent) questions about
+your configuration, infrastructure / cloud provider, and your
+preferences. First up, Genesis needs to know what Vault to store your
+credentials in:</p>
+
+<pre><code>Known Vault targets - current target indicated with a (*): (*)
+init         (insecure) http://127.0.0.1:8201
+
+Which Vault would you like to target? &gt; init Now targeting init at
+http://127.0.0.1:8201
+</code></pre>
+
+<p>The next question is about <em>proto-BOSH</em> vs. <em>regular BOSH</em>. A proto-BOSH director
+is the root level BOSH in a genesis deployment. We don't
+yet have a BOSH director, so we need to deploy a proto-BOSH.  Say "y"
+here.</p>
+
+<pre><code>Is this a proto-BOSH director? [y|n] &gt; y
+</code></pre>
+
+<p>After that, Genesis asks a series of questions about the networking
+for this director.  These answers completely depend on the network setup 
+and IP allocation on your vCenter. The values provided below are just examples. </p>
+
+<pre><code>What static IP do you want to deploy this BOSH director on? &gt;
+10.4.0.4
+
+What network should this BOSH director exist in (in CIDR
+notation)? &gt; 10.4.0.0/24
+
+What default gateway (IP address) should this BOSH director use? &gt;
+10.4.0.1
+
+What DNS servers should BOSH use? (leave value empty to end) 1st
+value &gt; 10.4.0.2 2nd value &gt;
+</code></pre>
+
+<p>To properly configure the BOSH director, Genesis needs to know where
+we are deploying (what cloud provider / IaaS).  This is AWS, so answer
+"2".</p>
+
+<pre><code>What IaaS will this BOSH director orchestrate? 1) VMWare vSphere
+2) Amazon Web Services 3) Microsoft Azure 4) Google Cloud Platform
+5) OpenStack 6) BOSH Warden
+
+Select choice &gt; 1
+</code></pre>
+
+<p>Now that Genesis knows we're in vSphere, it can ask more pointed
+questions about how we expect the BOSH director to access vCenter on our
+behalf. Have the information about your vSphere that we noted earlier on hand and 
+these questions will be a breeze. </p>
+
+<pre><code>What is the IP address of your VMWare vCenter Server Appliance? &gt;
+your_director_ip
+
+What username should BOSH use to authenticate with vCenter? &gt; 
+your_vsphere_usrname
+
+What is the password for the vCenter user? &gt;
+password [hidden]:
+password [confirm]:
+
+What vCenter data center do you want to BOSH to deploy to? &gt;
+your_data_center_name
+
+What vCenter cluster do you want BOSH to deploy to? &gt; 
+your_cluster_name
+
+What vCenter resource pool (if any) do you want BOSH to deploy to? (default: none) &gt; 
+none or your_resource_pool_name
+
+What data stores do you wish to use for ephemeral (OS) disks? (leave value empty to end)
+1st value &gt; your_data_store_name
+2nd value &gt;
+
+Do you wish to use these same data stores for persistent (data) disks?
+[y|n] &gt; y
+
+What is the name of the VM network in vCenter to deploy BOSH to? &gt; your_VM_network_name
+
+Would you like to edit the environment file?
+[y|n] &gt; n
+</code></pre>
+
+<p>Finally, you'll be asked if you want to edit the environment file.
+You can safely say "no" here; we won't be customizing this proto-BOSH.</p>
+
+<p>Now it is Genesis' turn to do some thinking and processing.  You
+should see something that looks like this (depending on what you named
+your environment):</p>
+
+<pre><code> - auto-generating credentials (in secret/test/vsphere/BOSH)... -
+ auto-generating certificates (in secret/test/vsphere/BOSH)...
+
+New environment test-vsphere provisioned!
+
+To deploy, run this:
+
+  genesis deploy 'test-vsphere'
+</code></pre>
+
+<p>Genesis just generated all of the random passwords and required X.509
+certificates that a functioning BOSH director needs.</p>
+
+<p>Now all you have to do is run the <code>genesis deploy</code> command.</p>
+
+<pre><code>$ genesis deploy test-vsphere
+</code></pre>
+
+<p>When that finishes, follow the on-screen instructions and log into the
+BOSH director:</p>
+
+<pre><code>$ genesis do test-vsphere -- login Running login addon for test-vsphere
+Logging you in as user 'admin'... Using environment
+'https://10.4.0.4:25555'
+
+Email (): admin Password ():
+
+Successfully authenticated with UAA
+
+Succeeded
+</code></pre>
+
+<p>Then continue following the instructions to upload a stemcell.</p>
+
+<h3>Cloud Config</h3>
+
+<p>BOSH Cloud Config is a file that specifies the details of the infrastructure
+that BOSH has available to deploy VMs to. It is  one of the more arcane and esoteric parts of
+BOSH. On other infrastructures, Genesis provides the ability to use Terraform
+to provision the necessary resources for Genesis, and then output a corresponding cloud config.
+Since the use case for Terraform on vSphere is less straight-forward, one isn't provided and instead 
+a starter cloud-config is provided here:</p>
+
+<pre><code>azs:
+- name: z1
+cloud_properties:
+    datacenters:
+    - clusters: [z1: {}]
+
+vm_types:
+- name: default
+cloud_properties:
+    cpu: 2
+    ram: 1024
+    disk: 3240
+- name: large
+cloud_properties:
+    cpu: 2
+    ram: 4096
+    disk: 30_240
+
+disk_types:
+- name: default
+disk_size: 3000
+- name: large
+disk_size: 50_000
+
+networks:
+- name: default
+type: manual
+subnets:
+- range: CIDR-FOR-DESIRED-IP-BLOCK
+    gateway: YOUR-GATEWAY-IP
+    az: z1
+    dns: [YOUR-DNS-IP-ADDRESS(ES)]
+    cloud_properties:
+    name: YOUR-NETWORK-NAME
+
+compilation:
+workers: 5
+reuse_compilation_vms: true
+az: z1
+vm_type: large
+network: default
+</code></pre>
+
+<p>Save this cloud config to a file named <code>cloud-config.yml</code>, fill in the placeholders with the values for 
+your infrastructure, and then run: </p>
+
+<pre><code> bosh -e test-vsphere update-cloud-config control-plane.yml
+</code></pre>
+    </div>
+  </div>
+
+  <footer>
+    <div class="g">
+      <div class="x3">
+        <img src="/swlogo.png?0b567bdcee59ac95e3eaf667ec543ebc1631d6c0">
+
+        <p>Genesis is maintained by Stark &amp; Wayne,
+        a leading Cloud-Native consulting firm.</p>
+      </div>
+
+      <div class="x3">
+        <nav>
+          <li><a href="/">Home</a></li>
+          <li><a href="/download/">Download</a></li>
+          <li><a href="/community/">Community</a></li>
+          <li><a href="/docs/">Docs</a></li>
+        </nav>
+      </div>
+
+      <div class="x3">
+      </div>
+    </div>
+
+    <div class="copyright">
+      <p>Copyright &copy; 2019 The Genesis Authors.  All rights reserved.</p>
+    </div>
+  </footer>
+  <script type="text/javascript" src="/site.js?d2112e355882784cf7f38561cf3ccb0bd5da3111"></script>
+</body>
+</html>
