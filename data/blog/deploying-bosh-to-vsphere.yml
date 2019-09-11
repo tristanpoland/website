@@ -32,9 +32,10 @@ This blog post will walk you through using genesis to deploy a BOSH director on 
 ## Prerequisites
 
 The prerequisites for following along with these steps are:
-    1.) Access to VCenter. During experimentation, admin credentials are ok. In production, 
-        use a vCenter accout with the [minimum required vSphere Permissions][vsphere-perms]
-    2.) A Linux bastion host running in vSphere that can be accessed via SSH. This host
+
+   1. Access to VCenter. During experimentation, admin credentials are ok. In production, 
+        use a vCenter accout with the [minimum required vSphere Permissions][vcenter-perms]
+   2. A Linux bastion host running in vSphere that can be accessed via SSH. This host
         must be able to access the internet and the desired IP of the soon-to-be BOSH director. 
         We will walk through configuring this bastion host below. 
 
