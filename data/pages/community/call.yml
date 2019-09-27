@@ -48,7 +48,60 @@ Calls are not recorded.
 4. Open Forum
 
 
-<h2 id="20190820">August 20th, 2018</h2>
+<h2 id="20190917">August 20th, 2019</h2>
+
+These are the notes from our second community call, held at 11:00am EDT on
+Tuesday, September 17th, 2019.
+
+## New Kit Releases
+
+**BOSH** kit v1.5.0 was released on September 6th, 2019, and brings with it
+a full complement of component software updates.  Notably, BOSH itself is
+now at version 270.5.0, which is the latest as of today.
+
+This release of BOSH deprecates some of the backwards-compaitibility with
+regards to naming attributed in manifest files, so a lot of other kits got
+updated to accommodate.  If you want to run this, you are highly encouraged
+to follow suit with your other kit deployments either before, or directly
+after.
+
+At a minimum, you'll need to run the following versions:
+
+  - Concourse Kit v3.6.2
+  - SHIELD Kit v1.3.1
+  - Cloud Foundry Kit v1.5.0
+  - Vault Kit v1.5.1
+
+
+**Concourse** kit v3.8.0 was released on September 15th, 2019.  Notably, it
+upgrades to version 5.5.1 of Concourse, which has some nice quality-of-life
+improvements in the UI and worker areas.
+
+**Jumpbox** kit v1.0.5 was released on September 13th, 2019.  This release
+primarily includes updates to the OpenVPN component, and software bundled
+through the corresponding Jumpbox BOSH Release.
+
+**Blacksmith** kit v0.5.0 was released on September 11th, 2019, bringing
+with it a new Kubernetes Forge for deploying Kubernetes clusters on-demand.
+The Genesis Team is currently using this in the Stark & Wayne hardware lab
+to investigate new ways to break Kubernetes clusters, in an ongoing effort
+to containerize more.  (We talk more about this in a bit).
+
+## Upcoming Releases
+
+We are in the thick of bringing the Cloud Foundry deployment up to a more
+recent vintage.  We are currently targeting mid-summer 2019 versions of all
+components, but because the upstream project moves quickly and breaks things
+regularly, we are proceeding cautiously.  If anyone wants to assist in the
+testing of pre-release version of the kit, please shout out in the #help
+channel in Slack.
+
+## Moving to Container Deployments
+
+(This was an open discussion)
+
+
+<h2 id="20190820">August 20th, 2019</h2>
 
 These are the notes from our first ever community call, held at 11:00am EDT on
 Tuesday, August 20th, 2019.
