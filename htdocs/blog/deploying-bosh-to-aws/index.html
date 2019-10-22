@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+<link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/favicon/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/favicon/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/favicon/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/favicon/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/favicon/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+<link rel="manifest" href="/favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/favicon/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+
+<meta name="twitter:card"       content="summary">
+
+
+<meta property="og:type"        content="article">
+<meta property="og:title"       content="Deploying a BOSH to AWS, via Genesis">
+<meta property="og:site_name"   content="Genesis">
+<meta property="og:url"         content="https://genesisproject.io/writings/deploying-bosh-to-aws.html">
+
+
+<meta property="og:description" content="Do you have an Amazon AWS account?  Do you with things were more
+automated and just easier to manage? Want to do that using BOSH, but wish
+there was a simple way to deploy BOSH? Me too. So, let's do that.
+">
+
+
+<title>Deploying a BOSH to AWS, via Genesis - Genesis</title>
+
+
+<link rel="stylesheet" href="/site.css?4b4881952086ec4adc88c328e3144bdf413704fc">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="/feed.xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-50822525-8"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','UA-50822525-8');</script>
+</head>
+<body>
+  <header class="top">
+    <img src="/logo.png?ff43466a0e4d90211659736aeee333c9b4d0fa77">
+    <nav>
+      <li><a href="/">Home</a></li>
+      <li><a href="/download/">Download</a></li>
+      <li><a href="/community/">Community</a></li>
+      <li><a href="/docs/">Docs</a></li>
+    </nav>
+  </header>
+
+  
+
+  <div class="header">
+    <div>
+      <h1>The Genesis Blog</h1>
+    </div>
+  </div>
+
+  <div class="blog content ">
+    <div class="autotoc">
+    </div>
+
+    <div data-autotoc-headings="h2" data-autotoc-nav=".autotoc">
+      <h1>Deploying a BOSH to AWS, via Genesis</h1>
+      <p class="meta">Oct 14 2019</p>
+      
+      <p class="intro">
+        <img src="/blog/header/amazon-echo-dot.jpg"
+             alt="Rahul Chakraborty (@hckmstrrahul), via Unsplash">
+        <cite>image credit <a target="_blank" href="https://unsplash.com/@hckmstrrahul">Rahul Chakraborty (@hckmstrrahul), via Unsplash</a></cite>
+      </p>
+      
+      <p>Do you have an Amazon AWS account?  Do you with things were more
+automated and just easier to manage? Want to do that using BOSH, but wish
+there was a simple way to deploy BOSH? Me too. So, let's do that.</p>
+
+<h2>Why BOSH?</h2>
+
+<p>Before you can do anything in the Genesis ecosystem, you really need a BOSH
+director.  But why is Genesis so enamoured with BOSH?</p>
+
+<p>Simple:</p>
+
+<ol>
+<li>Orchestration</li>
+<li>Cloud Portability</li>
+<li>Self-Healing</li>
+<li>Separation of Concerns</li>
+</ol>
+
+<p>BOSH is, first and foremost, an <strong>orchestrator</strong> of virtual machines.  You
+tell it what you want deployed, and it handles all the nitty-gritty details
+of spooling up compute and memory resources, storage volumes, etc.</p>
+
+<p>We're going to use Amazon AWS EC2 instances in this tutorial, but that's not
+the whole of BOSH's unique bag of tricks.  Through the abstraction of a
+<em>cloud provider interface</em> (or "CPI" if you prefer TLAs), BOSH supports a
+whole range of cloud infrastructures, including Microsoft Azure, Google
+Cloud Platform, VMware vSphere ESXi, and more.  The best part?  You don't
+have to do anything terribly special to move a deployment manifest (the
+recipe you give BOSH that tells it how to deploy stuff) from one cloud to
+another!</p>
+
+<p>But BOSH does way more than just stand up new VMs.  It keeps a watchful eye
+(a tedious task that only a robot does well) on all the machines it deploys,
+and if they go away, it replaces them with new instances.  This is critical
+for running large distributed systems (like Cloud Foundry), since individual
+VMs can go missing for a variety of reasons:  the cloud provider loses the
+instance, software crashes, etc.  BOSH notices these types of outages and
+happily provisions replacement machines and puts them into service.</p>
+
+<p>Finally, <strong>separation of concerns</strong> becomes increasingly important as we
+transition into the <em>day 2 operations</em> phase of running a platform.  With
+BOSH, there are two types of updates: <em>OS updates</em> and <em>release updates</em>.</p>
+
+<p>The majority of security patches are going to come through the former
+channel.  As upstream OS vendors (Canonical, Microsoft, etc.) upgrade core
+system components like the kernel, OpenSSL libraries, etc., the BOSH team
+is building updated <em>stemcells</em> that roll all of those changes up into a
+nice, versioned package that operators can deploy.  These stemcells are
+wholly independent of any of the software we deploy (like Kubernetes).</p>
+
+<p>Application-specific security patches, as well as bug fixes and new
+features, come through the latter channel.  For example, when the Cloud
+Foundry UAA team patches UAA, they release a new <em>BOSH release</em> that we can
+then deploy on top of our existing stemcells.</p>
+
+<p>Taken together, these two avenues of updates allow operators to choose when
+and how to patch their systems, based on business need, security posture,
+and risk tolerance.  When you're running a platform with thousands of
+customers, atop hundreds of VMs, this becomes a luxury you'll not want to go
+without.</p>
+
+<p>That's why Genesis loves BOSH so much.</p>
+
+<h2>What We're Going To Build</h2>
+
+<p>We are going to assume that you are starting out with nothing deployed in
+Amazon AWS, and work our way up to a BOSH director that you can use (in
+concert with Genesis) to deploy all kinds of other fun things.</p>
+
+<p>To that end, we will build the following:</p>
+
+<ol>
+<li>An Amazon VPC, to house our deployments</li>
+<li>A series of Amazon subnets for separating deployments by function.</li>
+<li>A NAT gateway and some routing logic to let traffic flow.</li>
+<li>A bastion host that is SSH-able from the Internet at large.</li>
+<li>A BOSH director (surprise!)</li>
+<li>A Vault deployment, for storing secure credentials</li>
+</ol>
+
+<p>This is the beginning of an entire Genesis Control plane, but we'll save the
+rest of the deployments for future tutorials.</p>
+
+<h2>Spinning Up AWS via Terraform</h2>
+
+<p>The first four things on our list are deployed via Terraform.  To make this
+easier (and since few truly <em>enjoy</em> writing Terraform configurations), we
+are going to use the <a href="https://github.com/genesis-community/terraforms">Genesis Terraforms</a> project:</p>
+
+<pre><code>$ cd ~/ops
+$ git clone https://github.com/genesis-community/terraforms
+$ cf terraforms/lab/aws
+</code></pre>
+
+<p>Before Terraform can do its thing, we need to provide it some credentials
+for accessing Amazon AWS on our behalf.  Those will go in the <code>aws.tfvars</code>
+file:</p>
+
+<pre><code>$ cat &gt;aws.tfvars &lt;&lt;EOF
+aws_access_key = "... your Access Key ID ..."
+aws_secret_key = "... your Secret Access Key ..."
+aws_vpc_name   = "genesis-lab1"
+aws_key_name   = "genesis-lab1"
+aws_key_file   = "genesis-lab1.pem"
+aws_region     = "us-west-2"
+EOF
+</code></pre>
+
+<p>The only two values you <em>really</em> must change are the <code>aws_access_key</code> and
+<code>aws_secret_key</code>.</p>
+
+<p>We also need to generate an EC2 SSH keypair, which will go on the Bastion
+host that we are about to deploy.  You may want to refer to these
+<a href="https://github.com/genesis-community/terraforms/tree/master/lab/aws#deploying-an-aws-lab">step-by-step instructions</a>.  Make sure the private key exists
+in the <code>terraform/lab/aws</code> directory, and is named according to whatever you
+put in the <code>aws_key_file</code> variable.</p>
+
+<p>To deploy, we've provided a helpful <code>Makefile</code>, so all you have to do is
+type:</p>
+
+<pre><code>$ make
+</code></pre>
+
+<p>This spits out a lot of output, mostly just Terraform explaining all the
+work its about to perform. At the end, you should see this:</p>
+
+<pre><code>Plan: 14 to add, 0 to change, 0 to destroy.
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value:
+</code></pre>
+
+<p>Type <code>yes</code> (Terraform will be happy with nothing else) and it's off to the
+races!  And by races, I mean the long and (relatively) slow process of
+standing up infrastructure inside of Amazon's data centers.  Go grab a cup
+of tea and let Terraform do its thing.</p>
+
+<p><img src="/blog/deploying-bosh-to-aws/tea.jpg" title="image credit Desislava
+Dermendzhieva (@desidermz), via Unsplash"></p>
+
+<p>When all is said and done, your termainal should say something like this:</p>
+
+<pre><code>For configuring your proto-BOSH:
+
+  Static IP:       10.4.0.4
+  Range (CIDR):    10.4.0.0/20
+  Gateway:         10.4.0.1
+  DNS:             10.4.0.2
+
+  AWS Region:      us-west-2
+  VM Sec. Group:   open-lab
+  BOSH Sec. Group: open-lab
+  Subnet ID:       subnet-01c354c3403d4149e
+
+To access the bastion host:
+
+  ssh -i genesis-lab1.pem ubuntu@35.164.43.170
+</code></pre>
+
+<p><em>(your IP address and Subnet ID will be different.)</em></p>
+
+<h2>Settling in on the Bastion Host</h2>
+
+<p>The bastion host has all the software you need to run Genesis, including
+Spruce, Vault, the BOSH and CF CLIs, and, of course, <code>genesis</code> itself.</p>
+
+<p><aside><p><strong>Note:</strong> if you ever forget how the IP address of
+your bastion host, and don't want to log into the AWS web console to find
+out, you can just run</p>
+
+<pre><code>$ make info</code></pre>
+
+<p>To print out the information you got at the end of the initial
+Terraforming.</p></aside></p>
+
+<p>The first time you log into the bastion, you're going to have to do a little
+bit of configuration.</p>
+
+<pre><code>$ sudo jumpbox system
+</code></pre>
+
+<p>The first command sets up global jumpbox-y things.  It installs a slew of
+useful utilities like <a href="https://github.com/starkandwayne/safe">safe</a>, <a href="https://github.com/geofffranks/spruce">spruce</a>, <a href="https://github.com/stedolan/jq">jq</a>, and more.
+It also installs required commands like <code>bosh</code>, <code>cf</code>, and <code>genesis</code>.</p>
+
+<p>To see what's installed, just run <code>jumpbox</code> with no arguments.</p>
+
+<pre><code>$ jumpbox
+&gt;&gt; Checking jumpbox installation
+   jumpbox installed - jumpbox v55
+   ruby installed - ruby 2.3.1p112 (2016-04-26) [x86_64-linux-gnu]
+   bosh installed - version 6.1.0-9c1c210c-2019-09-18T17:33:51Z
+   cf installed - cf version 6.46.1+4934877ec.2019-08-23
+   jq installed - jq-1.6
+   spruce installed - spruce - Version 1.22.0
+   safe installed - safe v1.3.4
+   vault installed - Vault v1.2.3
+   genesis installed - [installing genesis runtime]
+   sipcalc installed - sipcalc 1.1.6
+
+   git user.name  is 'B. Astion'
+   git user.email is 'ubuntu@lab.genesis'
+
+   To bootstrap this installation,  try `jumpbox system`
+   To set up your personal environment: `jumpbox user`
+   To update this copy of jumpbox, use: `jumpbox sync`
+   To create a new local user account:  `jumpbox useradd`
+</code></pre>
+
+<h3>The Joys of Terminal Multiplexing</h3>
+
+<p>One final note before we jump into BOSH and Genesis: <code>tmux</code> is an amazing
+piece of software.</p>
+
+<p>It's a terminal multiplexer that lets you run lots of terminal sessions,
+across a single SSH link.  If you get disconnected, have to reboot your
+laptop, or just want to unplug for a long weekend, your tmux session will
+still hum along happily on the remote server.</p>
+
+<p>To use tmux, just run <code>tmux</code> from the bastion host (that's important!)</p>
+
+<p>It should look something like this:</p>
+
+<p><img class="full" src="/blog/shared/tmux-screenshot.png"></p>
+
+<p>For the rest of this article, I'm going to assume you're doing everything
+from a tmux session.  There's a <a href="https://jameshunt.us/writings/my-tmux-cheat-sheet.html">tmux cheat sheet</a> out there if you
+aren't 100% comfortable in tmux.</p>
+
+<h2>Spinning a Temporary Vault</h2>
+
+<p>Genesis leverages <a href="https://vaultproject.io">Hashicorp Vault</a> to generate and securely store
+passwords, SSH keys, X.509 certificates and more.  Once we get a BOSH
+director up and running (our very next task, actually), we will use it to
+deploy a Vault instance.  Until we get that far, however, we need an
+<em>initial</em> Vault to jumpstart the process.</p>
+
+<p>This is where <code>safe</code> proves valuable.</p>
+
+<p>Safe (an alternative command-line interface for Vault) provides the means to
+run a local Vault instance, on loopback.  It's so easy, we won't have to
+worry about configuration, process management, or unsealing / initializing
+our nascent Vault.</p>
+
+<p>So, without further ado:</p>
+
+<pre><code>$ safe local --memory --as init
+Now targeting (temporary) init at http://127.0.0.1:8201
+This Vault is MEMORY-BACKED!
+If you want to retain your secrets be sure to safe export.
+Ctrl-C to shut down the Vault
+</code></pre>
+
+<p>This gives us a <em>memory-backed</em> Vault, named <code>init</code>.  If we kill the process,
+we will lose all the secrets.  That might seem like a bad thing, but we only
+really have to get through two deployments (about 2 hours wall time), and
+a memory-backed initial Vault won't leak credentials as easily.</p>
+
+<p>Once the local Vault is up and running, we can interact with it via <code>safe</code>:</p>
+
+<pre><code>$ safe tree
+$ safe paths
+</code></pre>
+
+<p>etc.</p>
+
+<p><aside><p><strong>Remember</strong> to always run the initial Vault inside
+of a tmux session.  You don't want to lose all of your credentials just
+because you had to close the lid on your laptop and drive home.</p></aside></p>
+
+<h2>Deploying the Proto-BOSH</h2>
+
+<p>Before we can begin deploying things with BOSH, we need a BOSH director.
+This will be our very first Genesis deployment in this environment, and
+we'll use the BOSH <code>create-env</code> tooling (under the hood) to get up and
+running.</p>
+
+<p><em>(If you don't know what create-env is, or have never stood up a BOSH
+director, don't worry; we'll walk through every step of the process.)</em></p>
+
+<p>In Genesis, a <em>proto-BOSH</em> is the initial deployment.  It is used, in turn,
+to deploy both the <em>operations tier</em> (Vault, SHIELD, Concourse, etc.), and
+also each of the other <em>environment BOSH directors</em>.  Having BOSH deployed
+by another BOSH seems a bit weird at first, but it turns out to be a
+surprisingly useful optimization.  For one thing, it makes for faster BOSH
+director updates.</p>
+
+<p>To deploy something with Genesis, you need a <em>Kit</em>.  Kits roll up most of
+the tedious bits of configuring BOSH releases into usable deployments.  They
+can be a bit opinionated at times, but we think that makes for better
+software and systems.</p>
+
+<p>Specifically, we are going to use the (unsurprisingly-named) <strong>BOSH Genesis
+Kit</strong>.  Since this our first deployment of BOSH, we're going to initialize a
+new set of deployments, using <code>genesis init</code> (remember to do this from a
+<code>tmux</code> session):</p>
+
+<pre><code>$ mkdir ~/ops
+$ cd ~/ops
+$ genesis init -k bosh
+Downloading Genesis kit bosh (latest version)...
+
+Initialized empty Genesis repository in /home/ubuntu/ops/bosh-deployments
+using the bosh/1.2.1 kit.
+</code></pre>
+
+<p>The <code>genesis init</code> command creates a <em>deployments</em> directory for the type of
+thing you are deploying (in our case, BOSH), and then downloads a Genesis
+Kit from GitHub.</p>
+
+<p>Next, we need to write an <em>environment</em> file for our new BOSH director.</p>
+
+<pre><code>$ cd bosh-deployments
+$ genesis new jhunt-aws
+</code></pre>
+
+<p>Genesis will then ask a whole bunch of (pertinent) questions about your
+configuration, infrastructure / cloud provider, and your preferences.
+First up, Genesis needs to know what Vault to store your credentials in:</p>
+
+<pre><code>Known Vault targets - current target indicated with a (*):
+(*) init         (insecure) http://127.0.0.1:8201
+
+Which Vault would you like to target?
+&gt; init
+Now targeting init at http://127.0.0.1:8201
+</code></pre>
+
+<p>The next question is about <em>proto-BOSH</em> vs. <em>regular BOSH</em>.  We don't yet
+have a BOSH director, so we need to deploy a proto-BOSH.  Say "y" here.</p>
+
+<pre><code>Is this a proto-BOSH director?
+[y|n] &gt; y
+</code></pre>
+
+<p>After that, Genesis asks a series of questions about the networking for this
+director.  These answers come from our understanding of the Terraform
+configuration we deployed.  You can use these values verbatim.</p>
+
+<pre><code>What static IP do you want to deploy this BOSH director on?
+&gt; 10.4.0.4
+
+What network should this BOSH director exist in (in CIDR notation)?
+&gt; 10.4.0.0/24
+
+What default gateway (IP address) should this BOSH director use?
+&gt; 10.4.0.1
+
+What DNS servers should BOSH use? (leave value empty to end)
+1st value &gt; 10.4.0.2
+2nd value &gt;
+</code></pre>
+
+<p>To properly configure the BOSH director, Genesis needs to know where we are
+deploying (what cloud provider / IaaS).  This is AWS, so answer "2".</p>
+
+<pre><code>What IaaS will this BOSH director orchestrate?
+1) VMWare vSphere
+2) Amazon Web Services
+3) Microsoft Azure
+4) Google Cloud Platform
+5) OpenStack
+6) BOSH Warden
+
+Select choice &gt; 2
+</code></pre>
+
+<p>Now that Genesis knows we're in Amazon, it can ask more pointed questions
+about how we expect the BOSH director to access AWS on our behalf.</p>
+
+<pre><code>What AWS region would you like to deploy to?
+&gt; us-west-2
+
+What is your AWS Access Key?
+&gt; AKIyourkeyhere...
+Now targeting init at http://127.0.0.1:8201
+
+What is your AWS Secret Key?
+secret_key [hidden]:
+secret_key [confirm]:
+</code></pre>
+
+<p>Next up, you will be asked for security groups, and the subnet ID to deploy
+the director to.</p>
+
+<pre><code>What security groups should the all deployed VMs be placed in? (leave value
+empty to end)
+1st value &gt; open-lab
+2nd value &gt;
+
+What is the ID of the AWS subnet you want to deploy to?
+&gt; subnet-0b79be9eaeb7d164b
+
+What security groups should the BOSH Director VM be in? (leave value empty
+to end)
+1st value &gt; open-lab
+2nd value &gt;
+</code></pre>
+
+<p>Hint: you can find the AWS Subnet ID in the output of <code>make info</code>.</p>
+
+<p><em>(The open-lab security group allows all inbound and outbound traffic, on
+all ports, to and from all hosts, all protocols.  It won't pass muster on a
+production system, but it sure is handy in lab environments.)</em></p>
+
+<p>That concludes the question &amp; answer session.</p>
+
+<p>There is one thing to be done manually in the AWS console, and the Genesis
+<code>new</code> wizard helpfully explains the what, why, and how.</p>
+
+<pre><code>Before deploying, please be sure to import the keypair
+generated for you from Vault into AWS console.
+
+First run the following command to get the public key:
+
+    safe get secret/jhunt/aws/bosh/aws/ssh:public
+
+Then go to EC2 &gt; Key Pairs &gt; Import Key Pair and:
+
+  1. Type 'vcap@jhunt-aws' in the 'Key pair name' input box
+  2. Paste the safe command output into the 'Public key contents' input box
+  3. Click 'Import' button
+
+Now you can SSH into VMs deployed by this director
+using the generated key.
+</code></pre>
+
+<p>So go do that.</p>
+
+<p>Finally, you'll be asked if you want to edit the environment file.  You can
+safely say "no" here; we won't be customizing this proto-BOSH.</p>
+
+<p>Now it is Genesis' turn to do some thinking and processing.  You should see
+something that looks like this (depending on what you named your
+environment):</p>
+
+<pre><code> - auto-generating credentials (in secret/jhunt/aws/bosh)...
+ - auto-generating certificates (in secret/jhunt/aws/bosh)...
+
+New environment jhunt-aws provisioned!
+
+To deploy, run this:
+
+  genesis deploy 'jhunt-aws'
+</code></pre>
+
+<p>Genesis just generated all of the random passwords and required X.509
+certificates that a functioning BOSH director needs.  Isn't that neat?</p>
+
+<p>Literally all you have to do is run that <code>genesis deploy</code> command.</p>
+
+<pre><code>$ genesis deploy jhunt-aws
+</code></pre>
+
+<p>When that finishes, follow the on-screen instructions and log into the BOSH
+director:</p>
+
+<pre><code>$ genesis do jhunt-aws -- login
+Running login addon for jhunt-aws
+Logging you in as user 'admin'...
+Using environment 'https://10.4.0.4:25555'
+
+Email (): admin
+Password ():
+
+Successfully authenticated with UAA
+
+Succeeded
+</code></pre>
+
+<h2>Moving Into Our New BOSH Director</h2>
+
+<p>The BOSH director is deployed, but before we can use it to deploy something,
+we need to do two things.</p>
+
+<ol>
+<li>Upload a Xenial Stemcell</li>
+<li>Install a valid Cloud Config</li>
+</ol>
+
+<h3>Uploading Stemcells</h3>
+
+<p>The BOSH Genesis Kit sports this wonderful addon called <em>upload-stemcells</em>
+that provides a menu driven interface for selecting and uploading stemcells
+(the stuff deployment VMs are made of).  It properly limits which stemcell
+variants are considered, based on the IaaS you configured the director for.</p>
+
+<p>Since we're going to need a stemcell, let's take it for a spin!</p>
+
+<pre><code>$ genesis do jhunt-aws -- upload-stemcells
+</code></pre>
+
+<p>This will show you the major and minor versions of the Xenial stemcell
+series (Ubuntu 16.04 LTS) for AWS, and let you pick which you want to
+upload.  The upload is handed off to the BOSH director, and when you get
+back to a prompt you should be good to go.</p>
+
+<p>I tested with Xenial 97.x (latest minor revision).</p>
+
+<h3>Configuring Clouds</h3>
+
+<p>BOSH Cloud Config is one of the more arcane and esoteric parts of BOSH.
+To help make this easier, the <strong>Genesis Terraforms</strong> repository can build a
+rudimentary, baseline cloud config, if you ask it to.</p>
+
+<p>From wherever you ran the Terraforming process, run:</p>
+
+<pre><code>$ make cc
+</code></pre>
+
+<p>That will print out a cloud config YAML document that you can transfer to
+the bastion host, and use that to <code>bosh update-cloud-config</code>.</p>
+
+<p>This cloud config defines a <code>default</code> network, some generic VM types (small,
+medium, large), a default disk type, and a single availability zone (z1).
+It should suffice to get us through the next deployment, and since this is a
+lab, you're probably going to modify it eventually anyway!</p>
+
+<h2>Deploying a Real Vault</h2>
+
+<p>Now that we have a BOSH director, a stemcell, and a cloud config, we can
+deploy a real Vault to replace the ephemeral <code>safe local</code> Vault we've been
+using up to now.  We'll repeat the same dance of <code>genesis init</code> / <code>genesis
+new</code>, only this time, for the <strong>Vault Genesis Kit</strong>.</p>
+
+<pre><code>$ cd ~/ops
+$ genesis init -k vault
+$ cd vault-deployments
+$ genesis new jhunt-aws
+</code></pre>
+
+<p>The Vault kit is mercifully less chatty than the BOSH Director kit, so there
+isn't much in the way of questions to answer during <code>genesis new</code>.  We will
+be asked if this is the <em>Genesis Vault</em>.  It is, so answer "y" to that one.</p>
+
+<p>If you try to deploy the Vault now (go ahead, I'll wait) it will fail,
+because the Vault Kit expects to deploy a highly-available cluster across
+three different availability zones.  Our lab only has one AZ, so it doesn't
+work.</p>
+
+<p>Not a big deal, all we have to do is open up the <code>jhunt-aws.yml</code> file (in
+<code>vault-deployments/</code>) in our favorite editor, and add this to the <code>params:</code>
+stanza:</p>
+
+<pre><code>params:
+  availability_zones: [z1]
+  stemcell_os: ubuntu-xenial
+</code></pre>
+
+<p>Changing <code>stemcell_os</code> is also necessary, because (at least as of 1.2.1) the
+Vault Kit expects to deploy to the latest Ubuntu Trusty (14.04 LTS), but we
+only uploaded Xenial stemcells.</p>
+
+<p>Now we can deploy.</p>
+
+<pre><code>$ genesis deploy jhunt-aws
+</code></pre>
+
+<p>After the deployment succeeds, we need to initialize the Vault:</p>
+
+<pre><code>$ genesis do jhunt-aws -- init
+</code></pre>
+
+<p>This sets up a safe target in your local configuration, named <code>jhunt-aws</code>
+(after the environment).  We are now able to transfer all of our
+credentials from the ephemeral <code>init</code> Vault to their forever home.</p>
+
+<pre><code>$ safe -T init export | safe -T jhunt-aws import
+</code></pre>
+
+<p>It is now safe to kill the <code>safe local</code> process.</p>
+
+<p>Congratulations! </p>
+
+<p class="emoji">🎉</p>
+
+<h2>Where To From Here?</h2>
+
+<p>Hopefully you've had fun setting up this little AWS lab.  The BOSH director
+we deployed has Credhub installed, so you're able to deploy whatever you
+want to it, with or without the power of Genesis.</p>
+
+<p>If you do think Genesis is awesome sauce, check out the other kits and see
+if anything tickles your fancy.  Official Genesis Kits live on GitHub, in
+the <a href="https://github.com/genesis-community">Genesis Community organization</a>.  Notable Kits include:</p>
+
+<ul>
+<li><p><strong><a href="https://github.com/genesis-community/concourse-genesis-kit">Concourse</a></strong> - Deploy a CI/CD pipeline and get started
+with automating your Genesis deployments!</p></li>
+<li><p><strong><a href="https://github.com/genesis-community/shield-genesis-kit">SHIELD</a></strong> - A data protection solution for the cloud.
+Schedule backups and perform restores on databases, key-value stores,
+even file systems.</p></li>
+<li><p><strong><a href="https://github.com/genesis-community/cf-genesis-kit">Cloud Foundry</a></strong> - The Cloud Foundry PaaS itself.  Now
+deployed via Genesis.</p></li>
+<li><p><strong><a href="https://github.com/genesis-community/blacksmith-genesis-kit">Blacksmith</a></strong> - Data services, on-demand, leveraging
+BOSH.  Available for CF marketplaces and Kubernetes!</p></li>
+</ul>
+    </div>
+  </div>
+
+  <footer>
+    <div class="g">
+      <div class="x3">
+        <img src="/swlogo.png?0b567bdcee59ac95e3eaf667ec543ebc1631d6c0">
+
+        <p>Genesis is maintained by Stark &amp; Wayne,
+        a leading Cloud-Native consulting firm.</p>
+      </div>
+
+      <div class="x3">
+        <nav>
+          <li><a href="/">Home</a></li>
+          <li><a href="/download/">Download</a></li>
+          <li><a href="/community/">Community</a></li>
+          <li><a href="/docs/">Docs</a></li>
+        </nav>
+      </div>
+
+      <div class="x3">
+      </div>
+    </div>
+
+    <div class="copyright">
+      <p>Copyright &copy; 2019 The Genesis Authors.  All rights reserved.</p>
+    </div>
+  </footer>
+  <script type="text/javascript" src="/site.js?d2112e355882784cf7f38561cf3ccb0bd5da3111"></script>
+</body>
+</html>
