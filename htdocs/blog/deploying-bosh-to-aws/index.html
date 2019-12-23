@@ -43,7 +43,7 @@ there was a simple way to deploy BOSH? Me too. So, let's do that.
 <title>Deploying a BOSH to AWS, via Genesis - Genesis</title>
 
 
-<link rel="stylesheet" href="/site.css?4b4881952086ec4adc88c328e3144bdf413704fc">
+<link rel="stylesheet" href="/site.css?36b8443d934f1beca13af53179c1289057cf340c">
 <link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="/feed.xml">
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-50822525-8"></script>
@@ -384,11 +384,11 @@ new set of deployments, using <code>genesis init</code> (remember to do this fro
 
 <pre><code>$ mkdir ~/ops
 $ cd ~/ops
-$ genesis init -k bosh
+$ genesis init -k bosh --vault init
 Downloading Genesis kit bosh (latest version)...
 
 Initialized empty Genesis repository in /home/ubuntu/ops/bosh-deployments
-using the bosh/1.2.1 kit.
+using the bosh/1.5.0 kit.
 </code></pre>
 
 <p>The <code>genesis init</code> command creates a <em>deployments</em> directory for the type of
@@ -403,18 +403,9 @@ $ genesis new jhunt-aws
 
 <p>Genesis will then ask a whole bunch of (pertinent) questions about your
 configuration, infrastructure / cloud provider, and your preferences.
-First up, Genesis needs to know what Vault to store your credentials in:</p>
-
-<pre><code>Known Vault targets - current target indicated with a (*):
-(*) init         (insecure) http://127.0.0.1:8201
-
-Which Vault would you like to target?
-&gt; init
-Now targeting init at http://127.0.0.1:8201
-</code></pre>
-
-<p>The next question is about <em>proto-BOSH</em> vs. <em>regular BOSH</em>.  We don't yet
-have a BOSH director, so we need to deploy a proto-BOSH.  Say "y" here.</p>
+First up, Genesis needs to know if you want a <em>proto-BOSH</em> or a <em>regular
+BOSH</em>.  We don't yet have a BOSH director, so we need to deploy a
+proto-BOSH.  Say "y" here.</p>
 
 <pre><code>Is this a proto-BOSH director?
 [y|n] &gt; y
@@ -428,7 +419,7 @@ configuration we deployed.  You can use these values verbatim.</p>
 &gt; 10.4.0.4
 
 What network should this BOSH director exist in (in CIDR notation)?
-&gt; 10.4.0.0/24
+&gt; 10.4.0.0/20
 
 What default gateway (IP address) should this BOSH director use?
 &gt; 10.4.0.1
@@ -459,8 +450,7 @@ about how we expect the BOSH director to access AWS on our behalf.</p>
 &gt; us-west-2
 
 What is your AWS Access Key?
-&gt; AKIyourkeyhere...
-Now targeting init at http://127.0.0.1:8201
+&gt; ... type your key here ...
 
 What is your AWS Secret Key?
 secret_key [hidden]:
@@ -476,7 +466,7 @@ empty to end)
 2nd value &gt;
 
 What is the ID of the AWS subnet you want to deploy to?
-&gt; subnet-0b79be9eaeb7d164b
+&gt; subnet-01c354c3403d4149e
 
 What security groups should the BOSH Director VM be in? (leave value empty
 to end)
@@ -491,28 +481,6 @@ all ports, to and from all hosts, all protocols.  It won't pass muster on a
 production system, but it sure is handy in lab environments.)</em></p>
 
 <p>That concludes the question &amp; answer session.</p>
-
-<p>There is one thing to be done manually in the AWS console, and the Genesis
-<code>new</code> wizard helpfully explains the what, why, and how.</p>
-
-<pre><code>Before deploying, please be sure to import the keypair
-generated for you from Vault into AWS console.
-
-First run the following command to get the public key:
-
-    safe get secret/jhunt/aws/bosh/aws/ssh:public
-
-Then go to EC2 &gt; Key Pairs &gt; Import Key Pair and:
-
-  1. Type 'vcap@jhunt-aws' in the 'Key pair name' input box
-  2. Paste the safe command output into the 'Public key contents' input box
-  3. Click 'Import' button
-
-Now you can SSH into VMs deployed by this director
-using the generated key.
-</code></pre>
-
-<p>So go do that.</p>
 
 <p>Finally, you'll be asked if you want to edit the environment file.  You can
 safely say "no" here; we won't be customizing this proto-BOSH.</p>
@@ -532,9 +500,36 @@ To deploy, run this:
 </code></pre>
 
 <p>Genesis just generated all of the random passwords and required X.509
-certificates that a functioning BOSH director needs.  Isn't that neat?</p>
+certificates that a functioning BOSH director needs.  Isn't that neat?
+There is one thing to be done manually in the AWS console, and the Genesis
+<code>new</code> wizard helpfully explains the what, why, and how.</p>
 
-<p>Literally all you have to do is run that <code>genesis deploy</code> command.</p>
+<p>Before we go off and <code>genesis deploy</code> this BOSH director, scroll back
+through the output in your terminal until you find this:</p>
+
+<pre><code>Before deploying, please be sure to import the keypair
+generated for you from Vault into AWS console.
+
+First run the following command to get the public key:
+
+    safe get secret/jhunt/aws/bosh/aws/ssh:public
+
+Then go to EC2 &gt; Key Pairs &gt; Import Key Pair and:
+
+  1. Type 'vcap@jhunt-aws' in the 'Key pair name' input box
+  2. Paste the safe command output into the 'Public key contents' input box
+  3. Click 'Import' button
+
+Now you can SSH into VMs deployed by this director
+using the generated key.
+</code></pre>
+
+<p>Now that the keys for the SSH EC2 keypair have been generated in the Vault,
+it's time time import them into AWS itself.</p>
+
+<p>So go do that.</p>
+
+<p>Finally, we can run that <code>genesis deploy</code> command.</p>
 
 <pre><code>$ genesis deploy jhunt-aws
 </code></pre>
@@ -582,7 +577,7 @@ series (Ubuntu 16.04 LTS) for AWS, and let you pick which you want to
 upload.  The upload is handed off to the BOSH director, and when you get
 back to a prompt you should be good to go.</p>
 
-<p>I tested with Xenial 97.x (latest minor revision).</p>
+<p>I tested with Xenial 456.x (latest minor revision).</p>
 
 <h3>Configuring Clouds</h3>
 
