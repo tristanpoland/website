@@ -6,9 +6,13 @@ format:   markdown
 template: call.tt
 
 next:
+  - id:   20200116
+    date: January 16th, 2020
+previous:
+  - id:   20191217
+    date: December 17th, 2019
   - id:   20190917
     date: September 17th, 2019
-previous:
   - id:   20190820
     date: August 20th, 2019
 --- |-
@@ -20,24 +24,27 @@ the Genesis project, and its overall direction.  Topics include latest news,
 development progress, and future direction.
 
 The next Genesis Roadmap Call is
-<br>
-**Tuesday, September 17th** at **11:00am EDT**.
+<div class="schedule">
+<div class="date">Tuesday, January 16th</div>
+<div class="time">at 11:00am Eastern (8:00am Pacific/4:00pm UTC)</div>
+</div>
 
-We use zoom: <https://zoom.us/j/7165551212>
+We use [Zoom][zoom], and will announce the Meeting ID/Link in the **#announcements**
+channel in the [Genesis Slack Org][slack] the day before the call.
 
-You can also call in (the Meeting ID is **716 555 1212**):
+You can also call in to the zoom meeting and enter the Meeting ID given in
+the channel:
 
 - US: **+1 646 876 9923** or **+1 669 900 6833**
 - [International numbers available](https://zoom.us/u/cdjcbHG2o)
 
 Calls are not recorded.
 
-# Agenda for September 17th, 2019
+<h2 id="20200116">Agenda for January 16th, 2020</h2>
 
 1. Introductions
 
 2. Announcements
-   - Blogs and Docs and Blogs and Docs!
    - Recent Releases
    - Upcoming Releases
 
@@ -47,13 +54,60 @@ Calls are not recorded.
 
 4. Open Forum
 
+#Past Meetings
 
-<h2 id="20190917">August 20th, 2019</h2>
+<h2 id="20191217">December 17th, 2019</h2>
+
+These are the notes from our second community call, held at 11:00am EDT on
+Tuesday, December 17th, 2019.
+
+### New Kit Releases
+
+**Shield** kit [v1.6.0](https://github.com/genesis-community/shield-genesis-kit/releases/tag/v1.6.0)
+was released on December 5th, 2019, which bumps the
+Shield version to [v8.6.2](https://github.com/shieldproject/shield/releases/tag/v8.6.2).
+
+**Minio** kit v0.4.1 was released on December 5th, 2019, which bumps the
+Minio version to RELEASE.2019-10-12T01-39-57Z
+
+**Prometheus** kit [v1.5.1](https://github.com/genesis-community/prometheus-genesis-kit/releases/tag/v1.5.1)
+was released on December 6th, 2019, updating Prometheus version to
+[v26.1.0](https://github.com/bosh-prometheus/prometheus-boshrelease/releases/tag/v26.1.0)
+
+### Addendum: CF Genesis Kit Updates
+
+It was not discussed in the meeting, but **cf** kit has had some significant
+updates since the previous Roadmap Meeting in September.  
+It has been brought up to date with [v9.5.0 of cf-deployment release](https://github.com/cloudfoundry/cf-deployment/releases/tag/v9.5.0)
+for the majority of functionality in [release v1.6.0](https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.6.0).
+
+It has also undergone some drastic refactoring of instance groups and almost
+all static IPs have been removed in preference for dynamic assignment as of
+[v1.7.0](https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.7.0)
+
+Container-to-container networking and service discovery was added to v1.7.1,
+and the routing api is now available as of v1.7.2.
+
+There were further improvements and bug fixes -- please refer to the [release
+notes](https://github.com/genesis-community/cf-genesis-kit/releases) for full details.
+
+### Upcoming Kit Releases
+
+We are continuing our efforts to keep cf-genesis-kit up to feature parity
+with cf-deployment, with a new release based on cf-deployment v12.5.0 at the
+end of 2019, or early in 2020 (before next roadmap call).  This will include
+up-to-date releases, improved TLS interworkings betweeen components, and
+several other bug fixes and minor improvements.
+
+Note:  We are not including the updates in v12.6.0 of cf-deployment as they
+do not work in air-gapped environments.
+
+<h2 id="20190917">September 17th, 2019</h2>
 
 These are the notes from our second community call, held at 11:00am EDT on
 Tuesday, September 17th, 2019.
 
-## New Kit Releases
+### New Kit Releases
 
 **BOSH** kit v1.5.0 was released on September 6th, 2019, and brings with it
 a full complement of component software updates.  Notably, BOSH itself is
@@ -87,7 +141,7 @@ The Genesis Team is currently using this in the Stark & Wayne hardware lab
 to investigate new ways to break Kubernetes clusters, in an ongoing effort
 to containerize more.  (We talk more about this in a bit).
 
-## Upcoming Releases
+### Upcoming Releases
 
 We are in the thick of bringing the Cloud Foundry deployment up to a more
 recent vintage.  We are currently targeting mid-summer 2019 versions of all
@@ -96,7 +150,7 @@ regularly, we are proceeding cautiously.  If anyone wants to assist in the
 testing of pre-release version of the kit, please shout out in the #help
 channel in Slack.
 
-## Moving to Container Deployments
+### Moving to Container Deployments
 
 (This was an open discussion)
 
@@ -106,14 +160,14 @@ channel in Slack.
 These are the notes from our first ever community call, held at 11:00am EDT on
 Tuesday, August 20th, 2019.
 
-## The Website
+### The Website
 
 Our website (this website!), <https://genesisproject.io> just got a snazzy
 new redesign.  Now that the day-to-day annoyance of modifying the website
 content is more well-in-hand, the team expects to start putting up more and
 more blog posts and documentation!
 
-## Blogs, Blogs, and More Docs!
+### Blogs, Blogs, and More Docs!
 
 The Genesis Team has been putting forth a concerted effort to write more
 approachable "first timer" content to get people interested in deploying
@@ -122,24 +176,25 @@ Cloud technology like CF, BOSH, and Kubernetes into the Genesis mindset.
 Hopefully, by the time of our next Communty Call (September 17th), we'll
 have something more concrete to show off.
 
-## Cloud Foundry Genesis Kit
+### Cloud Foundry Genesis Kit
 
 Work continues on keeping the CF Genesis Kit up-to-date with the most recent
 _stable_ cf-deployment upstream.  Our strategy with CF has been to follow
 the upstream cf-deployment from the community, but discriminate in what we
 ingest to keep with our vision of Cloud Foundry structure.
 
-## CI/CD Pipelines
+### CI/CD Pipelines
 
 For those interested, James showed off the internal CI/CD pipelines that the
 Genesis Team uses for release engineering, and talked about the specific
 challenges facing testing at-scale with so many different feature flags,
 IaaS features, and user preferences.
 
-## Concourse v5.4.0 Released!
+### Concourse v5.4.0 Released!
 
 Lastly (but certainly not leastly) the Concourse Genesis Kit was updated to
 Concourse v5.4.0! 🎉
 
 [trello]: https://trello.com/b/HFOPui7k/genesis
 [slack]:  /community#slack
+[zoom]: https://zoom.us/download#client_4meeting

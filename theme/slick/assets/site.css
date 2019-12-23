@@ -540,3 +540,10 @@ article {
     padding-top: 0 !important; }
   article img {
     max-width: 100%; }
+
+.schedule
+  .date {
+    font-size: 225%;
+    padding-bottom: 0.25em; }
+  .time {
+    font-size: 150%; }
