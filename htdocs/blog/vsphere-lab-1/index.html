@@ -93,12 +93,15 @@ Genesis also allows users to easily deploy a BOSH director in the first place.</
 
 <h2>Prerequisites</h2>
 
-<p>The prerequisites for following along with these steps are:
-    1.) Access to VCenter. During experimentation, admin credentials are ok. In production, 
-        use a vCenter accout with the [minimum required vSphere Permissions][vsphere-perms]
-    2.) A Linux bastion host running in vSphere that can be accessed via SSH. This host
-        must be able to access the internet and the desired IP of the soon-to-be BOSH director. 
-        We will walk through configuring this bastion host below. </p>
+<p>The prerequisites for following along with these steps are:</p>
+
+<ol>
+<li>Access to VCenter. During experimentation, admin credentials are ok. In production, 
+    use a vCenter accout with the <a href="https://github.com/cloudfoundry/BOSH-vsphere-cpi-release/blob/master/docs/required_vcenter_privileges.md">minimum required vSphere Permissions</a></li>
+<li>A Linux bastion host running in vSphere that can be accessed via SSH. This host
+    must be able to access the internet and the desired IP of the soon-to-be BOSH director. 
+    We will walk through configuring this bastion host below. </li>
+</ol>
 
 <h2>First Things First: Gathering the necessary information about your VSphere installation</h2>
 
