@@ -14,8 +14,7 @@ communications, which has been reflected in the cf-deployment release.  This
 change in v1.8.0 is to better approximate the certificate tree with regards
 to the CA used to sign each certificate, as well as CN and SANs used.  This
 version also contains future-looking configuration to support extended key
-usage that is currently supported but not validated currently in Cloud
-Foundry - this will be supported in a future version of Genesis.
+usage that is supported but not validated currently in Cloud Foundry.
 
 # Impact
 
