@@ -83,9 +83,9 @@ your certificates.  There are two ways to do this:</p>
 <h2>The Quick and Dirty Method</h2>
 
 <p>The fastest way to proceed is to regenerate all your secrets using the
-<code>genesis rotate-secrets &lt;env&gt; -f</code> command, for your target environment.  The
-<code>-f</code> option is needed to force the regeneration of the CA certs, which are 
-otherwise left unrotated.</p>
+<code>genesis rotate-secrets &lt;env&gt; -f</code> command for your target environment after
+you update its kit version.  The <code>-f</code> option is needed to force the
+regeneration of the CA certs, which are otherwise left unrotated.</p>
 
 <p>However, this has the side effect of rotating <strong>ALL</strong> your secrets, including
 the credentials used for passwords.  <span title='This is erroneous - see update below' id='warning' style="text-decoration: line-through;">
@@ -140,10 +140,10 @@ for s in $(safe paths $path_root | grep '.*\/certs\/.*') ; do echo "removing $s"
 <p><strong>Warning:</strong> Ctrl-C will not stop that command, so ensure you've correctly
 entered your <code>path_root</code>.</p>
 
-<p>Once that is complete, just run <code>genesis add-secrets &lt;env&gt;</code> to build the
-required certificates.  This method is preferred as it clears out all the
-old defunct certificates that are no longer used, but it doesn't hurt to
-leave them in.</p>
+<p>Once that is complete, update the kit version in your environment file and
+run <code>genesis add-secrets &lt;env&gt;</code> to build the required certificates.  This
+method is preferred as it clears out all the old defunct certificates that
+are no longer used, but it doesn't hurt to leave them in.</p>
 
 <h2>Verification</h2>
 
@@ -157,7 +157,10 @@ by another CA certificate, but this is needed for the
 <code>diego_instance_identity_ca</code>.  To that end, when you first run a command that
 looks at building a manifest (<code>manifest</code>, <code>deploy</code>, <code>lookup</code>, <code>yamls</code>,
 etc...), the blueprint hook script with check that the CA is signed
-correctly, and if not, will renew it with the correct signatory CA.</p>
+correctly, and if not, will renew it with the correct signatory CA.  If this
+happens in a pipeline, it will lack the required permissions to change the
+secret, so make sure you run <code>genesis manifest &lt;env&gt;</code> prior to triggering
+your pipeline run.</p>
 
 <h1>Help &amp; Support</h1>
 
