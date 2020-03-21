@@ -69,7 +69,12 @@
       "notes": "# Administrative Release Only\n\nThere are no functional changes in this release.  It is a re-release to\njumpstart some CI/CD pipelines that have a hard time repacking old versions of\nthings; we changed GitHub orgs and it confused that particular pipeline\n",
       "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.17",
       "version": "2.6.17"
+    },
+    {
+      "notes": "# New Feature: groups in pipeline config\n\nIt supports grouping in pipeline config file, `genesis repipe` will generate groups\naccordingly.\n",
+      "url": "https://github.com/starkandwayne/shield/releases/tag/v2.6.18",
+      "version": "2.6.18"
     }
   ],
-  "latest": "2.6.17"
+  "latest": "2.6.18"
 }
