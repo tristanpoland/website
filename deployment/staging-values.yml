@@ -1,0 +1,16 @@
+ingress:
+  hosts:
+    - staging.genesisproject.io
+    - staging.www.genesisproject.io
+    - staging.genesisproject.k8s.lke.starkandwayne.com
+  tls:
+    enabled: true
+    certIssuer: "lab-ca-issuer"
+
+app:
+  org: genesis-community
+  repo: website
+
+  setup_script: |
+    #!/bin/sh
+    mv /tmp/website/htdocs/* /var/www/
