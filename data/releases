@@ -72,7 +72,7 @@
     },
     {
       "notes": "# New Feature: groups in pipeline config\n\nIt supports grouping in pipeline config file, `genesis repipe` will generate groups\naccordingly.\n",
-      "url": "https://github.com/starkandwayne/shield/releases/tag/v2.6.18",
+      "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.6.18",
       "version": "2.6.18"
     }
   ],

@@ -14,11 +14,11 @@ header() {
 
 VERSION=$(cat releases/version)
 CURRENT_VERSION=$(spruce json $REPO_ROOT/data/releases | jq -r .latest)
-RELEASE="https://github.com/starkandwayne/shield/releases/tag/$(cat releases/tag)"
+RELEASE="https://github.com/genesis-community/genesis/releases/tag/$(cat releases/tag)"
 BASE_DIR=$(pwd)
 
 if [[ "$CURRENT_VERSION" != "$VERSION" ]]; then
-	header "Getting New Release Notes for SHIELD v$VERSION"
+	header "Getting New Release Notes for Genesis v$VERSION"
 	cat releases/body
 	(
 		spruce json $REPO_ROOT/data/releases | jq -r '{"all":.all}' | spruce merge -
@@ -51,7 +51,7 @@ if [[ -n "$(cd ${REPO_ROOT}; git status --porcelain)" ]]; then
 	git add -A
 	git status
 	if [[ "$CURRENT_VERSION" != "$VERSION" ]]; then
-		git commit -m "[ci] Integrate release notes from SHIELD v$VERSION"
+		git commit -m "[ci] Integrate release notes from Genesis v$VERSION"
 	else
 		git commit -m "[ci] Rebuilt static assets via pipeline"
 	fi
