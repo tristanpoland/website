@@ -6,9 +6,11 @@ format:   markdown
 template: call.tt
 
 next:
-  - id:   20200121
-    date: January 21st, 2020
+  - id:   20200519
+    date: May 19th, 2020
 previous:
+  - id:   20200421
+    date: April 21st, 2020
   - id:   20191217
     date: December 17th, 2019
   - id:   20190917
@@ -40,7 +42,7 @@ the channel:
 
 Calls are not recorded.
 
-<h2 id="20200121">Agenda for January 21st, 2020</h2>
+<h2 id="20200521">Agenda for May 19st, 2020</h2>
 
 1. Introductions
 
@@ -55,6 +57,238 @@ Calls are not recorded.
 4. Open Forum
 
 #Past Meetings
+
+<h2 id="20200421">April 21st, 2020</h2>
+
+Its been a busy first third of 2020.  Beyond the crazyness of the COVID-19
+situation, we've been working hard at bringing some significant changes to
+Genesis and its Kits, which have been released since the last meeting in
+March.  This is a summary of what was discussed during this meeting, which
+lasted longer than the full hour, so we didn't get to discuss everything
+that was new and upcoming, but will be touched on here in the meeting notes.
+
+### Genesis v2.7.x Release
+
+Genesis v2.7.0 was [released on April 9th](https://github.com/genesis-community/genesis/releases/tag/v2.7.0), and represents a significant
+update in some major aspects of Genesis.  There are new features and well
+as significant improvements to existing features.  Releases 2.7.1 through
+2.7.6 followed with some bug fixes and feature enhancements in the following
+days.
+
+#### New Feature: Kit Providers
+
+Simply put, this allows you to configure a Genesis deployment repository to
+use a different source for your kits instead of the Genesis-Community Github
+Organization.  At release, it support any other github organization that
+follows a release system similar to what is used by the Genesis-Community
+org.  This will work for Github Enterprise as well, which will benefit users
+that must function without access to the internet.
+
+Full details can be found in the [2.7.0 release notes](https://github.com/genesis-community/genesis/releases/tag/v2.7.0), or by running `genesis
+kit-provider -h` for displaying or changing it on an existing deployment
+repo, or `genesis init -h` for initializing a new deployment repo.
+
+###### Secrets Management Refactor
+
+Secrets management has grown piecemeal over the life of Genesis, and we've
+been listening to your feedback on how to make it better.  Release 2.7.0
+introduced significant improvements, with some refinement being offered by
+releases [2.7.2](https://github.com/genesis-community/genesis/releases/tag/v2.7.2) and [2.7.4](https://github.com/genesis-community/genesis/releases/tag/v2.7.4).  Genesis [2.7.6](https://github.com/genesis-community/genesis/releases/tag/v2.7.6) added support for managing
+non-generated secrets; those secrets that are gathered during `genesis new`
+and never heard from again... until now.
+
+The improvements are detailed in the release notes, but a quick summary is as
+follows:
+
+* Significant improvement in feedback when any of the `*-secrets` commands
+  are running.  There is a a progress indicator as each secret is processed in
+  the form of a [current/total] counter.  Each secret details the type of
+  secret being processed and its result.  It has a compact form that only
+  uses one line unless there's an error, or a verbose mode where all the
+  details are printed.
+
+* `remove-secrets` has been added to allow full secrets lifecycle
+  management, with extra functionality that will be explained below.
+
+* `check-secrets` now validates that the secrets are correct, not just
+  present.  This includes X509 expiry, cert/key agreement, signing chain,
+  key usage and CN/SANs; public/private key agreement and size for
+  Diffie-Hellman, RSA and SSH; and randomly generated passwords size,
+  composition and alternate encodings.  Never deploy again just to find your
+  secrets are invalid.  It also supports levels of validation, with `-lm`
+  for checking for presence, `-li` for finding invalid secrets, and `-lp`
+  for finding problematic secrets (see below).
+
+* Now that we can identify invalid secrets, what to do about them.  In
+  earlier versions, you could just rotate all the secrets, or use `safe` to
+  manually remove each one that was bad.  As of 2.7.0, both `rotate-secrets`
+  and `remove-secrets` have added a way to remove invalid secrets.  After
+  some feedback on the original method of doing this, v2.7.6 solidified the
+  interface with a `-I` for targeting only invalid secrets, or `-P` for both
+  invalid or problematic (secrets that are technically different than what
+  the kit specifies, but potentially won't stop you from deploying, but
+  may become an issue in specific situations)
+
+* `rotate-secrets` (and `remove-secrets`) provide a much finer control on
+  what they operate on.  Beyond the `-I` and `-P` options, you can specify exact
+  sub-paths (the part of the secrets path under the general secrets path for
+  your environment).  This will allow you to rotate/remove specific secrets.
+  Furthermore, you will be prompted to confirm the action, though this can
+  be overridden with the `-y` option.  Finally, in the ultimate form of
+  control, you can use the `-i|--interactive` option to step through each
+  secret and decide its fate.
+
+* `rotate-secrets` loses `-f|--force` ...
+
+  Force option was used to rotate secrets that were "fixed", a label for
+  secrets that were never support to be altered.  This was selected by the
+  kit for secrets such as DB encryption keys, but was also applied to CA
+  certificates.  In practice, this was found too far reaching (all or
+  nothing).  To replace a fixed secret, use `remove-secrets` and add it back
+  using `add-secrets`.  Note: CA Certificates are no longer considered
+  fixed.
+
+* ... but gains `--renew`
+
+  CA Cert rotation was always problematic, and often provoked race condition
+  when trying to update all the certs that were signed by that CA.  To
+  resolve this, `rotate-secrets` gains the option `--renew` which keeps the
+  key, but generates a new certificate, with a new expiry date.  The new CA
+  is recognized by the certs the previous incarnation signed, so no more
+  race condition when rolling new certificates out.
+
+* Finally, some love for the provided secrets.
+
+  When kits need to interact with external entities, it needs provided
+  secrets to be able to securely access them.  Thise are generally provided
+  by the `genesis new` process, but that was it for lifecycle management.
+  As of v2.7.6, if a kit specified its usage of provided secrets under the
+  `provided` top-level key in its kit.yml file, all of the `*-secrets`
+  commands would now apply.  They could be checked, added if missing,
+  rotated and removed.  bosh-genesis-kit v1.10.2 was the first to ship with
+  this feature, and other kits will be updated to incorporate it in the near
+  future.
+
+#### Custom Secrets Mounts
+
+Genesis has always put its secrets in a Vault directly under `/secrets`
+mount, followed by a slug based on the environment name and the kit type.
+Similarly, for Exodus data (the secrets that leave the environment to be
+shared by other genesis environments for purpose of connectivity,
+information and collaboration), it was stored under
+`/secrets/exodus/<env-name>/<kit-type>`  This made it hard to use a central
+corporate vault, which was sometimes required by InfoSec policy.
+
+As of v2.7.0, environments could specify an alternative mount point for both
+secrets and exodus data.  When creating an environment specifying
+`--secret-mount` allowed you to specify an alternative base underwhich the
+secrets of the kit would be stored (still further under the env slug and kit
+type, which together can be overwritten by using the `--secrets-path`
+option.  For Exodus data, the option is `--exodus-mount`, which now defaults
+to `<secrets_mount>/exodus` but doesn't require being under the secrets
+mount.
+
+For existing environments, these options have corresponding keys under the
+`genesis:` top-level key.  Just drop the `--` prefix and change the other
+dashes to underscores: for example, `--secrets-mount` becomes
+`secrets_mount`
+
+_Note:_  While we're talking about the `genesis` block, it should be noted that
+it has become the official location for Genesis-related information, while
+`params` is for kit-related information.  As such, the `params.env` has been
+moved to `genesis.env`, and `params.bosh` has moved to `genesis.bosh_env`.
+This has been supported since v2.6.13, but any kit that specifies compliance
+with v2.7.0 minimum version will expect these values in the `genesis` block.
+
+#### Common Root CA Certificate and Certificate Chaining
+
+Before, all generated CA certificates were self-signed, and there was no way
+to specify generating a CA signed by another CA.  Genesis v2.7.0 supports
+explicit signing of generated certificates as well as specifing a default
+root CA certificates that will be used to sign any CA that isn't explicitly
+signed in the kit.yml definition.
+
+This default CA is specified by a vault path using the --root-ca-path during
+a `new` operation, or by adding `genesis.root_ca_path` to an existing
+environment and rotating the existing certificates.
+
+#### Initial Credhub Support
+
+In preparation for our v2.0.0 of cf-genesis-kit that is based on
+cf-deployment, we need to be able to interoperate with credhub and
+credhub-based deployments.  Steps have been added to add credhub
+connectivity to the BOSH kit for facilitating login to the Credhub located
+on its director VM, as well as providing Exodus data to allow other kits to
+connect to it.
+
+It does not yet have the full lifecycle support of the `*-secrets` commands,
+but that will be added as the need appears.
+
+#### Improved Kit Authoring.
+
+Now that we allow kits to be hosted outside of Genesis Community, we've
+improved our tooling for building them.
+
+* Improved Functionality for X509 Certificates:
+
+  As mentioned above, we have a more flexible signing chain specification.
+  By default (and previously only method), a certificate named 'ca' will be
+  the signing CA certificate for all sibling certificates for the given
+  secrets path under certificates: key in kit.yml. Alternatively, you can
+  specify an alternatively named certificate as the default ca for the
+  cohorts using the `is_ca` boolean property. Finally, you can explicitly
+  state another path as the signing CA certificate (relative to
+  environment's base secrets path) by using the `signed-by`: property.  This
+  allows multiple levels of CA signature chains.
+
+  Also mensioned above, the user can specify a root CA certificate to be
+  used to sign all base CAs for the kit that would otherwise be self-signed.
+  If you want to have an explicitly self-signed CA certificate even with the
+  presence of a root CA, you can ensure a CA is self-signed by providing its
+  own secrets path as its `signed-by:` property.
+
+  Can now specify `usage:` property per certificate, which takes a list of
+  key usage and extended key usage values. Supported usages are:
+  `digital_signature`, `non_repudiation`, `content_commitment`, `key_encipherment`,
+  `data_encipherment`, `key_agreement`, `key_cert_sign`, `crl_sign`, `encipher_only`,
+  `decipher_only`, `client_auth`, `server_auth`, `code_signing`, `email_protection`,
+  and `timestamping`.
+
+* Parameter values in Secrets Specifications:
+
+  Kits can specify default values for parameter references in the form of
+  `${param.key||default value}`
+
+  Kits can now specify parameter values in the secrets properties that will
+  be dereferenced from not only the environment, but also from the kits
+  manifests, albeit unevaluated. This works best for simple defaults for
+  parameters that can be overwritten in the environment file.
+
+* Check secrets integrity on compile-kit
+
+  When the kit is compiled with `genesis compile-kit`, it now validates all
+  the secrets specifications in `kit.yml`, to ensure that the end user does
+  not get stuck with a kit that cannot generate valid secrets.
+
+#### Removed Genesis v1 Support
+
+As stated in the release notes for v2.7.0, Genesis v1 was bundled into
+Genesis v2 and would be unpacked and executed if the `genesis` executable
+detected that it was being run against a v1 repository.
+
+Genesis v1 has not changed in over 3 years, and if you're still using v1,
+you can still use genesis v2.6.x or 2.5.x releases to keep your system
+working.  More importantly, if you're still using Genesis v1, we want to
+know!  We'd love to help you migrate up to a v2 solution so you can take
+advantage of all of its benefits.
+
+### More to follow in the AM
+
+Its now midnight on the West Coast, and I wanted to make sure we got this
+information out tonight.  I will continue tomorrow with the list of bugs and
+minor feature enhancements the 2.7.0 line brings, along with the
+improvements in the new kits, and what's to come.  I will announce in the
+Genesis slack #announcements channel when this gets updated.
 
 <h2 id="20191217">December 17th, 2019</h2>
 
