@@ -56,22 +56,128 @@
     <div>
       <nav>
         <h2>Latest Stable</h2>
-        <li><a href="#latest">Genesis v2.6.18</a></li>
+        <li><a href="#latest">Genesis v2.7.6</a></li>
         <h2>Historic Releases</h2>
+        
+        <li><a href="#v2.6.18">2.6.18</a></li>
         
       </nav>
     </div>
 
-    <div id="v2.6.18">
-      <h1 id="latest">Genesis v2.6.18</h1>
+    <div id="v2.7.6">
+      <h1 id="latest">Genesis v2.7.6</h1>
       
-        <h2>New Feature: groups in pipeline config</h2>
+        <h2>Improvements</h2>
+
+<ul>
+<li><p>Add provided secrets handling for provided secrets</p>
+
+<p>Users can now manage provided secrets via the <code>*-secrets</code> commands.
+Provided secrets are those secrets that are not generated, but asked for
+in the <code>genesis new</code> process.  A <code>genesis remove-secrets --all</code> will
+remove them.  Copying an environment file to a new name and running
+<code>add-secrets</code> wouldn't populate these, and <code>check-secrets</code> wouldn't
+detect that they were missing.  That's no good!</p>
+
+<p>This is now fixed.</p>
+
+<ul>
+<li><code>check-secrets</code> now reports on their presence or absence</li>
+<li><code>add-secrets</code> and <code>rotate-secrets</code> now propts for values to be stored.</li>
+<li><code>remove-secrets</code> can now remove them</li>
+</ul>
+
+<p>Support for this functionality must be provided per kit, which requires
+a new top-level section in <code>kit.yml</code>: <code>provided</code></p>
+
+<p>The structure is thus:</p>
+
+<p><code>
+provided:
+&lt;"base"||feature-name&gt;:
+  &lt;path&gt;:
+    [type: 'generic']
+    keys:
+      &lt;key1&gt;:
+        [prompt: "informational discription of the source or purpose of the value"]
+        [sensitive: true|false]
+      [&lt;key2&gt;: ...]
+  [&lt;path2: ...]
+[&lt;feature2&gt;: ...]
+</code></p>
+
+<p><code>prompt</code> if not given defaults to "Value for <path> <key>" so its best to
+provide one, but not fatal if you don't.</p>
+
+<p><code>sensitive</code> defaults to true - this means the input will be hidden and
+confirmed with a second entry.  The user's input will be displayed if
+false.</p></li>
+<li><p>Better dev kit identity</p>
+
+<p>While a dev kit's name and version are stuck being dev and latest for
+legacy reasons, the dev kits id has been updated to reflect whatever
+name and version are found in the dev kit's kit.yml, with a "(dev)" flag
+tacked on the end.  If there is no name or version, the values of
+"unknown" and "in-development" are used as filler respectively.  This
+gives the user a better idea of what class of kit they are dealing with</p>
+
+<p>In order to use this value in hooks, $GENESIS<em>KIT</em>ID was made available.</p></li>
+<li><p>Add <code>bail</code> hook helper</p>
+
+<p><p>The internal <code>__bail</code> function was being used in hooks, and was being called
+<code>bail</code>, <code>_bail</code>, and <code>__bail</code>.  This formalizes the function as <code>bail</code> and
+approves it as an externally callable function.</p></li>
+<li><p>In interest of providing no more and no less information than is wanted,
+users can now set <code>$GENESIS_SHOW_BOSH_CMD</code> to a non-empty value to see the
+bosh command being called from any helper.  If this is deemed valuable, it
+will be extended to internal Genesis calls to BOSH as well (which are
+currently available via the -D/-T options as part of the debug/trace logs.)</p></li>
+<li><p>Improved <code>humanize_path</code> for some corner cases.</p></li>
+<li><p>Provide <code>humanize_path</code> as a helper function, and <code>$GENESIS_CALL</code> as a
+contained <code>&lt;bin_path&gt; -C &lt;env_path&gt;</code>, with the <code>-C</code> part only specified if
+needed.  This is for cut-and-pastable output from helpers like info,
+post-deploy, new, and addon routines.</p></li>
+</ul></p>
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li><p>Fixed filter bug when only paths were set.</p></li>
+<li><p>Version check for compile-kit to ensure this version of genesis is new
+enough to know how to compile a kit based on its <code>genesis_version_min</code></p></li>
+<li><p>Fix path/bin issues with output</p>
+
+<ul>
+<li><p>Fix ../mydir when getting humanize path of mydir when in mydir</p></li>
+<li><p>Ensure executables always have a path component.</p></li>
+<li><p>caveat: <code>humanize_bin</code> will drop the path component if the genesis
+binary is in the path and that is the binary being used.  If its the
+same name as the binary in the path, but was run from a different
+location, it keeps the location (ie you'll still get ./genesis if
+you called it that way and your in a path different than where your
+path genesis resides.)</p></li>
+<li><p>Fixed conflated <code>$GENESIS_CALLER_DIR</code> and <code>$GENESIS_ROOT</code> usage.
+<code>$GENESIS_CALLER_DIR</code> is where genesis was called from, while
+<code>$GENESIS_ROOT</code> is where the environment files are found.  There were
+places this was incorrectly used, but would only cause a problem if <code>-C</code>
+was used.</p></li>
+</ul></li>
+<li><p>Bail if genesis.env isn't available for 2.7.x kits</p>
+
+<p>Kits that need v2.7.0 or greater of Genesis expect genesis.env to be set,
+not params.env.  Genesis now prints instructions on modifications needed to
+the environment .yml file to upgrade it to v2.7.x standards.</p></li>
+</ul>
+        <a class="button" href="https://github.com/starkandwayne/shield/releases/tag/v2.7.6" target="_blank">Download v2.7.6</a>
+      
+
+      
+      <h1 id="v2.6.18">Genesis v2.6.18</h1>
+      <h2>New Feature: groups in pipeline config</h2>
 
 <p>It supports grouping in pipeline config file, <code>genesis repipe</code> will generate groups
 accordingly.</p>
-        <a class="button" href="https://github.com/starkandwayne/shield/releases/tag/v2.6.18" target="_blank">Download v2.6.18</a>
-      
-
+      <a class="button" href="https://github.com/starkandwayne/shield/releases/tag/v2.6.18" target="_blank">Download v2.6.18 from Github</a>
       
 
     </div>
