@@ -31,7 +31,7 @@ that have been moved to the `genesis` block will ellicit a warning.
 Note:  Not *ALL* values are being moved out of the `params` block, just
 specific values.
 
-Read the [full details in GMP-GEN-0001 - Environment File `genesis` Block Required](/docs/migrations/gmp-GEN-0001)
+Read the [full details in GMP-GEN-0001 - Environment File `genesis` Block Required](/docs/migrations/gmp-gen-0001)
 
 # BOSH
 
