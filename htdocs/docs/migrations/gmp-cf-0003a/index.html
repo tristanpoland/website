@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+<link rel="apple-touch-icon" sizes="57x57" href="/favicon/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/favicon/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/favicon/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/favicon/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/favicon/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/favicon/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/favicon/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
+<link rel="manifest" href="/favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/favicon/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+
+<title>Genesis</title>
+
+
+<link rel="stylesheet" href="/site.css?36b8443d934f1beca13af53179c1289057cf340c">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="/feed.xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-50822525-8"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','UA-50822525-8');</script>
+</head>
+<body>
+  <header class="top">
+    <img src="/logo.png?ff43466a0e4d90211659736aeee333c9b4d0fa77">
+    <nav>
+      <li><a href="/">Home</a></li>
+      <li><a href="/download/">Download</a></li>
+      <li><a href="/community/">Community</a></li>
+      <li><a href="/docs/">Docs</a></li>
+    </nav>
+  </header>
+
+    <div class="header">
+    <div>
+      <h1>GMP-CF-0003a - TLS Certificate Refactor in v1.8.0+ (Genesis v2.7.7+)</h1>
+      
+    </div>
+  </div>
+
+  <div class="content">
+    <div>
+      
+    </div>
+
+    <div>
+      <h1>Overview</h1>
+
+<p>Cloud Foundry has recently improved support for secure inter-process
+communications, which has been reflected in the cf-deployment release.  This
+change in v1.8.0 is to better approximate the certificate tree with regards
+to the CA used to sign each certificate, as well as CN and SANs used.  This
+version also contains future-looking configuration to support extended key
+usage that is supported but not validated currently in Cloud Foundry.</p>
+
+<h1>Impact</h1>
+
+<p>The impact of this feature is minimal to the runtime and stability of
+your Cloud Foundry deployment. It requires rotating the certificates and
+associated CA certificates.  Genesis provides the tooling to do this.</p>
+
+<p>There is no downtime incurred by applying this feature.</p>
+
+<h1>The Process</h1>
+
+<p>You will need to be using Genesis v2.7.7 or later.  If you are still using
+an earlier version, please use <a href="/docs/migrations/gmp-cf-0003/index.html">GMP 3</a>,
+or better yet, first upgrade to the latest version of Genesis first, then
+perform the following:</p>
+
+<ol>
+<li><p>Ensure you're at least upgraded to v1.7.2 -- while it is possible to
+upgrade directy from earlier versions, the 1.7.x series have their own
+migration processes, and doing too many things at once is a recipe for
+disaster.</p></li>
+<li><p>Update your environment file to the desired version of the kit.  These
+changes originated in v1.8.0, but further changes also happened in
+v1.9.x.  We would recommend targetting the latest v1.10.x at this time.
+Just set the <code>kit.version</code> in your environment yaml.</p></li>
+<li><p>Update your certificates.  Genesis v2.7.7 makes this easy.  Just run:</p>
+
+<p><code>
+genesis rotate-secrets &lt;env&gt; -I
+</code></p>
+
+<p>This will rotate all the secrets that are invalid, while leaving secrets
+that don't need to change alone.  For further peace of mind, you can use
+a <code>-i</code> option to run it interactively, or for the ultra-precautious,
+first take a backup of your vault using:
+<code>safe export  &lt;path/for/env/secrets/ &gt; my-secrets.json</code></p></li>
+<li><p>Verify your secrets are all now valid using <code>genesis check-secrets &lt;env&gt;</code>.</p></li>
+<li><p>Deploy (manually*)</p>
+
+<p>* Because there are steps that have to be taken between updating the
+environment file and deploying the environment, it is not recommended
+that this process be done via the pipelines.  However it is possible as
+long as you regenerate the impacted secrets beforehand, and then push the
+version bump as a common value in your ancestral yml file so it can
+propagate through the pipeline.  In this case, do not commit your version
+bumps in each of your environment files.</p></li>
+</ol>
+
+<h1>Help &amp; Support</h1>
+
+<p>If you have concerns about the impact of this migration process, or
+need assistance running through it, please don't hesitate to <a href="/community#slack">find us
+in #help on Slack</a>.</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="g">
+      <div class="x3">
+        <img src="/swlogo.png?0b567bdcee59ac95e3eaf667ec543ebc1631d6c0">
+
+        <p>Genesis is maintained by Stark &amp; Wayne,
+        a leading Cloud-Native consulting firm.</p>
+      </div>
+
+      <div class="x3">
+        <nav>
+          <li><a href="/">Home</a></li>
+          <li><a href="/download/">Download</a></li>
+          <li><a href="/community/">Community</a></li>
+          <li><a href="/docs/">Docs</a></li>
+        </nav>
+      </div>
+
+      <div class="x3">
+      </div>
+    </div>
+
+    <div class="copyright">
+      <p>Copyright &copy; 2020 The Genesis Authors.  All rights reserved.</p>
+    </div>
+  </footer>
+  <script type="text/javascript" src="/site.js?d2112e355882784cf7f38561cf3ccb0bd5da3111"></script>
+</body>
+</html>

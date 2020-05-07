@@ -19,6 +19,20 @@ Genesis Kit it applies to.  Migration Process numbers will not be
 intentionally reused.  Indeed, they are intended to be used in reference
 documentation (like Github release notes).
 
+# Genesis/All Kits
+
+## GMP-GEN-0001 - Environment File `genesis` Block Required in v2.7.x
+
+Though introduced in v2.6.x, the `genesis` block in the environment files is
+now the primary source of all things not kit related, and will be required
+in a future 2.7.x release.  For now, continued use of `params`-based values
+that have been moved to the `genesis` block will ellicit a warning.
+
+Note:  Not *ALL* values are being moved out of the `params` block, just
+specific values.
+
+Read the [full details in GMP-GEN-0001 - Environment File `genesis` Block Required](/docs/migrations/gmp-GEN-0001)
+
 # BOSH
 
 The following migration processes apply to the Genesis BOSH Kit, for
@@ -45,7 +59,9 @@ cf-deployment v12.5.0.  This remaps the CA signing certificate as well as
 the CN and SANs used by the certificates. As such, the existing certificates
 need to be rotated.
 
-Read the [full details of **GMP-CF-0003 - TLS Certificate Refactor in v1.8.0**](/docs/migrations/gmp-cf-0003).
+**NEW:** [Simplified process](/docs/migrations/gmp-cf-0003a) updated for Genesis v2.7.7+
+
+Read the original [full details of **GMP-CF-0003 - TLS Certificate Refactor in v1.8.0**](/docs/migrations/gmp-cf-0003).
 
 ## GMP-CF-0002 - Optionally Removing Consul in 1.3
 
