@@ -56,8 +56,10 @@
     <div>
       <nav>
         <h2>Coming Up</h2>
-        <li><a href="#next">May 19th, 2020</a></li>
+        <li><a href="#next">June 16th, 2020</a></li>
         <h2>Previous Calls</h2>
+        
+        <li><a href="#20200526">May 26th, 2020</a></li>
         
         <li><a href="#20200421">April 21st, 2020</a></li>
         
@@ -80,24 +82,16 @@ development progress, and future direction.</p>
 <p>The next Genesis Roadmap Call is</p>
 
 <div class="schedule">
-<div class="date">Tuesday, January 21st</div>
+<div class="date">Tuesday, June 16th</div>
 <div class="time">at 11:00am Eastern (8:00am Pacific/4:00pm UTC)</div>
 </div>
 
 <p>We use <a href="https://zoom.us/download#client_4meeting">Zoom</a>, and will announce the Meeting ID/Link in the <strong>#announcements</strong>
 channel in the <a href="/community#slack">Genesis Slack Org</a> the day before the call.</p>
 
-<p>You can also call in to the zoom meeting and enter the Meeting ID given in
-the channel:</p>
-
-<ul>
-<li>US: <strong>+1 646 876 9923</strong> or <strong>+1 669 900 6833</strong></li>
-<li><a href="https://zoom.us/u/cdjcbHG2o">International numbers available</a></li>
-</ul>
-
 <p>Calls are not recorded.</p>
 
-<h2 id="20200521">Agenda for May 19st, 2020</h2>
+<h2 id="20200616">Agenda for June 16th, 2020</h2>
 
 <ol>
 <li><p>Introductions</p></li>
@@ -117,6 +111,86 @@ the channel:</p>
 </ol>
 
 <h1>Past Meetings</h1>
+
+<h2 id="20200526">May 26th 2020</h2>
+
+<p>The Genesis Release Engineering teams continue to crank out new versions of
+Genesis itself and its BOSH Deployment Kits.</p>
+
+<h3>What's Changed?</h3>
+
+<p>A lot.</p>
+
+<ul>
+<li><p>There was a breaking change to the proxy support vis-a-vis environment
+variables, to accommodate odd network topology where Vault and the
+jumpbox are on very different networks.  The <code>BOSH_ALL_PROXY</code> environment
+variable now no longer causes Genesis to also set <code>https_proxy</code> to match.</p></li>
+<li><p>The Genesis CLI now provides better feedback about <em>which</em> Vault it is
+using when it.</p></li>
+</ul>
+
+<h3>Testkit and CI/CD</h3>
+
+<p>We are now using a homegrown testing framework for ensuring that, given an
+input cloud-config, set of Genesis env files, and a kit version, we get the
+expected manifest.  This is useful, insofar as it allows us to validate our
+expectations from various combinations of features and parameters, without
+needing to actually deploy to test.  This makes CI/CD way more powerful and
+covers a lot more ground than we were able to previously, due to budgetary
+constraints.</p>
+
+<h3>Revamped Documentation</h3>
+
+<p>Stark &amp; Wayne is looking to dedicate a technical writer to the project to
+flesh out both internal and user-facing documentation, use cases, getting
+started guides, etc., to improve the quality of documentation.  Thanks,
+Stark &amp; Wayne!</p>
+
+<h3>What's Coming Soon</h3>
+
+<ul>
+<li><p>The BOSH 1.x Kit will soon have support for both external databases and
+(s3) blobstores, as well as IAM instance metadata CPI authentication!</p></li>
+<li><p>The BOSH 2.x Kit, based on the upstream <code>bosh-deployment</code>, is nearing a
+release candidate, and marks a change in paradigm in how we do release
+engineering for BOSH directors.  Once this goes live, our release cadence
+should increase considerably.</p></li>
+<li><p>The CF 2.x Kit, based on the upstream <code>cf-deployment</code> is currently
+available as a release candidate, backed by a month of field experience.
+Right now, all 2.x deployments have been greenfield, and we do not
+recommend attempting to update a 1.x deployment to 2.x.  A migration plan
+to enable that is in the works.</p></li>
+<li><p>We are working on releasing the CF app-autoscaler Kit, as a standalone
+deployment vehicle, for express use with the CF 2.x kit.</p></li>
+</ul>
+
+<h3>What's Coming in the Far Future?</h3>
+
+<p>James talked at length about future plans for Genesis, in a Kubernetes
+world.  What happens when we <em>start</em> with a Kubernetes cluster, and then try
+to deploy control plane systems, BOSH directors, and ultimately Cloud
+Foundry instances?</p>
+
+<p>The first task before us is to map current VM-based control plane systems
+onto their Kubernetes equivalents.  This is pretty much a one-for-one swap
+of VMs for containers.  Vault, OpenVPN, SHIELD, Prometheus, and Concourse
+all have Helm charts, or at least Docker images that can be deployed to the
+Kubernetes control plane.  Jumpbox is a bit weird, since it doesn't <em>do</em>
+anything, but a "pause" container can do the job, and you can get in via
+<code>kubectl exec</code>.</p>
+
+<p><a href="https://starkandwayne.com/gluon">Gluon</a> is a Controller for Kubernetes that
+lets you deploy BOSH things via Kubernetes CRDs.  R&amp;D thinks this is a good
+direction to go in -- it will allow us to support VM-based CF via BOSH, as
+well as deploy other Kubernetes clusters via the <a href="https://github.com/jhunt/k8s-boshrelease">K8s BOSH
+Release</a>.</p>
+
+<p>We're still experimenting with all of these technologies in R&amp;D, and will
+be focusing heavily on migration paths from current iterations of
+Genesis-deployed things (via Kits).</p>
+
+<p>This is going to be fun.</p>
 
 <h2 id="20200421">April 21st, 2020</h2>
 
