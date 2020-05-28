@@ -60,7 +60,7 @@ Calls are not recorded.
 
 <h2 id="20200421">April 21st, 2020</h2>
 
-Its been a busy first third of 2020.  Beyond the crazyness of the COVID-19
+Its been a busy first third of 2020.  Beyond the craziness of the COVID-19
 situation, we've been working hard at bringing some significant changes to
 Genesis and its Kits, which have been released since the last meeting in
 March.  This is a summary of what was discussed during this meeting, which
@@ -78,15 +78,15 @@ days.
 #### New Feature: Kit Providers
 
 Simply put, this allows you to configure a Genesis deployment repository to
-use a different source for your kits instead of the Genesis-Community Github
-Organization.  At release, it support any other github organization that
+use a different source for your kits instead of the Genesis-Community GitHub
+Organization.  At release, it support any other GitHub organization that
 follows a release system similar to what is used by the Genesis-Community
-org.  This will work for Github Enterprise as well, which will benefit users
+org.  This will work for GitHub Enterprise as well, which will benefit users
 that must function without access to the internet.
 
 Full details can be found in the [2.7.0 release notes](https://github.com/genesis-community/genesis/releases/tag/v2.7.0), or by running `genesis
 kit-provider -h` for displaying or changing it on an existing deployment
-repo, or `genesis init -h` for initializing a new deployment repo.
+repository, or `genesis init -h` for initializing a new deployment repository.
 
 ###### Secrets Management Refactor
 
@@ -107,14 +107,14 @@ follows:
   uses one line unless there's an error, or a verbose mode where all the
   details are printed.
 
-* `remove-secrets` has been added to allow full secrets lifecycle
+* `remove-secrets` has been added to allow full secrets life cycle
   management, with extra functionality that will be explained below.
 
 * `check-secrets` now validates that the secrets are correct, not just
   present.  This includes X509 expiry, cert/key agreement, signing chain,
   key usage and CN/SANs; public/private key agreement and size for
   Diffie-Hellman, RSA and SSH; and randomly generated passwords size,
-  composition and alternate encodings.  Never deploy again just to find your
+  composition and alternate encoding.  Never deploy again just to find your
   secrets are invalid.  It also supports levels of validation, with `-lm`
   for checking for presence, `-li` for finding invalid secrets, and `-lp`
   for finding problematic secrets (see below).
@@ -160,8 +160,8 @@ follows:
 * Finally, some love for the provided secrets.
 
   When kits need to interact with external entities, it needs provided
-  secrets to be able to securely access them.  Thise are generally provided
-  by the `genesis new` process, but that was it for lifecycle management.
+  secrets to be able to securely access them.  These are generally provided
+  by the `genesis new` process, but that was it for life cycle management.
   As of v2.7.6, if a kit specified its usage of provided secrets under the
   `provided` top-level key in its kit.yml file, all of the `*-secrets`
   commands would now apply.  They could be checked, added if missing,
@@ -177,11 +177,11 @@ Similarly, for Exodus data (the secrets that leave the environment to be
 shared by other genesis environments for purpose of connectivity,
 information and collaboration), it was stored under
 `/secrets/exodus/<env-name>/<kit-type>`  This made it hard to use a central
-corporate vault, which was sometimes required by InfoSec policy.
+corporate vault, which was sometimes required by security policy.
 
 As of v2.7.0, environments could specify an alternative mount point for both
 secrets and exodus data.  When creating an environment specifying
-`--secret-mount` allowed you to specify an alternative base underwhich the
+`--secret-mount` allowed you to specify an alternative base under which the
 secrets of the kit would be stored (still further under the env slug and kit
 type, which together can be overwritten by using the `--secrets-path`
 option.  For Exodus data, the option is `--exodus-mount`, which now defaults
@@ -204,7 +204,7 @@ with v2.7.0 minimum version will expect these values in the `genesis` block.
 
 Before, all generated CA certificates were self-signed, and there was no way
 to specify generating a CA signed by another CA.  Genesis v2.7.0 supports
-explicit signing of generated certificates as well as specifing a default
+explicit signing of generated certificates as well as specifying a default
 root CA certificates that will be used to sign any CA that isn't explicitly
 signed in the kit.yml definition.
 
@@ -215,13 +215,13 @@ environment and rotating the existing certificates.
 #### Initial Credhub Support
 
 In preparation for our v2.0.0 of cf-genesis-kit that is based on
-cf-deployment, we need to be able to interoperate with credhub and
-credhub-based deployments.  Steps have been added to add credhub
+cf-deployment, we need to be able to inter-operate with Credhub and
+Credhub-based deployments.  Steps have been added to add Credhub
 connectivity to the BOSH kit for facilitating login to the Credhub located
 on its director VM, as well as providing Exodus data to allow other kits to
 connect to it.
 
-It does not yet have the full lifecycle support of the `*-secrets` commands,
+It does not yet have the full life cycle support of the `*-secrets` commands,
 but that will be added as the need appears.
 
 #### Improved Kit Authoring.
@@ -241,7 +241,7 @@ improved our tooling for building them.
   environment's base secrets path) by using the `signed-by`: property.  This
   allows multiple levels of CA signature chains.
 
-  Also mensioned above, the user can specify a root CA certificate to be
+  Also mentioned above, the user can specify a root CA certificate to be
   used to sign all base CAs for the kit that would otherwise be self-signed.
   If you want to have an explicitly self-signed CA certificate even with the
   presence of a root CA, you can ensure a CA is self-signed by providing its
@@ -330,7 +330,7 @@ notes](https://github.com/genesis-community/cf-genesis-kit/releases) for full de
 We are continuing our efforts to keep cf-genesis-kit up to feature parity
 with cf-deployment, with a new release based on cf-deployment v12.5.0 at the
 end of 2019, or early in 2020 (before next roadmap call).  This will include
-up-to-date releases, improved TLS interworkings between components, and
+up-to-date releases, improved TLS inner workings between components, and
 several other bug fixes and minor improvements.
 
 Note:  We are not including the updates in v12.6.0 of cf-deployment as they
@@ -347,7 +347,7 @@ Tuesday, September 17th, 2019.
 a full complement of component software updates.  Notably, BOSH itself is
 now at version 270.5.0, which is the latest as of today.
 
-This release of BOSH deprecates some of the backwards-compaitibility with
+This release of BOSH deprecates some of the backwards-compatibility with
 regards to naming attributed in manifest files, so a lot of other kits got
 updated to accommodate.  If you want to run this, you are highly encouraged
 to follow suit with your other kit deployments either before, or directly
@@ -407,7 +407,7 @@ The Genesis Team has been putting forth a concerted effort to write more
 approachable "first timer" content to get people interested in deploying
 Cloud technology like CF, BOSH, and Kubernetes into the Genesis mindset.
 
-Hopefully, by the time of our next Communty Call (September 17th), we'll
+Hopefully, by the time of our next Community Call (September 17th), we'll
 have something more concrete to show off.
 
 ### Cloud Foundry Genesis Kit
