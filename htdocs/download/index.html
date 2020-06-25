@@ -56,7 +56,7 @@
     <div>
       <nav>
         <h2>Latest Stable</h2>
-        <li><a href="#latest">Genesis v2.7.9</a></li>
+        <li><a href="#latest">Genesis v2.7.10</a></li>
         <h2>Historic Releases</h2>
         
         <li><a href="#v2.6.18">2.6.18</a></li>
@@ -64,93 +64,36 @@
       </nav>
     </div>
 
-    <div id="v2.7.9">
-      <h1 id="latest">Genesis v2.7.9</h1>
+    <div id="v2.7.10">
+      <h1 id="latest">Genesis v2.7.10</h1>
       
         <h2>Improvements</h2>
 
-<ul>
-<li><p>Add new secret type of UUID</p>
-
-<p>In kit.yml, you can now generate UUIDs of all types.  By default, you just
-need to specify the type 'uuid' for a path and key (similar to how 'random'
-works.  The full syntax is:</p>
-
-<p><code>uuid [v1|time|v3|md5|v4|random|v5|sha1] [namespace (&lt;UUID&gt;|dns|url|oid|x500)] [name &lt;string&gt;] [fixed]</code></p>
-
-<p>With no arguments, a v4/random UUID is generated.  If v3/md5 or v5/sha1 is
-specified, it takes a name and optional namespace argument to build the
-hash, which will always generate the same value for the same input
-arguments, unlike the other versions.  The name can be any string, and the
-namespace can be the pre-defined namespaces of dns, url, oid or x500, or any
-arbitrary UUID string.</p></li>
-<li><p>Expanded config support.  Kits can now specify which configs are required
-and for what hook scripts.  This allows for custom cloud and runtime configs
-to be validated and used for information.  Furthermore, cloud config can now
-be used during the <code>new</code> script to check if the required keys are present or
-even propose values that can be added.</p>
-
-<p>This is done using one of the following two styles:</p>
-
-<p>```
---- # kit.yml required<em>configs style 1
-required</em>configs:</p>
-
-<ul>
-<li>cloud</li>
-<li>runtime</li>
-<li>runtime@thiskit
-```</li>
-</ul>
+<p>The <code>--cloud-config|--cc</code> and <code>--runtime-config|--rc</code> have been streamlined
+  into a single <code>--config|-c</code> with backwards compatibility to the existing
+  <code>-c</code> (for cloud config).  You can now specify named configs as such:</p>
 
 <p><code>
---- # kit.yml required configs style 2
-required_configs:
-cloud: true
-runtime: [blueprint new]
-funky: false
+  -c [type[@name]=]/path/to/config.yml
 </code></p>
 
-<p>In the first style, all hooks will require the listed configurations.  In
-the second style, <code>cloud</code> config will always be required, <code>runtime</code> will
-only be required when processing <code>blueprint</code> and <code>new</code> hooks, and <code>funky</code>
-will never be required.</p>
+<p>If type is not given, it is assumed cloud, and likewise if name is not
+  given, it is assumed to be the unnamed <code>default</code> config for the given
+  type.</p>
 
-<p>By default, if no <code>required_configs</code> block is specified, only <code>cloud</code> config
-is requred when processing <code>blueprint</code>, and no other hooks.  This is
-effectively the previous behaviour.</p></li>
-<li><p>Add <code>move_secrets_to_credhub</code> bash helper function</p>
-
-<p><code>move_secrets_to_credhub src_path:key dst_path</code></p>
-
-<p><p>This will move a secret under the environments Vault area to the
-environments credhub area.  Do not include the secrets base before the
-<code>src_path</code>, or the bosh env/deployment prefix before the <code>dst_path</code>.</p></li>
-<li><p>Derived features are features that are artificially created by the
-hooks/features script to facilitate absent of other features or a specific
-combination of features, so that secrets can be better specified (ie a
-secret that only exists if a feature ISN'T specified)  They must start with
-a <code>+</code>, are not checked with the validation features, and cannot be
-explicitly stated in an environment file.</p></li>
-</ul></p>
+<p><code>-c</code> can be specified multiple times to specify multiple configs.  It
+  does not error check that you haven't specified the same type and name
+  multiple times, so that's on you to ensure you're not doing that.</p>
 
 <h2>Bug Fixes</h2>
 
 <ul>
-<li><p>Kit releases that preceed the current version by 30 or more releases are no
-longer reported as non-existant.</p></li>
-<li><p>Compiled kits no longer contain the spec tests and kit devtools, as they
-aren't needed to use the kit.</p></li>
-<li><p>Improved details given when hooks fail, specifically when <code>blueprint</code> fails
-to determine which manifest fragments are requied for merging</p></li>
-<li><p>Don't populate missing <code>maybe</code> params</p>
-
-<p>When a parameter is conditionally available, the <code>maybe:</code> parameter
-dereference would prevent errors if the parameter was missing, but it would
-leave an empty string as the value.  This changes that behaviour to drop the
-key or the array element that was being set to the missing parameter.</p></li>
+<li>The overly agressive downloading of cloud config for most activities has
+been reduced to only deployment and check, as was the previous behaviour.
+Likewise, the downloading of cloud config is not attempted when deploying a
+proto-bosh (or anything else that uses create-env for deployment)</li>
 </ul>
-        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.9" target="_blank">Download v2.7.9</a>
+        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.10" target="_blank">Download v2.7.10</a>
       
 
       
