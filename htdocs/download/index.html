@@ -56,7 +56,7 @@
     <div>
       <nav>
         <h2>Latest Stable</h2>
-        <li><a href="#latest">Genesis v2.7.11</a></li>
+        <li><a href="#latest">Genesis v2.7.12</a></li>
         <h2>Historic Releases</h2>
         
         <li><a href="#v2.6.18">2.6.18</a></li>
@@ -64,73 +64,15 @@
       </nav>
     </div>
 
-    <div id="v2.7.11">
-      <h1 id="latest">Genesis v2.7.11</h1>
+    <div id="v2.7.12">
+      <h1 id="latest">Genesis v2.7.12</h1>
       
-        <h2>Improvements</h2>
+        <h2>Bug Fixes</h2>
 
 <ul>
-<li><p>Add better kit id to exodus data</p>
-
-<p>As more things use the previously deployed kit to determine what needs
-to be upgraded, it is important to have this information correctly
-identified.  Prior to this change, dev kits reported the name as dev and
-the version as latest (from the env yaml file)</p>
-
-<p>This change uses the kit name and version located in the kit.yml file
-directly, and also adds <code>kit_is_dev</code> to record that a dev kit is being
-used.</p></li>
-<li><p>Added features to exodus export, info script</p>
-
-<p>Features are now stored in exodus on successful deploy, and reported by
-the info command.</p></li>
-<li><p><em>BREAKING CHANGE</em> Hooks now use <code>CREDHUB_*</code> environment variables to
-connect to credhub.  This required your BOSH to be deployed with
-bosh-genesis-kit v1.15.1 or later - please upgrade your bosh prior to
-deploying any kits that use Credhub (cf, cf-app-autoscaler)</p></li>
-<li><p>Decouple vault/bosh with loading of env</p>
-
-<p>Not all genesis commands need vault or bosh, but it was being
-proactively connected any time the env was loaded.</p></li>
+<li>Fixes missing bosh config error in pipeline deployments</li>
 </ul>
-
-<h2>Kit Development Improvements</h2>
-
-<ul>
-<li><p>Add ability to require connections to kit hooks</p>
-
-<p>Normally, hook don't need bosh or vault, but if they do, the kit can
-specify which hook needs vault or bosh (or in the future credhub) so
-the connection can be validated before the hooks are run (similar to the
-required_configs behaviour)</p></li>
-<li><p>Allow feature hook to access the same environment variables and helper
-script that the other hooks use.</p></li>
-</ul>
-
-<h2>Bug Fixes</h2>
-
-<ul>
-<li><p>When safe was not configured with any targets, the error that occurred in
-Genesis was confusing and not explanatory.  It will now plainly explain that
-it is can't read <code>.saferc</code> and therefore not select the desired vault.</p></li>
-<li><p>Fixed some BOSH config requirements that were problematic for some edge cases</p></li>
-<li><p>Improve hook standard error handling.</p>
-
-<p>Previous improvements stopped STDERR from being output directly to
-screen.  This has been reverted so that STDERR would be output directly to
-the terminal in real time.</p></li>
-<li><p>Resolve recursion issue with feature hook checking if bosh create-env is
-specified, which needs to check features, which runs feature hook...</p></li>
-<li><p>Prevent double check_prereq calls</p></li>
-</ul>
-
-<h2>Minimum Dependencies</h2>
-
-<ul>
-<li>bosh: v5.0.1</li>
-<li>spruce: v1.26.0</li>
-</ul>
-        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.11" target="_blank">Download v2.7.11</a>
+        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.12" target="_blank">Download v2.7.12</a>
       
 
       
