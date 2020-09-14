@@ -104,7 +104,12 @@
       "notes": "# Bug Fixes\n\n- Fixes missing bosh config error in pipeline deployments\n",
       "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.7.12",
       "version": "2.7.12"
+    },
+    {
+      "notes": "# Improvements\n\nThis release contains improvements to Pipeline Generation and Integration\n\n* Enable Enterprise Vault support, use Safe to init\n\n  Instead of using the Vault Genesis kit, some clients need to integrate with\n  their companies Enterprise Vault.  This means supporting namespaces and\n  disabling strongbox, the process that Safe uses to treat multiple Vault VMs\n  as a single target when unsealing.\n\n  Since Safe nicely wraps up support for this, the pipelines have been updated\n  to use Safe to initialize connections to the Vault, making it seamless\n  regardless of it being Enterprise or not, v1 or v2 kv backend.\n\n  Changes:\n    - In your `ci.yml`, under `pipeline.vault`, you can specify `namespace` as\n      a string, and `no-strongbox` as a truthy value to connect to your\n      enterprise vault.\n\n* More dynamic 'default' pipeline layout.\n\n  If ci.yml specifies a `default` layout, that layout will be used without\n  having to specify it, but it will expect the fly target to also be `default`\n  -- this is at odds with the concourse `login` addon which names the fly\n  target the same as the environment name.\n\n  To resolve this, if you only have a single layout in your `ci.yml` file, it\n  will be considered the default, so it can be named the same as your fly\n  target aka concourse environment.  If you have muptiple layouts, a layout\n  named `default`, if it exists, will be considered default to keep existing\n  behaviour.  Otherwise, if you have multiple named layouts and you didn't\n  specify one in the `repipe` command, it will present you with a list to\n  chose from.  The `-t|--target` command will still behave as normal.\n\n* Use use https instead of ssh for git in pipeliens\n\n  Some places must use https endpoints with basic auth for accessing git\n  repositories instead of ssh with keys.  This enables that ability.\n\n  Change in behaviour:\n    - In the `ci.yml` file, under `pipeline.git`, you specify `username` and\n      `password` instead of `private_key`\n    - If `username` and `password` are used, the URI used will be\n      `https://<host>/<owner>/<repo>.git` but this can be specified directly\n      using `pipeline.git.uri`\n",
+      "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.7.13",
+      "version": "2.7.13"
     }
   ],
-  "latest": "2.7.12"
+  "latest": "2.7.13"
 }
