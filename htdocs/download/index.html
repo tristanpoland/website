@@ -56,7 +56,7 @@
     <div>
       <nav>
         <h2>Latest Stable</h2>
-        <li><a href="#latest">Genesis v2.7.13</a></li>
+        <li><a href="#latest">Genesis v2.7.14</a></li>
         <h2>Historic Releases</h2>
         
         <li><a href="#v2.6.18">2.6.18</a></li>
@@ -64,62 +64,43 @@
       </nav>
     </div>
 
-    <div id="v2.7.13">
-      <h1 id="latest">Genesis v2.7.13</h1>
+    <div id="v2.7.14">
+      <h1 id="latest">Genesis v2.7.14</h1>
       
         <h2>Improvements</h2>
 
-<p>This release contains improvements to Pipeline Generation and Integration</p>
+<ul>
+<li><p>Allow <code>genesis repipe</code> to keep pipelines paused.</p></li>
+<li><p>Update generated pipelines:</p>
 
 <ul>
-<li><p>Enable Enterprise Vault support, use Safe to init</p>
-
-<p>Instead of using the Vault Genesis kit, some clients need to integrate with
-their companies Enterprise Vault.  This means supporting namespaces and
-disabling strongbox, the process that Safe uses to treat multiple Vault VMs
-as a single target when unsealing.</p>
-
-<p>Since Safe nicely wraps up support for this, the pipelines have been updated
-to use Safe to initialize connections to the Vault, making it seamless
-regardless of it being Enterprise or not, v1 or v2 kv backend.</p>
-
-<p>Changes:</p>
-
-<ul>
-<li>In your <code>ci.yml</code>, under <code>pipeline.vault</code>, you can specify <code>namespace</code> as
-a string, and <code>no-strongbox</code> as a truthy value to connect to your
-enterprise vault.</li>
-</ul></li>
-<li><p>More dynamic 'default' pipeline layout.</p>
-
-<p>If ci.yml specifies a <code>default</code> layout, that layout will be used without
-having to specify it, but it will expect the fly target to also be <code>default</code>
--- this is at odds with the concourse <code>login</code> addon which names the fly
-target the same as the environment name.</p>
-
-<p>To resolve this, if you only have a single layout in your <code>ci.yml</code> file, it
-will be considered the default, so it can be named the same as your fly
-target aka concourse environment.  If you have muptiple layouts, a layout
-named <code>default</code>, if it exists, will be considered default to keep existing
-behaviour.  Otherwise, if you have multiple named layouts and you didn't
-specify one in the <code>repipe</code> command, it will present you with a list to
-chose from.  The <code>-t|--target</code> command will still behave as normal.</p></li>
-<li><p>Use use https instead of ssh for git in pipeliens</p>
-
-<p>Some places must use https endpoints with basic auth for accessing git
-repositories instead of ssh with keys.  This enables that ability.</p>
-
-<p>Change in behaviour:</p>
-
-<ul>
-<li>In the <code>ci.yml</code> file, under <code>pipeline.git</code>, you specify <code>username</code> and
-<code>password</code> instead of <code>private_key</code></li>
-<li>If <code>username</code> and <code>password</code> are used, the URI used will be
-<code>https://&lt;host&gt;/&lt;owner&gt;/&lt;repo&gt;.git</code> but this can be specified directly
-using <code>pipeline.git.uri</code></li>
-</ul></li>
+<li><p>Add icons to resources.</p></li>
+<li><p>Replace deprecated <code>aggregate</code> with <code>in_parallel</code>.</p></li>
+<li><p>Support for git resource extra configurations.</p></li>
 </ul>
-        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.13" target="_blank">Download v2.7.13</a>
+
+<p><p>This allows adding configurations to all git resource types.  The extra
+configurations can be specified under <code>pipeline.git.config</code>.  Common
+configurations that are expected to be utilized would be <code>check_every</code>
+and <code>webhook_token</code>, but any value specified on
+https://concourse-ci.org/resources.html could be used (with the exception
+of <code>name</code> and <code>type</code>).</p></li>
+<li><p>Support for an upcoming <code>generic</code> Genesis Kit.</p></li>
+</ul></p>
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li><p>Prevent new_enough helper from exiting on false</p></li>
+<li><p>Error if create-env deploy uses invalid options</p>
+
+<p>In particular, specifying --dry-run on a create-env, has no effect.  It
+actually changes the target, which can be destructive and allowing this
+option gives users a false sense of security.  Options --yes, --fix and
+--recreate are also considered invalid for <code>genesis deploy</code> when deploying
+a create-env.</p></li>
+</ul>
+        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.14" target="_blank">Download v2.7.14</a>
       
 
       
