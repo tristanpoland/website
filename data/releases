@@ -114,7 +114,12 @@
       "notes": "# Improvements\n\n- Allow `genesis repipe` to keep pipelines paused.\n\n- Update generated pipelines:\n  - Add icons to resources.\n\n  - Replace deprecated `aggregate` with `in_parallel`.\n\n  - Support for git resource extra configurations.\n\n    This allows adding configurations to all git resource types.  The extra\n    configurations can be specified under `pipeline.git.config`.  Common\n    configurations that are expected to be utilized would be `check_every`\n    and `webhook_token`, but any value specified on\n    https://concourse-ci.org/resources.html could be used (with the exception\n    of `name` and `type`).\n\n- Support for an upcoming `generic` Genesis Kit.\n\n# Bug Fixes\n\n- Prevent new_enough helper from exiting on false\n\n- Error if create-env deploy uses invalid options\n\n  In particular, specifying --dry-run on a create-env, has no effect.  It\n  actually changes the target, which can be destructive and allowing this\n  option gives users a false sense of security.  Options --yes, --fix and\n  --recreate are also considered invalid for `genesis deploy` when deploying\n  a create-env.\n",
       "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.7.14",
       "version": "2.7.14"
+    },
+    {
+      "notes": "# Improvements\n\n- Updates to pipelines:\n\n  - Commit state file on failed create-env deployment.\n\n  - Add pipeline.notifications to ci.yml.  Can take the arguments of\n    `inline` (default), `parallel`, and `grouped`.\n\n    Both `parallel` and `grouped` make the notifications parallel to the\n    task that is being notified as ready, so don`t block the manual\n    trigger progression.  `grouped` has the additional behaviour that\n    moves the notification tasks into a separate group.  The default `inline`\n    maintains the original behaviour of notification preceeding the manual\n    task.\n\n# Bug Fixes\n\n- Don't block -y|--yes for create-env deploys\n\n  Since create-env deploys follow the spirit of the 'yes' option, we will\n  allow it even though it has no effect.  This will allow automation to\n  blindly specify -y without having to check if the deployment is a\n  create-env.\n\n  This reverts a change found in Genesis 2.7.14\n\n- Fix failures when no safe target is available\n\n  Detection of the safe target was moved to Genesis::Top in v2.7.14, but\n  there are a select few circumstances that does not require the safe\n  target to be known, such as `genesis embed`.  This fix makes the missing\n  safe target non-fatal, but adds a debug warning message if missing.\n",
+      "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.7.15",
+      "version": "2.7.15"
     }
   ],
-  "latest": "2.7.14"
+  "latest": "2.7.15"
 }

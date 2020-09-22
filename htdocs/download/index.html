@@ -56,7 +56,7 @@
     <div>
       <nav>
         <h2>Latest Stable</h2>
-        <li><a href="#latest">Genesis v2.7.14</a></li>
+        <li><a href="#latest">Genesis v2.7.15</a></li>
         <h2>Historic Releases</h2>
         
         <li><a href="#v2.6.18">2.6.18</a></li>
@@ -64,43 +64,47 @@
       </nav>
     </div>
 
-    <div id="v2.7.14">
-      <h1 id="latest">Genesis v2.7.14</h1>
+    <div id="v2.7.15">
+      <h1 id="latest">Genesis v2.7.15</h1>
       
         <h2>Improvements</h2>
 
 <ul>
-<li><p>Allow <code>genesis repipe</code> to keep pipelines paused.</p></li>
-<li><p>Update generated pipelines:</p>
+<li><p>Updates to pipelines:</p>
 
 <ul>
-<li><p>Add icons to resources.</p></li>
-<li><p>Replace deprecated <code>aggregate</code> with <code>in_parallel</code>.</p></li>
-<li><p>Support for git resource extra configurations.</p></li>
+<li><p>Commit state file on failed create-env deployment.</p></li>
+<li><p>Add pipeline.notifications to ci.yml.  Can take the arguments of
+<code>inline</code> (default), <code>parallel</code>, and <code>grouped</code>.</p></li>
 </ul>
 
-<p><p>This allows adding configurations to all git resource types.  The extra
-configurations can be specified under <code>pipeline.git.config</code>.  Common
-configurations that are expected to be utilized would be <code>check_every</code>
-and <code>webhook_token</code>, but any value specified on
-https://concourse-ci.org/resources.html could be used (with the exception
-of <code>name</code> and <code>type</code>).</p></li>
-<li><p>Support for an upcoming <code>generic</code> Genesis Kit.</p></li>
+<p><p>Both <code>parallel</code> and <code>grouped</code> make the notifications parallel to the
+task that is being notified as ready, so don<code>t block the manual
+trigger progression.</code>grouped<code>has the additional behaviour that
+moves the notification tasks into a separate group.  The default</code>inline`
+maintains the original behaviour of notification preceeding the manual
+task.</p></li>
 </ul></p>
 
 <h2>Bug Fixes</h2>
 
 <ul>
-<li><p>Prevent new_enough helper from exiting on false</p></li>
-<li><p>Error if create-env deploy uses invalid options</p>
+<li><p>Don't block -y|--yes for create-env deploys</p>
 
-<p>In particular, specifying --dry-run on a create-env, has no effect.  It
-actually changes the target, which can be destructive and allowing this
-option gives users a false sense of security.  Options --yes, --fix and
---recreate are also considered invalid for <code>genesis deploy</code> when deploying
-a create-env.</p></li>
+<p>Since create-env deploys follow the spirit of the 'yes' option, we will
+allow it even though it has no effect.  This will allow automation to
+blindly specify -y without having to check if the deployment is a
+create-env.</p>
+
+<p>This reverts a change found in Genesis 2.7.14</p></li>
+<li><p>Fix failures when no safe target is available</p>
+
+<p>Detection of the safe target was moved to Genesis::Top in v2.7.14, but
+there are a select few circumstances that does not require the safe
+target to be known, such as <code>genesis embed</code>.  This fix makes the missing
+safe target non-fatal, but adds a debug warning message if missing.</p></li>
 </ul>
-        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.14" target="_blank">Download v2.7.14</a>
+        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.15" target="_blank">Download v2.7.15</a>
       
 
       
