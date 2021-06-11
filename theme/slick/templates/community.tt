@@ -52,14 +52,3 @@
     <img src="/community/zoom.png">
   </div>
 
-  <div class="trello band" id="trello">
-    <div>
-      <h2>Work with us on <span>Trello</span></h2>
-
-      <p>We coordinate a loose-knit group of hackers on the
-      Internet via our public <a href="https://trello.com/b/HFOPui7k/genesis">Trello Board</a>.
-      Whether you want to get involved and pick up some cards,
-      or just keep pace with the state of Genesis, check it out!</p>
-    </div>
-    <img src="/community/trello.png" />
-  </div>

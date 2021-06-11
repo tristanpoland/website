@@ -6,5 +6,5 @@ format: markdown
 --- |-
 - [About Genesis](/docs/about)
 - [Getting Started](/docs/getting-started)
-- [Operators' Manual](/docs/manual)
+- [Operators' Manual](https://runbooks.starkandwayne.com/genesis.html)
 - [Migration Processes](/docs/migrations)
