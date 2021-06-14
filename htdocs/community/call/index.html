@@ -56,18 +56,10 @@
     <div>
       <nav>
         <h2>Coming Up</h2>
-        <li><a href="#next">June 16th, 2020</a></li>
+        <li><a href="#next">July 1st, 2021</a></li>
         <h2>Previous Calls</h2>
         
-        <li><a href="#20200526">May 26th, 2020</a></li>
-        
-        <li><a href="#20200421">April 21st, 2020</a></li>
-        
-        <li><a href="#20191217">December 17th, 2019</a></li>
-        
-        <li><a href="#20190917">September 17th, 2019</a></li>
-        
-        <li><a href="#20190820">August 20th, 2019</a></li>
+        <li><a href="#20210604">June 4th, 2021</a></li>
         
       </nav>
     </div>
@@ -75,23 +67,23 @@
     <div>
       <h1>Joining the Call</h1>
 
-<p>On the third Tuesday of every month, we hold a conference call to discuss
-the Genesis project, and its overall direction.  Topics include latest news,
+<p>On the first Thursday of every month, we hold a conference call to discuss
+the Genesis project and its overall direction.  Topics include latest news,
 development progress, and future direction.</p>
 
 <p>The next Genesis Roadmap Call is</p>
 
 <div class="schedule">
-<div class="date">Tuesday, June 16th</div>
+<div class="date">Thursday, July 1st</div>
 <div class="time">at 11:00am Eastern (8:00am Pacific/4:00pm UTC)</div>
 </div>
 
-<p>We use <a href="https://zoom.us/download#client_4meeting">Zoom</a>, and will announce the Meeting ID/Link in the <strong>#announcements</strong>
-channel in the <a href="/community#slack">Genesis Slack Org</a> the day before the call.</p>
+<p>We use [Zoom][zoom], and will announce the Meeting ID/Link in the <strong>#announcements</strong>
+channel in the [Genesis Slack Org][slack] the day before the call.</p>
 
 <p>Calls are not recorded.</p>
 
-<h2 id="20200616">Agenda for June 16th, 2020</h2>
+<h2 id="20210701">Agenda for July 1st, 2021</h2>
 
 <ol>
 <li><p>Introductions</p></li>
@@ -101,462 +93,46 @@ channel in the <a href="/community#slack">Genesis Slack Org</a> the day before t
 <li>Recent Releases</li>
 <li>Upcoming Releases</li>
 </ul></li>
-<li><p>Development Progress Update</p>
-
-<ul>
-<li><a href="https://trello.com/b/HFOPui7k/genesis">Trello Board</a> Review</li>
-<li>Dev Team Status Report</li>
-</ul></li>
 <li><p>Open Forum</p></li>
 </ol>
 
 <h1>Past Meetings</h1>
 
-<h2 id="20200526">May 26th 2020</h2>
+<h2 id="20210604">June 4th, 2021</h2>
 
 <p>The Genesis Release Engineering teams continue to crank out new versions of
 Genesis itself and its BOSH Deployment Kits.</p>
 
-<h3>What's Changed?</h3>
+<h3>What's New?</h3>
 
-<p>A lot.</p>
+<p><strong>Cloud Foundry</strong> kit <a href="https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.10.5">v1.10.5</a>
+was released on May 23rd 2021, which adds support for dynamic X.509 certificate TTL.</p>
 
-<ul>
-<li><p>There was a breaking change to the proxy support vis-a-vis environment
-variables, to accommodate odd network topology where Vault and the
-jumpbox are on very different networks.  The <code>BOSH_ALL_PROXY</code> environment
-variable now no longer causes Genesis to also set <code>https_proxy</code> to match.</p></li>
-<li><p>The Genesis CLI now provides better feedback about <em>which</em> Vault it is
-using when it.</p></li>
-</ul>
-
-<h3>Testkit and CI/CD</h3>
-
-<p>We are now using a homegrown testing framework for ensuring that, given an
-input cloud-config, set of Genesis env files, and a kit version, we get the
-expected manifest.  This is useful, insofar as it allows us to validate our
-expectations from various combinations of features and parameters, without
-needing to actually deploy to test.  This makes CI/CD way more powerful and
-covers a lot more ground than we were able to previously, due to budgetary
-constraints.</p>
-
-<h3>Revamped Documentation</h3>
-
-<p>Stark &amp; Wayne is looking to dedicate a technical writer to the project to
-flesh out both internal and user-facing documentation, use cases, getting
-started guides, etc., to improve the quality of documentation.  Thanks,
-Stark &amp; Wayne!</p>
-
-<h3>What's Coming Soon</h3>
+<h3>What's Coming Soon?</h3>
 
 <ul>
-<li><p>The BOSH 1.x Kit will soon have support for both external databases and
-(s3) blobstores, as well as IAM instance metadata CPI authentication!</p></li>
-<li><p>The BOSH 2.x Kit, based on the upstream <code>bosh-deployment</code>, is nearing a
-release candidate, and marks a change in paradigm in how we do release
-engineering for BOSH directors.  Once this goes live, our release cadence
-should increase considerably.</p></li>
-<li><p>The CF 2.x Kit, based on the upstream <code>cf-deployment</code> is currently
-available as a release candidate, backed by a month of field experience.
-Right now, all 2.x deployments have been greenfield, and we do not
-recommend attempting to update a 1.x deployment to 2.x.  A migration plan
-to enable that is in the works.</p></li>
-<li><p>We are working on releasing the CF app-autoscaler Kit, as a standalone
-deployment vehicle, for express use with the CF 2.x kit.</p></li>
+<li><p>The <code>genesis update</code> command will allow genesis users to update their genesis
+CLI via the CLI itself. This will be released in 2.7.xx.</p></li>
+<li><p>An updated inheritance system will lean toward using convention over configuration.</p></li>
+<li><p>Genesis will check for whether Bosh environment variables are set and use them if so.</p></li>
+<li><p>The above two improvements will be included in 2.8, which is expected within the next week.</p></li>
 </ul>
 
-<h3>What's Coming in the Far Future?</h3>
-
-<p>James talked at length about future plans for Genesis, in a Kubernetes
-world.  What happens when we <em>start</em> with a Kubernetes cluster, and then try
-to deploy control plane systems, BOSH directors, and ultimately Cloud
-Foundry instances?</p>
-
-<p>The first task before us is to map current VM-based control plane systems
-onto their Kubernetes equivalents.  This is pretty much a one-for-one swap
-of VMs for containers.  Vault, OpenVPN, SHIELD, Prometheus, and Concourse
-all have Helm charts, or at least Docker images that can be deployed to the
-Kubernetes control plane.  Jumpbox is a bit weird, since it doesn't <em>do</em>
-anything, but a "pause" container can do the job, and you can get in via
-<code>kubectl exec</code>.</p>
-
-<p><a href="https://starkandwayne.com/gluon">Gluon</a> is a Controller for Kubernetes that
-lets you deploy BOSH things via Kubernetes CRDs.  R&amp;D thinks this is a good
-direction to go in -- it will allow us to support VM-based CF via BOSH, as
-well as deploy other Kubernetes clusters via the <a href="https://github.com/jhunt/k8s-boshrelease">K8s BOSH
-Release</a>.</p>
-
-<p>We're still experimenting with all of these technologies in R&amp;D, and will
-be focusing heavily on migration paths from current iterations of
-Genesis-deployed things (via Kits).</p>
-
-<p>This is going to be fun.</p>
-
-<h2 id="20200421">April 21st, 2020</h2>
-
-<p>Its been a busy first third of 2020.  Beyond the craziness of the COVID-19
-situation, we've been working hard at bringing some significant changes to
-Genesis and its Kits, which have been released since the last meeting in
-March.  This is a summary of what was discussed during this meeting, which
-lasted longer than the full hour, so we didn't get to discuss everything
-that was new and upcoming, but will be touched on here in the meeting notes.</p>
-
-<h3>Genesis v2.7.x Release</h3>
-
-<p>Genesis v2.7.0 was <a href="https://github.com/genesis-community/genesis/releases/tag/v2.7.0">released on April 9th</a>, and represents a significant
-update in some major aspects of Genesis.  There are new features and well
-as significant improvements to existing features.  Releases 2.7.1 through
-2.7.6 followed with some bug fixes and feature enhancements in the following
-days.</p>
-
-<h4>New Feature: Kit Providers</h4>
-
-<p>Simply put, this allows you to configure a Genesis deployment repository to
-use a different source for your kits instead of the Genesis-Community GitHub
-Organization.  At release, it support any other GitHub organization that
-follows a release system similar to what is used by the Genesis-Community
-org.  This will work for GitHub Enterprise as well, which will benefit users
-that must function without access to the internet.</p>
-
-<p>Full details can be found in the <a href="https://github.com/genesis-community/genesis/releases/tag/v2.7.0">2.7.0 release notes</a>, or by running <code>genesis
-kit-provider -h</code> for displaying or changing it on an existing deployment
-repository, or <code>genesis init -h</code> for initializing a new deployment repository.</p>
-
-<h6>Secrets Management Refactor</h6>
-
-<p>Secrets management has grown piecemeal over the life of Genesis, and we've
-been listening to your feedback on how to make it better.  Release 2.7.0
-introduced significant improvements, with some refinement being offered by
-releases <a href="https://github.com/genesis-community/genesis/releases/tag/v2.7.2">2.7.2</a> and <a href="https://github.com/genesis-community/genesis/releases/tag/v2.7.4">2.7.4</a>.  Genesis <a href="https://github.com/genesis-community/genesis/releases/tag/v2.7.6">2.7.6</a> added support for managing
-non-generated secrets; those secrets that are gathered during <code>genesis new</code>
-and never heard from again... until now.</p>
-
-<p>The improvements are detailed in the release notes, but a quick summary is as
-follows:</p>
+<h3>What's Coming in the Future?</h3>
 
 <ul>
-<li><p>Significant improvement in feedback when any of the <code>*-secrets</code> commands
-are running.  There is a a progress indicator as each secret is processed in
-the form of a [current/total] counter.  Each secret details the type of
-secret being processed and its result.  It has a compact form that only
-uses one line unless there's an error, or a verbose mode where all the
-details are printed.</p></li>
-<li><p><code>remove-secrets</code> has been added to allow full secrets life cycle
-management, with extra functionality that will be explained below.</p></li>
-<li><p><code>check-secrets</code> now validates that the secrets are correct, not just
-present.  This includes X509 expiry, cert/key agreement, signing chain,
-key usage and CN/SANs; public/private key agreement and size for
-Diffie-Hellman, RSA and SSH; and randomly generated passwords size,
-composition and alternate encoding.  Never deploy again just to find your
-secrets are invalid.  It also supports levels of validation, with <code>-lm</code>
-for checking for presence, <code>-li</code> for finding invalid secrets, and <code>-lp</code>
-for finding problematic secrets (see below).</p></li>
-<li><p>Now that we can identify invalid secrets, what to do about them.  In
-earlier versions, you could just rotate all the secrets, or use <code>safe</code> to
-manually remove each one that was bad.  As of 2.7.0, both <code>rotate-secrets</code>
-and <code>remove-secrets</code> have added a way to remove invalid secrets.  After
-some feedback on the original method of doing this, v2.7.6 solidified the
-interface with a <code>-I</code> for targeting only invalid secrets, or <code>-P</code> for both
-invalid or problematic (secrets that are technically different than what
-the kit specifies, but potentially won't stop you from deploying, but
-may become an issue in specific situations)</p></li>
-<li><p><code>rotate-secrets</code> (and <code>remove-secrets</code>) provide a much finer control on
-what they operate on.  Beyond the <code>-I</code> and <code>-P</code> options, you can specify exact
-sub-paths (the part of the secrets path under the general secrets path for
-your environment).  This will allow you to rotate/remove specific secrets.
-Furthermore, you will be prompted to confirm the action, though this can
-be overridden with the <code>-y</code> option.  Finally, in the ultimate form of
-control, you can use the <code>-i|--interactive</code> option to step through each
-secret and decide its fate.</p></li>
-<li><p><code>rotate-secrets</code> loses <code>-f|--force</code> ...</p>
-
-<p>Force option was used to rotate secrets that were "fixed", a label for
-secrets that were never support to be altered.  This was selected by the
-kit for secrets such as DB encryption keys, but was also applied to CA
-certificates.  In practice, this was found too far reaching (all or
-nothing).  To replace a fixed secret, use <code>remove-secrets</code> and add it back
-using <code>add-secrets</code>.  Note: CA Certificates are no longer considered
-fixed.</p></li>
-<li><p>... but gains <code>--renew</code></p>
-
-<p>CA Cert rotation was always problematic, and often provoked race condition
-when trying to update all the certs that were signed by that CA.  To
-resolve this, <code>rotate-secrets</code> gains the option <code>--renew</code> which keeps the
-key, but generates a new certificate, with a new expiry date.  The new CA
-is recognized by the certs the previous incarnation signed, so no more
-race condition when rolling new certificates out.</p></li>
-<li><p>Finally, some love for the provided secrets.</p>
-
-<p>When kits need to interact with external entities, it needs provided
-secrets to be able to securely access them.  These are generally provided
-by the <code>genesis new</code> process, but that was it for life cycle management.
-As of v2.7.6, if a kit specified its usage of provided secrets under the
-<code>provided</code> top-level key in its kit.yml file, all of the <code>*-secrets</code>
-commands would now apply.  They could be checked, added if missing,
-rotated and removed.  bosh-genesis-kit v1.10.2 was the first to ship with
-this feature, and other kits will be updated to incorporate it in the near
-future.</p></li>
+<li><p>Carousel Integration: The Carousel tool allows operators to browse and manage Credhub secrets
+in a Bosh-aware manner. Its rotation feature will be integrated into the Genesis CLI to allow
+for credhub credential rotations.</p></li>
+<li><p>Credhub Integration: In addition to allowing for rotations of credhub secrets via Carousel, 
+the Genesis CLI will be updated to do accomplish adding, checking, and deleting secrets.</p></li>
+<li><p><code>genesis config</code>: This command will give genesis operators a smoother experience for managing 
+<code>.genesis/config</code> files. </p></li>
+<li><p>AutoCommit on Deploy: Genesis will automatically commit state to the deployment’s git repository.
+This will ensure that all deployed state is reflected in the repository’s configs and state files.</p></li>
+<li><p>Cepler Integration: Cepler will generate CI pipelines for deploying and managing Genesis Kits.
+This will decouple pipeline code from the kits themselves.</p></li>
 </ul>
-
-<h4>Custom Secrets Mounts</h4>
-
-<p>Genesis has always put its secrets in a Vault directly under <code>/secrets</code>
-mount, followed by a slug based on the environment name and the kit type.
-Similarly, for Exodus data (the secrets that leave the environment to be
-shared by other genesis environments for purpose of connectivity,
-information and collaboration), it was stored under
-<code>/secrets/exodus/&lt;env-name&gt;/&lt;kit-type&gt;</code>  This made it hard to use a central
-corporate vault, which was sometimes required by security policy.</p>
-
-<p>As of v2.7.0, environments could specify an alternative mount point for both
-secrets and exodus data.  When creating an environment specifying
-<code>--secret-mount</code> allowed you to specify an alternative base under which the
-secrets of the kit would be stored (still further under the env slug and kit
-type, which together can be overwritten by using the <code>--secrets-path</code>
-option.  For Exodus data, the option is <code>--exodus-mount</code>, which now defaults
-to <code>&lt;secrets_mount&gt;/exodus</code> but doesn't require being under the secrets
-mount.</p>
-
-<p>For existing environments, these options have corresponding keys under the
-<code>genesis:</code> top-level key.  Just drop the <code>--</code> prefix and change the other
-dashes to underscores: for example, <code>--secrets-mount</code> becomes
-<code>secrets_mount</code></p>
-
-<p><em>Note:</em>  While we're talking about the <code>genesis</code> block, it should be noted that
-it has become the official location for Genesis-related information, while
-<code>params</code> is for kit-related information.  As such, the <code>params.env</code> has been
-moved to <code>genesis.env</code>, and <code>params.bosh</code> has moved to <code>genesis.bosh_env</code>.
-This has been supported since v2.6.13, but any kit that specifies compliance
-with v2.7.0 minimum version will expect these values in the <code>genesis</code> block.</p>
-
-<h4>Common Root CA Certificate and Certificate Chaining</h4>
-
-<p>Before, all generated CA certificates were self-signed, and there was no way
-to specify generating a CA signed by another CA.  Genesis v2.7.0 supports
-explicit signing of generated certificates as well as specifying a default
-root CA certificates that will be used to sign any CA that isn't explicitly
-signed in the kit.yml definition.</p>
-
-<p>This default CA is specified by a vault path using the --root-ca-path during
-a <code>new</code> operation, or by adding <code>genesis.root_ca_path</code> to an existing
-environment and rotating the existing certificates.</p>
-
-<h4>Initial Credhub Support</h4>
-
-<p>In preparation for our v2.0.0 of cf-genesis-kit that is based on
-cf-deployment, we need to be able to inter-operate with Credhub and
-Credhub-based deployments.  Steps have been added to add Credhub
-connectivity to the BOSH kit for facilitating login to the Credhub located
-on its director VM, as well as providing Exodus data to allow other kits to
-connect to it.</p>
-
-<p>It does not yet have the full life cycle support of the <code>*-secrets</code> commands,
-but that will be added as the need appears.</p>
-
-<h4>Improved Kit Authoring.</h4>
-
-<p>Now that we allow kits to be hosted outside of Genesis Community, we've
-improved our tooling for building them.</p>
-
-<ul>
-<li><p>Improved Functionality for X509 Certificates:</p>
-
-<p>As mentioned above, we have a more flexible signing chain specification.
-By default (and previously only method), a certificate named 'ca' will be
-the signing CA certificate for all sibling certificates for the given
-secrets path under certificates: key in kit.yml. Alternatively, you can
-specify an alternatively named certificate as the default ca for the
-cohorts using the <code>is_ca</code> boolean property. Finally, you can explicitly
-state another path as the signing CA certificate (relative to
-environment's base secrets path) by using the <code>signed-by</code>: property.  This
-allows multiple levels of CA signature chains.</p>
-
-<p>Also mentioned above, the user can specify a root CA certificate to be
-used to sign all base CAs for the kit that would otherwise be self-signed.
-If you want to have an explicitly self-signed CA certificate even with the
-presence of a root CA, you can ensure a CA is self-signed by providing its
-own secrets path as its <code>signed-by:</code> property.</p>
-
-<p>Can now specify <code>usage:</code> property per certificate, which takes a list of
-key usage and extended key usage values. Supported usages are:
-<code>digital_signature</code>, <code>non_repudiation</code>, <code>content_commitment</code>, <code>key_encipherment</code>,
-<code>data_encipherment</code>, <code>key_agreement</code>, <code>key_cert_sign</code>, <code>crl_sign</code>, <code>encipher_only</code>,
-<code>decipher_only</code>, <code>client_auth</code>, <code>server_auth</code>, <code>code_signing</code>, <code>email_protection</code>,
-and <code>timestamping</code>.</p></li>
-<li><p>Parameter values in Secrets Specifications:</p>
-
-<p>Kits can specify default values for parameter references in the form of
-<code>${param.key||default value}</code></p>
-
-<p>Kits can now specify parameter values in the secrets properties that will
-be dereferenced from not only the environment, but also from the kits
-manifests, albeit unevaluated. This works best for simple defaults for
-parameters that can be overwritten in the environment file.</p></li>
-<li><p>Check secrets integrity on compile-kit</p>
-
-<p>When the kit is compiled with <code>genesis compile-kit</code>, it now validates all
-the secrets specifications in <code>kit.yml</code>, to ensure that the end user does
-not get stuck with a kit that cannot generate valid secrets.</p></li>
-</ul>
-
-<h4>Removed Genesis v1 Support</h4>
-
-<p>As stated in the release notes for v2.7.0, Genesis v1 was bundled into
-Genesis v2 and would be unpacked and executed if the <code>genesis</code> executable
-detected that it was being run against a v1 repository.</p>
-
-<p>Genesis v1 has not changed in over 3 years, and if you're still using v1,
-you can still use genesis v2.6.x or 2.5.x releases to keep your system
-working.  More importantly, if you're still using Genesis v1, we want to
-know!  We'd love to help you migrate up to a v2 solution so you can take
-advantage of all of its benefits.</p>
-
-<h3>More to follow in the AM</h3>
-
-<p>Its now midnight on the West Coast, and I wanted to make sure we got this
-information out tonight.  I will continue tomorrow with the list of bugs and
-minor feature enhancements the 2.7.0 line brings, along with the
-improvements in the new kits, and what's to come.  I will announce in the
-Genesis slack #announcements channel when this gets updated.</p>
-
-<h2 id="20191217">December 17th, 2019</h2>
-
-<p>These are the notes from our second community call, held at 11:00am EDT on
-Tuesday, December 17th, 2019.</p>
-
-<h3>New Kit Releases</h3>
-
-<p><strong>Shield</strong> kit <a href="https://github.com/genesis-community/shield-genesis-kit/releases/tag/v1.6.0">v1.6.0</a>
-was released on December 5th, 2019, which bumps the
-Shield version to <a href="https://github.com/shieldproject/shield/releases/tag/v8.6.2">v8.6.2</a>.</p>
-
-<p><strong>Minio</strong> kit v0.4.1 was released on December 5th, 2019, which bumps the
-Minio version to RELEASE.2019-10-12T01-39-57Z</p>
-
-<p><strong>Prometheus</strong> kit <a href="https://github.com/genesis-community/prometheus-genesis-kit/releases/tag/v1.5.1">v1.5.1</a>
-was released on December 6th, 2019, updating Prometheus version to
-<a href="https://github.com/bosh-prometheus/prometheus-boshrelease/releases/tag/v26.1.0">v26.1.0</a></p>
-
-<h3>Addendum: CF Genesis Kit Updates</h3>
-
-<p>It was not discussed in the meeting, but <strong>cf</strong> kit has had some significant
-updates since the previous Roadmap Meeting in September. <br>
-It has been brought up to date with <a href="https://github.com/cloudfoundry/cf-deployment/releases/tag/v9.5.0">v9.5.0 of cf-deployment release</a>
-for the majority of functionality in <a href="https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.6.0">release v1.6.0</a>.</p>
-
-<p>It has also undergone some drastic refactoring of instance groups and almost
-all static IPs have been removed in preference for dynamic assignment as of
-<a href="https://github.com/genesis-community/cf-genesis-kit/releases/tag/v1.7.0">v1.7.0</a></p>
-
-<p>Container-to-container networking and service discovery was added to v1.7.1,
-and the routing api is now available as of v1.7.2.</p>
-
-<p>There were further improvements and bug fixes -- please refer to the <a href="https://github.com/genesis-community/cf-genesis-kit/releases">release
-notes</a> for full details.</p>
-
-<h3>Upcoming Kit Releases</h3>
-
-<p>We are continuing our efforts to keep cf-genesis-kit up to feature parity
-with cf-deployment, with a new release based on cf-deployment v12.5.0 at the
-end of 2019, or early in 2020 (before next roadmap call).  This will include
-up-to-date releases, improved TLS inner workings between components, and
-several other bug fixes and minor improvements.</p>
-
-<p>Note:  We are not including the updates in v12.6.0 of cf-deployment as they
-do not work in air-gapped environments.</p>
-
-<h2 id="20190917">September 17th, 2019</h2>
-
-<p>These are the notes from our second community call, held at 11:00am EDT on
-Tuesday, September 17th, 2019.</p>
-
-<h3>New Kit Releases</h3>
-
-<p><strong>BOSH</strong> kit v1.5.0 was released on September 6th, 2019, and brings with it
-a full complement of component software updates.  Notably, BOSH itself is
-now at version 270.5.0, which is the latest as of today.</p>
-
-<p>This release of BOSH deprecates some of the backwards-compatibility with
-regards to naming attributed in manifest files, so a lot of other kits got
-updated to accommodate.  If you want to run this, you are highly encouraged
-to follow suit with your other kit deployments either before, or directly
-after.</p>
-
-<p>At a minimum, you'll need to run the following versions:</p>
-
-<ul>
-<li>Concourse Kit v3.6.2</li>
-<li>SHIELD Kit v1.3.1</li>
-<li>Cloud Foundry Kit v1.5.0</li>
-<li>Vault Kit v1.5.1</li>
-</ul>
-
-<p><strong>Concourse</strong> kit v3.8.0 was released on September 15th, 2019.  Notably, it
-upgrades to version 5.5.1 of Concourse, which has some nice quality-of-life
-improvements in the UI and worker areas.</p>
-
-<p><strong>Jumpbox</strong> kit v1.0.5 was released on September 13th, 2019.  This release
-primarily includes updates to the OpenVPN component, and software bundled
-through the corresponding Jumpbox BOSH Release.</p>
-
-<p><strong>Blacksmith</strong> kit v0.5.0 was released on September 11th, 2019, bringing
-with it a new Kubernetes Forge for deploying Kubernetes clusters on-demand.
-The Genesis Team is currently using this in the Stark &amp; Wayne hardware lab
-to investigate new ways to break Kubernetes clusters, in an ongoing effort
-to containerize more.  (We talk more about this in a bit).</p>
-
-<h3>Upcoming Releases</h3>
-
-<p>We are in the thick of bringing the Cloud Foundry deployment up to a more
-recent vintage.  We are currently targeting mid-summer 2019 versions of all
-components, but because the upstream project moves quickly and breaks things
-regularly, we are proceeding cautiously.  If anyone wants to assist in the
-testing of pre-release version of the kit, please shout out in the #help
-channel in Slack.</p>
-
-<h3>Moving to Container Deployments</h3>
-
-<p>(This was an open discussion)</p>
-
-<h2 id="20190820">August 20th, 2019</h2>
-
-<p>These are the notes from our first ever community call, held at 11:00am EDT on
-Tuesday, August 20th, 2019.</p>
-
-<h3>The Website</h3>
-
-<p>Our website (this website!), <a href="https://genesisproject.io">https://genesisproject.io</a> just got a snazzy
-new redesign.  Now that the day-to-day annoyance of modifying the website
-content is more well-in-hand, the team expects to start putting up more and
-more blog posts and documentation!</p>
-
-<h3>Blogs, Blogs, and More Docs!</h3>
-
-<p>The Genesis Team has been putting forth a concerted effort to write more
-approachable "first timer" content to get people interested in deploying
-Cloud technology like CF, BOSH, and Kubernetes into the Genesis mindset.</p>
-
-<p>Hopefully, by the time of our next Community Call (September 17th), we'll
-have something more concrete to show off.</p>
-
-<h3>Cloud Foundry Genesis Kit</h3>
-
-<p>Work continues on keeping the CF Genesis Kit up-to-date with the most recent
-<em>stable</em> cf-deployment upstream.  Our strategy with CF has been to follow
-the upstream cf-deployment from the community, but discriminate in what we
-ingest to keep with our vision of Cloud Foundry structure.</p>
-
-<h3>CI/CD Pipelines</h3>
-
-<p>For those interested, James showed off the internal CI/CD pipelines that the
-Genesis Team uses for release engineering, and talked about the specific
-challenges facing testing at-scale with so many different feature flags,
-IaaS features, and user preferences.</p>
-
-<h3>Concourse v5.4.0 Released!</h3>
-
-<p>Lastly (but certainly not leastly) the Concourse Genesis Kit was updated to
-Concourse v5.4.0! 🎉</p>
     </div>
   </div>
 
@@ -583,7 +159,7 @@ Concourse v5.4.0! 🎉</p>
     </div>
 
     <div class="copyright">
-      <p>Copyright &copy; 2020 The Genesis Authors.  All rights reserved.</p>
+      <p>Copyright &copy; 2021 The Genesis Authors.  All rights reserved.</p>
     </div>
   </footer>
   <script type="text/javascript" src="/site.js?d2112e355882784cf7f38561cf3ccb0bd5da3111"></script>
