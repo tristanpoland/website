@@ -75,7 +75,6 @@ sub v {
 $_->{notes} =~ s/^#/##/gm for @{$releases->{all}};
 my %xy;
 $releases->{all} = [
-  grep { $_->{_recent} }
   map {
     (my $xy = $_->{version}) =~ s/^(\d+\.\d+)\..*/$1/;
     $_->{_recent} = !$xy{$xy}; $xy{$xy} = 1;
