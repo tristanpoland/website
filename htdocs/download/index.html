@@ -56,33 +56,123 @@
     <div>
       <nav>
         <h2>Latest Stable</h2>
-        <li><a href="#latest">Genesis v2.7.32</a></li>
+        <li><a href="#latest">Genesis v2.7.34</a></li>
         <h2>Historic Releases</h2>
         
-        <li><a href="#v2.6.18">2.6.18</a></li>
+        <li><a href="#v2.7.33">2.7.33</a></li>
+        
+        <li><a href="#v2.7.32">2.7.32</a></li>
+        
+        <li><a href="#v2.7.31">2.7.31</a></li>
         
       </nav>
     </div>
 
-    <div id="v2.7.32">
-      <h1 id="latest">Genesis v2.7.32</h1>
+    <div id="v2.7.34">
+      <h1 id="latest">Genesis v2.7.34</h1>
       
-        <h2>Updates</h2>
+        <h2>Improvements</h2>
+
+<ul>
+<li><code>genesis init</code> can now accept a local compiled kit file as an argument to the <code>-k</code> option, allowing locally compiled (or stored) released kit files instead of relying on the local uncompiled <code>dev</code> directory.</li>
+</ul>
+
+<h2>Requirement Updates</h2>
+
+<ul>
+<li>BOSH CLI v6.4.4 is now required due to error when accessing non-bosh.io stemcells that are now being specified by upstream deployments.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li><code>genesis kit-manual</code> now works on dev kits, or environments that use dev
+kits</li>
+</ul>
+        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.34" target="_blank">Download v2.7.34</a>
+      
+
+      
+      <h1 id="v2.7.33">Genesis v2.7.33</h1>
+      <h2>New Feature</h2>
+
+<ul>
+<li><p>Add <code>update</code> genesis command to get new version</p>
+
+<p>Usage: genesis update [-c|--check] [-v|--version VERSION] [-d|--details] [-f|--force]</p>
+
+<p>-c, --check       Check if a newer version (or the specified version) is
+                  available.</p>
+
+<p>-v, --version <x> Install the specified version instead of the latest</p>
+
+<p>-d, --details     Print the release notes of the versions between the current
+                  version and the latest (or the release notes of the
+                  specified version)</p>
+
+<p>-f, --force       Replace the current genesis executable.  Otherwise,
+                  confirmation will be requested.</p></li>
+</ul>
+
+<h2>Improvements</h2>
+
+<ul>
+<li><p>Improve <code>genesis kit-provider -v</code> status output</p></li>
+<li><p>Improve <code>genesis list-kits</code> hint to include -r flag.</p></li>
+<li><p>Make it easier to trace the stack</p>
+
+<p>Adds the -S|--show-stack debug option, and gives better context of traces
+and errors.</p>
+
+<p>Behaviour Changes:</p>
+
+<ul>
+<li><p>internal <code>trace</code> output will show the location in the code were it was
+called. If --show-stack option specified, it will show the full stack
+instead of just the location.</p></li>
+<li><p>internal <code>dump_vars</code> output will now show the full stack instead of
+just the calling location if --show-stack specified (along with
+--trace or --debug)</p></li>
+<li><p>internal <code>bail</code> will show calling location if --trace or --debug is
+specified, or the full stack if --show-stack is specified (with or
+without --debug or --trace).  This allows you to see where genesis
+terminates without wading through all the trace output.</p></li>
+<li><p>internal <code>bug</code> will always full stack where the bug was encountered.
+This allows the user to paste the stack into a defect report against
+the genesis project.</p></li>
+</ul></li>
+<li><p>Limited false positives of detected changes in pipeline notify summaries. </p></li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li><p>Fix getting non-production github release version</p>
+
+<p>If user specified version by name, it should include draft and
+prereleases when looking for it.  This was the initial intent, but the
+wrong options were set when attempting it.</p></li>
+<li><p>Fix error when calling <code>genesis man</code> on a kit that does not exist.</p></li>
+<li><p>Fixes issue where proto-bosh deployment did not have up to date state file.</p></li>
+</ul>
+      <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.32" target="_blank">Download v2.7.33 from Github</a>
+      
+      <h1 id="v2.7.32">Genesis v2.7.32</h1>
+      <h2>Updates</h2>
 
 <ul>
 <li>credhub-cli is now a requirement. A check for credhub-cli has been added 
 jq v1.6 is now the minimum version required. </li>
 </ul>
-        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.32" target="_blank">Download v2.7.32</a>
+      <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.32" target="_blank">Download v2.7.32 from Github</a>
       
+      <h1 id="v2.7.31">Genesis v2.7.31</h1>
+      <h2>Updates</h2>
 
-      
-      <h1 id="v2.6.18">Genesis v2.6.18</h1>
-      <h2>New Feature: groups in pipeline config</h2>
-
-<p>It supports grouping in pipeline config file, <code>genesis repipe</code> will generate groups
-accordingly.</p>
-      <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.6.18" target="_blank">Download v2.6.18 from Github</a>
+<p>-Can now update subject, SAN, and usage of vault-stored certificates without generating a new key with genesis rotate-secrets --renew
+ This allows users to correct warnings that show up in the check during deployment without breaking mutual TLS.
+ (Note this will also renew the TTL for the certificates)</p>
+      <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.31" target="_blank">Download v2.7.31 from Github</a>
       
 
     </div>
