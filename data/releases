@@ -19,7 +19,12 @@
       "notes": "# Improvements\n\n* `genesis init` can now accept a local compiled kit file as an argument to the `-k` option, allowing locally compiled (or stored) released kit files instead of relying on the local uncompiled `dev` directory.\n\n# Requirement Updates\n\n* BOSH CLI v6.4.4 is now required due to error when accessing non-bosh.io stemcells that are now being specified by upstream deployments.\n\n# Bug Fixes\n\n* `genesis kit-manual` now works on dev kits, or environments that use dev\n  kits\n",
       "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.7.34",
       "version": "2.7.34"
+    },
+    {
+      "notes": "# Bug Fix\n\n* Update Genesis bosh activities to work with BOSH cli v6.4.4\n\n  As of BOSH cli 6.4.4, BOSH_* variables set to \"\" cause errors, so now they are simply unset.\n",
+      "url": "https://github.com/starkandwayne/genesis/releases/tag/v2.7.35",
+      "version": "2.7.35"
     }
   ],
-  "latest": "2.7.34"
+  "latest": "2.7.35"
 }

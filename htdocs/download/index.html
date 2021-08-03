@@ -56,8 +56,10 @@
     <div>
       <nav>
         <h2>Latest Stable</h2>
-        <li><a href="#latest">Genesis v2.7.34</a></li>
+        <li><a href="#latest">Genesis v2.7.35</a></li>
         <h2>Historic Releases</h2>
+        
+        <li><a href="#v2.7.34">2.7.34</a></li>
         
         <li><a href="#v2.7.33">2.7.33</a></li>
         
@@ -68,10 +70,22 @@
       </nav>
     </div>
 
-    <div id="v2.7.34">
-      <h1 id="latest">Genesis v2.7.34</h1>
+    <div id="v2.7.35">
+      <h1 id="latest">Genesis v2.7.35</h1>
       
-        <h2>Improvements</h2>
+        <h2>Bug Fix</h2>
+
+<ul>
+<li><p>Update Genesis bosh activities to work with BOSH cli v6.4.4</p>
+
+<p>As of BOSH cli 6.4.4, BOSH_* variables set to "" cause errors, so now they are simply unset.</p></li>
+</ul>
+        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.35" target="_blank">Download v2.7.35</a>
+      
+
+      
+      <h1 id="v2.7.34">Genesis v2.7.34</h1>
+      <h2>Improvements</h2>
 
 <ul>
 <li><code>genesis init</code> can now accept a local compiled kit file as an argument to the <code>-k</code> option, allowing locally compiled (or stored) released kit files instead of relying on the local uncompiled <code>dev</code> directory.</li>
@@ -89,9 +103,7 @@
 <li><code>genesis kit-manual</code> now works on dev kits, or environments that use dev
 kits</li>
 </ul>
-        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.34" target="_blank">Download v2.7.34</a>
-      
-
+      <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.34" target="_blank">Download v2.7.34 from Github</a>
       
       <h1 id="v2.7.33">Genesis v2.7.33</h1>
       <h2>New Feature</h2>
