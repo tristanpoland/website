@@ -56,8 +56,10 @@
     <div>
       <nav>
         <h2>Latest Stable</h2>
-        <li><a href="#latest">Genesis v2.7.35</a></li>
+        <li><a href="#latest">Genesis v2.8.0</a></li>
         <h2>Historic Releases</h2>
+        
+        <li><a href="#v2.7.35">2.7.35</a></li>
         
         <li><a href="#v2.7.34">2.7.34</a></li>
         
@@ -70,19 +72,276 @@
       </nav>
     </div>
 
-    <div id="v2.7.35">
-      <h1 id="latest">Genesis v2.7.35</h1>
+    <div id="v2.8.0">
+      <h1 id="latest">Genesis v2.8.0</h1>
       
-        <h2>Bug Fix</h2>
+        <h2>New Features</h2>
+
+<ul>
+<li><p>Auto-connect to BOSH director.</p>
+
+<p>Genesis can now automatically connect to the correct BOSH director for the
+specified environment, without need to set up a bosh configuration or
+manually logging into the director.</p>
+
+<p>Caveat: The BOSH director that deployed your environment MUST have been
+deployed by Genesis.  If not, you will still have to target and log into the
+BOSH director manually.</p></li>
+<li><p>Added <code>genesis bosh</code> command.</p>
+
+<p>Instead of worrying about logging into the right BOSH director, and
+translating genesis environment into BOSH environment and deployment, let
+Genesis do the heavy lifting.</p>
+
+<p>If you want to know something about your concourse vms, for example, you
+just run <code>genesis bosh my-concourse-env vms --vitals</code> and you'll get the
+right output.  Genesis will determine which bosh director deployed
+<code>my-concourse-env</code>, how to connect to it, what the BOSH deployment is named,
+and return the results of the command you specified.</p>
+
+<p>By default, the <code>genesis bosh</code> command is deployment centric, but sometimes
+you need to talk to the BOSH director itself.  In that case, you can specify
+the BOSH deployment itself, and use the <code>-as-director</code> (or <code>-A</code>) option to
+indicate that the environment is the director, not a deployment on a
+different director.  For proto-BOSH environments, this is required.</p>
+
+<p>See <code>genesis bosh -h</code> for more usage details.</p></li>
+<li><p>Connect to BOSH director without using the BOSH deployment kit.</p>
+
+<p>If you still need to connect to a BOSH director directly, you can configure
+your shell by using <code>eval "$(genesis bosh my-target-env --connect)"</code>.
+Please note that this connects to the BOSH director that deployed the
+<code>my-target-env</code>.  If <code>my-target-env</code> is a bosh deployment, the command will
+authenticate to the BOSH director that deployed it, not itself.  In this
+case, you need to use the <code>--as-director</code> option to explicitly state that
+this is the BOSH environment you wish to connect to.</p></li>
+</ul>
+
+<h2>Breaking Changes</h2>
+
+<ul>
+<li><p>Removes legacy support for kits without new or blueprint.</p>
+
+<p>As of v2.8.0, kits must use new and blueprint hooks.  All modern kits
+support this model, so anyone actively keeping current with genesis would
+not be impacted.</p></li>
+<li><p>Remove subkits, error if used in env file.</p>
+
+<p>Subkits have been deprecated since at least 2.6.13, so its time to remove
+them.</p></li>
+<li><p>Remove <code>--environment</code> global option.</p>
+
+<p>The environment option has been replaced with <code>--bosh-env</code> option to remove
+confusion regarding the overloaded 'environment' name.  Henceforth,
+environment refers to just the deployment environment.  The <code>-e</code> shortform
+is still usable.</p></li>
+</ul>
+
+<h2>Improvements</h2>
+
+<h3>Better Support for using BOSH create-env</h3>
+
+<ul>
+<li><p>Starting in v2.8.0, kits that indicate that they are compatible with
+v2.8.0 can support <code>use_create_env</code> as their method of indicating
+their ability to use create-env instead of deploy for deployments.</p>
+
+<ul>
+<li><p>Valid values are <code>yes</code> for this kit always uses create-env, <code>no</code> for
+kits that cannot use create-env, and <code>allow</code> for kits that permit
+either.</p></li>
+<li><p>The kit will have to detect <code>genesis.use_create_env</code> in the
+environment to determine blueprint and other create-env kit
+behaviour.  Genesis will manage the actual deployment and state file
+associated with it.</p></li>
+</ul></li>
+<li><p>Genesis properly handles both legacy features (create-env,bosh-init,
+proto) and v2.8.0's <code>genesis.use_create_env</code> attribute to determine is
+create-env is to be used.  It will also detect when an incompatible
+mixture of using create-env and specifying a <code>genesis.bosh-env</code>
+attribute, and fail with an appropriate error message.  A quick update
+of the environment file by the user will resolve this issue when
+encountered.</p>
+
+<ul>
+<li>Provide create-env (i.e.: bosh proto) deployments with diff/confirm</li>
+</ul>
+
+<p>Since BOSH does not provide a confirmation after a diff on the
+environment to be deployed, Genesis provides this based on a previous
+deployment, assuming it was added to the repo.</p>
+
+<p>If the exodus data from the previous deployment doesn't match the local
+archived manifest, a warning will be stated, or in the case of running
+under <code>-y</code>, the deploy will be aborted.</p>
+
+<p>This does require that you ensure you commit your repo after doing 
+deployments, which you should be doing regardless of this feature, as
+a method to record your deployment history. </p></li>
+</ul>
+<h3>Kit Overrides by Environment</h3>
+
+
+
+150750f8c54d845785f421ddb3b535c6
+
+
+
+<p>```</p>
+
+<p>And in an inheritting file:</p>
+
+<p>```
+kit:
+overrides:</p>
+
+<ul>
+<li>(( append ))</li>
+<li>second:
+stuff: overwritten</li>
+<li>|
+even_more: true
+```</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h3>Improved Kit Behaviour</h3>
+
+<ul>
+<li><p>Improve params handling for use in <code>new</code> hook.</p>
+
+<ul>
+<li><p>Support multiline values in keys and arrays in <code>param_entry</code>.</p></li>
+<li><p>Echo <code>param_comment</code> to screen so the same information that prefaces the
+value in the env.yml file can be used as an explanatory blurb prior to the
+prompt.</p></li>
+</ul></li>
+<li><p>Improve decompile-kit</p>
+
+<ul>
+<li><p>Can decompile kit to directories other than ./dev (<code>--directory &lt;dir&gt;</code>)</p></li>
+<li><p>Can specify an environment YAML file to identify which kit to decompile,
+instead of explicitly stating the kit/version.</p></li>
+</ul></li>
+</ul>
+
+<h3>Better BOSH Config Management</h3>
+
+<ul>
+<li><p>Support downloading multiple configs.</p>
+
+<p>Before, if you specified to download a config type (ie cloud or runtime)
+without a name, it would download only the unnamed <em>default</em> config of that
+type.  Experience has shown that the more correct interpretation should be
+to download all configs of that type, and merge them (in the order they are
+specified in the BOSH director).  The old behaviour can still be used by
+explicitly stating <code>default</code> as the name.</p></li>
+</ul>
+
+<h3>Messaging / Error Handling / Debugging</h3>
+
+<ul>
+<li><p>Added stderr output capture for <code>Genesis::Vault#get</code>.</p>
+
+<p>Rather than have the raw safe stderr leak out to the user, we now capture it
+and write it to the DEBUG stream.</p></li>
+<li><p>Improve deploy help output for create-env environments</p>
+
+<p>There are difference behaviours for create-env environment than from
+environments deployed via a BOSH director.  This update calls them out
+and gives instructions on their use.</p></li>
+<li><p>Improved error message when kit.features is incorrectly formed in environment YAML files.</p></li>
+<li><p>Better diagnosis messages when running PING in debug mode.</p></li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li><p>Kits can now specify required prerequisites via hook.</p>
+
+<p>Although the prereqs hook was documented, it was only partially
+implemented.  This commit completes that implementation, so that if
+<code>hooks/prereqs</code> exists in a kit, it will be run prior to usage.</p></li>
+<li><p>Fix bug where default config type was lost when fetching configs from BOSH
+director, resulting in bad messages and error reports.</p></li>
+<li><p>Export <code>GENESIS_EXODUS_MOUNT</code> to hooks environment.  This was missing from the
+set of vault path environment variables available to hook scripts.</p></li>
+</ul>
+
+<h2>Internal Changes/Improvements</h2>
+
+<h3>BOSH Refactor</h3>
+
+<ul>
+<li><p>Add <code>Genesis::BOSH</code> for controlling BOSH director.</p>
+
+<p>This is a major refactor to facilitate better operation and connections
+to BOSH directors.  Connections to Bosh will use exodus data to
+determine the corresponding BOSH director address and connection
+details.</p></li>
+<li><p>Set <code>GENESIS_BOSH_COMMAND</code> when checking BOSH cmd</p>
+
+<p>Also removes <code>check_bosh_version</code> subroutine that was replaced by
+<code>Genesis::BOSH#command</code></p></li>
+<li><p>Change <code>needs_bosh_create_env</code> to <code>use_create_env</code></p></li>
+</ul>
+
+<h3>Functionality Improvement</h3>
+
+<ul>
+<li><p>Allow <code>Genesis::Kit#metadata</code> to take args.</p>
+
+<p>If Genesis::Kit#metadata receives no arguments, it will return a hash
+reference for all metadata for the kit.  If it gets a single value, it
+returns the metadata corresponding to the key of that value.  Finally,
+if it gets a list of values, it will return a list of the metadata
+corresponding to the keys of the given values.</p></li>
+</ul>
+
+<h3>Efficiencies</h3>
+
+<ul>
+<li><p>Lazy-load kit provider types as needed.</p>
+
+<p>By using <code>require</code> instead of <code>use</code> for loading the
+<code>Genesis::Kit::Provider::*</code> classes, they are loaded as needed during
+runtime instead of fully loaded at compile-time.</p></li>
+<li><p>Memoize <code>Genesis::Env</code> <code>params</code> and <code>actual_environment_files</code>.</p></li>
+</ul>
+
+<h3>Structure / Maintainability</h3>
+
+<ul>
+<li><p>Reordered <code>lib/Genesis/Env.pm</code>, with folding and grouping.</p>
+
+<p>This is done to be consistent with the other lib files.  No actual code
+changed in this release, but the diff is massive because blocks were
+moved into logical groupings.</p></li>
+<li><p>Privatized <code>Genesis::Env#validate_name</code>.</p>
+
+<p><code>validate_name</code> method should only be used internally, so it was renamed
+<code>_validate_env_name</code>.</p></li>
+<li><p>Fixes inconsistant private variable naming.</p>
+
+<ul>
+<li><code>_configs</code> has been changed to <code>__configs</code> in <code>Genesis::Env</code>, to match all
+other private instance variables.</li>
+</ul></li>
+</ul>
+        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.8.0" target="_blank">Download v2.8.0</a>
+      
+
+      
+      <h1 id="v2.7.35">Genesis v2.7.35</h1>
+      <h2>Bug Fix</h2>
 
 <ul>
 <li><p>Update Genesis bosh activities to work with BOSH cli v6.4.4</p>
 
 <p>As of BOSH cli 6.4.4, BOSH_* variables set to "" cause errors, so now they are simply unset.</p></li>
 </ul>
-        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.35" target="_blank">Download v2.7.35</a>
-      
-
+      <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.7.35" target="_blank">Download v2.7.35 from Github</a>
       
       <h1 id="v2.7.34">Genesis v2.7.34</h1>
       <h2>Improvements</h2>
