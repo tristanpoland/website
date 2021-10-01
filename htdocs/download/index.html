@@ -56,8 +56,10 @@
     <div>
       <nav>
         <h2>Latest Stable</h2>
-        <li><a href="#latest">Genesis v2.8.0</a></li>
+        <li><a href="#latest">Genesis v2.8.1</a></li>
         <h2>Historic Releases</h2>
+        
+        <li><a href="#v2.8.0">2.8.0</a></li>
         
         <li><a href="#v2.7.35">2.7.35</a></li>
         
@@ -72,10 +74,27 @@
       </nav>
     </div>
 
-    <div id="v2.8.0">
-      <h1 id="latest">Genesis v2.8.0</h1>
+    <div id="v2.8.1">
+      <h1 id="latest">Genesis v2.8.1</h1>
       
-        <h2>New Features</h2>
+        <h2>Bug Fixes</h2>
+
+<ul>
+<li><p>Genesis v2.8.0 reworked how Genesis interacted with BOSH, getting the
+login information from exodus data.  However, when the exodus data is
+not available, it lost its ability to specify the BOSH connectivity
+via environment variables.  This has now been resolved.</p></li>
+<li><p>Fixes error <code>Can't locate object method "from_envvars" via package
+"Genesis::BOSH::Director"</code> when generating new genesis environment.</p></li>
+<li><p>Fixes error when running <code>genesis bosh -h</code>, documents how to get help
+for bosh commands instead of help for <code>genesis bosh</code></p></li>
+</ul>
+        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.8.1" target="_blank">Download v2.8.1</a>
+      
+
+      
+      <h1 id="v2.8.0">Genesis v2.8.0</h1>
+      <h2>New Features</h2>
 
 <ul>
 <li><p>Auto-connect to BOSH director.</p>
@@ -329,9 +348,7 @@ moved into logical groupings.</p></li>
 other private instance variables.</li>
 </ul></li>
 </ul>
-        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.8.0" target="_blank">Download v2.8.0</a>
-      
-
+      <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.8.0" target="_blank">Download v2.8.0 from Github</a>
       
       <h1 id="v2.7.35">Genesis v2.7.35</h1>
       <h2>Bug Fix</h2>
