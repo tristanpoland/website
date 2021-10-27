@@ -56,8 +56,10 @@
     <div>
       <nav>
         <h2>Latest Stable</h2>
-        <li><a href="#latest">Genesis v2.8.1</a></li>
+        <li><a href="#latest">Genesis v2.8.2</a></li>
         <h2>Historic Releases</h2>
+        
+        <li><a href="#v2.8.1">2.8.1</a></li>
         
         <li><a href="#v2.8.0">2.8.0</a></li>
         
@@ -74,10 +76,58 @@
       </nav>
     </div>
 
-    <div id="v2.8.1">
-      <h1 id="latest">Genesis v2.8.1</h1>
+    <div id="v2.8.2">
+      <h1 id="latest">Genesis v2.8.2</h1>
       
         <h2>Bug Fixes</h2>
+
+<ul>
+<li><p>Replaces error <code>Can't call method "execute" on an undefined value</code>
+with more useful information on why BOSH director cannot be accessed.</p></li>
+<li><p>Suppress repetitive deprecation messages for the environment when
+processing various genesis commands.</p></li>
+<li><p>The existing bosh wrapper function in Genesis::Helpers was not
+compatible with the Genesis v2.8 internals regarding BOSH connectivity.
+If the environment file exists, helpers will simply use <code>genesis bosh
+...</code> calls to make it Just Work™.  For the rare situation where the
+enviroment file doesn't exist, a much more complicated validation and
+connectivity routine is employed.</p></li>
+<li><p>When generating the BOSH director for an environment, and is using the
+environment variables to determine the BOSH director configuration, make
+sure to set the deployment name.</p></li>
+</ul>
+
+<h2>Kit Authoring Improvements</h2>
+
+<ul>
+<li><p>Added <code>version_check</code> bash function to check that the version of Genesis
+meets or exceeds your hook's required version.  If you use this, make sure
+your kit specifies <code>genesis_version_minimum</code> of 2.8.2.</p></li>
+<li><p>Improvements to <code>genesis compile-kit</code> interface and functionality:</p>
+
+<ul>
+<li><p>Now creates a local rc release when no version is specified, for the
+next patch level above the highest remote or local version found.</p></li>
+<li><p>Can specify --target|-t to have the compiled kit placed in the
+desired directory.  If the directory is a genesis repo, it will
+place it under the directory's .genesis/kits path.</p></li>
+<li><p>When using -v <version>, if that version already exists locally or
+remotely, it will error out to prevent reissuing different contents
+under the same version (--force can be used to overcome this
+limitation).</p></li>
+<li><p>When not specifying the explicit version, you can bump the major or
+minor version instead of the path by using --major|-M or --minor|-m
+options.  The --final option will create the next version without a
+-rc# component.</p></li>
+<li><p>Improved feedback while processing.</p></li>
+</ul></li>
+</ul>
+        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.8.2" target="_blank">Download v2.8.2</a>
+      
+
+      
+      <h1 id="v2.8.1">Genesis v2.8.1</h1>
+      <h2>Bug Fixes</h2>
 
 <ul>
 <li><p>Genesis v2.8.0 reworked how Genesis interacted with BOSH, getting the
@@ -89,9 +139,7 @@ via environment variables.  This has now been resolved.</p></li>
 <li><p>Fixes error when running <code>genesis bosh -h</code>, documents how to get help
 for bosh commands instead of help for <code>genesis bosh</code></p></li>
 </ul>
-        <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.8.1" target="_blank">Download v2.8.1</a>
-      
-
+      <a class="button" href="https://github.com/starkandwayne/genesis/releases/tag/v2.8.1" target="_blank">Download v2.8.1 from Github</a>
       
       <h1 id="v2.8.0">Genesis v2.8.0</h1>
       <h2>New Features</h2>
