@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+<link rel="apple-touch-icon" sizes="57x57" href="./favicon/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="./favicon/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="./favicon/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="./favicon/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="./favicon/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="./favicon/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="./favicon/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="./favicon/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="./favicon/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="./favicon/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon/favicon-16x16.png">
+<link rel="manifest" href="./favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="./favicon/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+
+<title>Genesis</title>
+
+
+<link rel="stylesheet" href="./site.css?36b8443d934f1beca13af53179c1289057cf340c">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="./feed.xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-50822525-8"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','UA-50822525-8');</script>
+</head>
+<body>
+  <header class="top">
+    <img src="./logo.png?ff43466a0e4d90211659736aeee333c9b4d0fa77">
+    <nav>
+      <li><a href="./">Home</a></li>
+      <li><a href="./download/">Download</a></li>
+      <li><a href="./community/">Community</a></li>
+      <li><a href="./docs/">Docs</a></li>
+    </nav>
+  </header>
+
+    <div class="header">
+    <div>
+      <h1>GMP-CONCOURSE-0001 - Concourse 4 Upgrade</h1>
+      
+    </div>
+  </div>
+
+  <div class="content">
+    <div>
+      
+    </div>
+
+    <div>
+      <h1>Overview</h1>
+
+<p>Concourse Genesis Kit v3.0.0 is the first kit that crosses the barrier from
+Concourse version 3 to 4. This carries with it some underlying changes to the
+way authorization works in Concourse. While the kit provides a reasonable layer
+of abstraction for most of these changes, you may still need to make changes to
+your existing Concourse deployment in order for the migration to go cleanly.</p>
+
+<h1>Impact</h1>
+
+<p>If your configuration fulfills any of the following criteria, then the database
+migration associated with this upgrade will fail:</p>
+
+<ul>
+<li>Two teams are configured with the same basic auth username</li>
+<li>Two teams are configured with Github Auth, but they point to different OAuth
+applications within Github. </li>
+<li>Two teams are configured with Github Auth, but they point to different Github
+instances (e.g. public Github and an enterprise deployment, or two enterprise deployments)</li>
+<li>Two teams are configured with CF Auth, but they point to different Cloud
+Foundry deployments</li>
+<li>If you're using Bitbucket auth - sorry, it's not supported in Concourse 4. You'll
+need to consider a different authentication type.</li>
+</ul>
+
+<p>Things that should not affect this migration:</p>
+
+<ul>
+<li>Two teams are configured with Basic auth, but they have different users.</li>
+<li>Two teams are configured with Github auth against the same OAuth provider,
+but they check for membership of different orgs or teams.</li>
+<li>Two teams are configured with CF Auth against the same Cloud Foundry but
+verify different space membership.</li>
+</ul>
+
+<p>Additionally, teams that are configured with basic auth will need to have their
+users added manually using the <code>add_local_users</code> property of the ATC. The user named
+<code>concourse</code> that is configured with the kit in Vault will be seeded for you automatically.</p>
+
+<h1>The Process</h1>
+
+<h2>Take a Backup</h2>
+
+<p>First off, take a backup of the <code>atc</code> database. If you don't already have
+SHIELD doing that, then consider having SHIELD do that. If for some reason that
+isn't an option, you can use the pg_dump at
+<code>/var/vcap/packages/postgres-&amp;lt;version-number&amp;gt;/bin/pg_dump</code> on the db node
+to create a backup.</p>
+
+<p>Basically, if you miss a step and the migration fails, it'll be nice to be able
+to fall back to the previous kit version and slap the backup in place.</p>
+
+<p>As an aside, if you have configured a SHIELD backup for this node, you may need
+to change your <code>pg_bindir</code> property of your target after the upgrade, as the
+Postgres folder will change paths due to the Postgres upgrade.</p>
+
+<h2>Checking if you have a problem to fix</h2>
+
+<p>For starters, if you only have one team then you don't have a problem. Stop reading and do the
+migration.</p>
+
+<p>If you're still reading, then it's time to get on the Concourse db VM and take a look at the
+ATC database. SSH in:</p>
+
+<pre><code>bosh -e &amp;lt;your-env&amp;gt; -d &amp;lt;your-concourse-deployment&amp;gt; ssh db
+</code></pre>
+
+<p>PSQL into the DB:</p>
+
+<pre><code>/var/vcap/packages/postgres-&amp;lt;your-postgres-version&amp;gt;/bin/psql -U atc
+</code></pre>
+
+<p>Get the team configurations:</p>
+
+<pre><code>select * from teams;
+</code></pre>
+
+<p>If any of the teams auth configurations fulfill the qualities described in the
+Impact section, you'll need to reconfigure your teams using the Fly CLI. </p>
+
+<h2>Fixing your configuration with the Fly CLI</h2>
+
+<p>Target your Concourse's main team with Fly, and for each team take the action
+related to your issue. All of these will need to be done with set-team.
+Properties are not upserted, so when calling set-team, make sure you provide
+the entire team configuration.</p>
+
+<ul>
+<li>If multiple teams have the same basic auth user, change all but one of the
+team's users to a different username using the <code>--basic-auth-*</code> flags. You can 
+always change it back after the migration.</li>
+<li>If teams reference different Github OAuth applications, migrate them all to
+using one with the <code>--github-auth-*</code> flags. You may need to grant the OAuth app
+access to query org or team membership in orgs with more secretive privacy
+settings. This is something that can be done after the migration is finished.
+You may also want to revoke all user tokens from the OAuth application you're
+migrating to - if users only allowed the application access to view the
+organizations revelant to that particular application's domain, then they will
+not get authorized for non-granted domains. Revoking their token will give them
+a chance to grant more access to the OAuth app, as it will cause them to go
+through the initial authorization flow again.</li>
+<li>If you can't merge OAuth applications, or you're referencing multiple Github
+instances, then you'll need to make separate Concourse deployments for each
+unmergeable zone.</li>
+<li>For CF, if you're referencing multiple Cloud Foundries, you'll need a separate
+Concourse deployments for each Cloud Foundry you want to auth to.</li>
+</ul>
+
+<h2>Seeding local users</h2>
+
+<p>If you have basic auth users other than the default <code>concourse</code> user, then
+you'll need seed them into the ATC manually in the environment manifest.</p>
+
+<pre><code>instance_groups:
+- name: web
+  jobs:
+  - name: atc
+    properties:
+      add_local_users:
+      - (( append ))
+      - username:$2$12$bcryptOfPassword
+      - username2:$2$12$bcryptOfPassword2
+</code></pre>
+
+<p>If you want an easy way to make the bcrypts of each password, put them in the
+Vault with <code>safe</code> and use <code>safe fmt bcrypt</code> to make a bcrypt for each. </p>
+
+<h1>Help &amp; Support</h1>
+
+<p>If you have concerns about the impact of this migration process, or need
+assistance running through it, please don't hesitate to
+<a href="./community#slack">find us in #help on Slack</a>.</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="g">
+      <div class="x3">
+        <img src="./swlogo.png?0b567bdcee59ac95e3eaf667ec543ebc1631d6c0">
+
+        <p>Genesis is maintained by Stark &amp; Wayne,
+        a leading Cloud-Native consulting firm.</p>
+      </div>
+
+      <div class="x3">
+        <nav>
+          <li><a href="./">Home</a></li>
+          <li><a href="./download/">Download</a></li>
+          <li><a href="./community/">Community</a></li>
+          <li><a href="./docs/">Docs</a></li>
+        </nav>
+      </div>
+
+      <div class="x3">
+      </div>
+    </div>
+
+    <div class="copyright">
+      <p>Copyright &copy; 2021 The Genesis Authors.  All rights reserved.</p>
+    </div>
+  </footer>
+  <script type="text/javascript" src="./site.js?d2112e355882784cf7f38561cf3ccb0bd5da3111"></script>
+</body>
+</html>

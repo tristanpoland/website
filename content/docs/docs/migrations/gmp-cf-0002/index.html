@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+<link rel="apple-touch-icon" sizes="57x57" href="./favicon/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="./favicon/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="./favicon/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="./favicon/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="./favicon/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="./favicon/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="./favicon/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="./favicon/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="./favicon/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="./favicon/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon/favicon-16x16.png">
+<link rel="manifest" href="./favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="./favicon/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+
+<title>Genesis</title>
+
+
+<link rel="stylesheet" href="./site.css?36b8443d934f1beca13af53179c1289057cf340c">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="./feed.xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-50822525-8"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','UA-50822525-8');</script>
+</head>
+<body>
+  <header class="top">
+    <img src="./logo.png?ff43466a0e4d90211659736aeee333c9b4d0fa77">
+    <nav>
+      <li><a href="./">Home</a></li>
+      <li><a href="./download/">Download</a></li>
+      <li><a href="./community/">Community</a></li>
+      <li><a href="./docs/">Docs</a></li>
+    </nav>
+  </header>
+
+    <div class="header">
+    <div>
+      <h1>GMP-CF-0002 - Optionally Removing Consul in 1.3</h1>
+      
+    </div>
+  </div>
+
+  <div class="content">
+    <div>
+      
+    </div>
+
+    <div>
+      <p><em>Note: previously, this GMP had stated that 1.4.0 of the Cloud Foundry Genesis
+Kit would be when the Consul components were officially removed.  1.4.0 was
+released on May 2nd, 2019, without this removal.  This GMP has been updated
+to instead target the 1.5.0 release.</em></p>
+
+<h1>Overview</h1>
+
+<p>With BOSH DNS a mature product and an integral component in many BOSH
+deployments, we have begun replacing Consul service discovery with
+BOSH DNS. The Cloud Foundry Genesis Kit v1.3 is the first step in this
+two-step phase. v1.3 colocates BOSH DNS and disables Consul DNS, but
+does not remove Consul entirely. The result is a seamless upgrade from
+v1.2.X while also leveraging BOSH DNS for service discovery.</p>
+
+<p>It is our plan to fully remove Consul from the Cloud Foundry Genesis
+Kit in v1.5, which will include the deletion of all <code>consul_etcd</code>
+virtual machines. This is the second step of the two-step phase, which
+enables a zero-downtime upgrade path from Consul DNS to BOSH DNS.</p>
+
+<p>However, if an operator wishes to remove all Consul related services
+from their Cloud Foundry deployment without waiting for v1.5, they may
+do so with a temporary feature flag implemented just for v1.3 called
+<code>migrate-1.3-without-consul</code>. This GMP will explain the steps
+necessary to use this feature.</p>
+
+<h1>Impact</h1>
+
+<p>The impact of this feature is minimal to the runtime and stability of
+your Cloud Foundry deployment. The decision to either apply or not
+apply this feature to your deployments will not impact future
+upgradability of this environment. No extra steps are necessary to
+maintain your Cloud Foundry environment after this GMP is completed.</p>
+
+<p>There is no downtime incurred by applying this feature.</p>
+
+<h1>The Process</h1>
+
+<h2>Determining Eligibility</h2>
+
+<p>Operators who wish to remove all Consul services from their Cloud
+Foundry deployment are only able to do so if their Genesis Cloud
+Foundry is version v1.3. To determine the version of the deployed
+Cloud Foundry environment, run the following command within your
+<code>cf-deployments</code> folder:</p>
+
+<pre><code>genesis info [environment name]
+</code></pre>
+
+<p>Where <code>[environment name]</code> is the name of the Cloud Foundry
+environment you wish to check.</p>
+
+<p>The result will look like this:</p>
+
+<pre><code>CF Deployment for Environment 'genesis-lab'
+
+  Last deployed about 30 minutes ago (08:32PM on Dec 19, 2018 UTC)
+            by David
+        to BOSH genesis-lab
+  based on kit cf/1.3
+          using Genesis v2.6.12
+  with manifest .genesis/manifests/buffalo-lab.yml (redacted)
+</code></pre>
+
+<p>The <code>based on kit</code> line must read <code>cf/1.3</code>. If it does not, please
+upgrade your Cloud Foundry installation with the v1.3 Cloud Foundry
+Genesis Kit before starting.</p>
+
+<p>If your <code>based on kit</code> line reads <code>cf/1.3</code>, and you wish to remove
+Consul entirely, please continue reading this guide.</p>
+
+<h2>Removing Consul</h2>
+
+<p>After ensuring the environment you wish to remove Consul from is on
+v1.3, edit your Genesis Environment Manifest and append
+<code>migrate-1.3-without-consul</code> to the feature list array. The end result
+will be something similar to:</p>
+
+<pre><code>---
+kit:
+  name:   cf
+  version: 1.3
+  features:
+  - local-blobstore
+  - local-ha-db
+  - migrate-1.3-without-consul
+params:
+  env:   genesis-lab
+  [...]
+</code></pre>
+
+<p>Once the feature has been added to your Genesis Environment Manifest,
+apply the changes with a <code>genesis deploy</code>:</p>
+
+<pre><code>genesis deploy [environment name]
+</code></pre>
+
+<p>This will remove any <code>consul_agents</code> colocated on VMs, as well as
+removing all <code>consul_etcd</code> VMs currently deployed. There will be no
+downtime during this deployment.</p>
+
+<h2>Deployments With Multiple Cell Instance Groups</h2>
+
+<p>If your deployment has multiple instance groups for cells (possibly for
+isolation segments), then you will need to add additional DNS aliases,
+or else the Auctioneer will not be able to locate Rep instances on the
+additional instance groups. As a result, applications will not be deployed
+to the additional cell instance groups.</p>
+
+<p>To map the correct DNS aliases to the additional cell instance groups, add
+the following to your environment file.</p>
+
+<pre><code>addons:
+- name: bosh-dns-aliases
+  jobs:
+  - name: bosh-dns-aliases
+    release: bosh-dns-aliases
+    properties:
+      aliases:
+      - domain: '_.cell.service.cf.internal'
+        targets:
+        - (( append ))
+        - query: '_'
+          instance_group: extra-cell-instance-group-1-name
+          deployment: (( grab name ))
+          network: (( grab params.cf_runtime_network ))
+          domain: bosh
+        - query: '_'
+          instance_group: extra-cell-instance-group-2-name
+          deployment: (( grab name ))
+          network: (( grab params.cf_runtime_network ))
+          domain: bosh
+</code></pre>
+
+<p>Add a block under the targets array for each additional instance
+group that you have. Change the <code>instance_group</code> value to the name
+of each additional cell instance group. To be clear, you do not
+need to add one for the instance group named cell.</p>
+
+<h2>Verification &amp; Closing Notes (Final step)</h2>
+
+<p>Once the deployment is complete, you can verify that Consul is no
+longer used in your environment by running:</p>
+
+<pre><code>bosh -e [environment name] -d [deployment name] vms
+</code></pre>
+
+<p>Where <code>[environment name]</code> is the name of your BOSH director alias,
+and <code>[deployment name]</code> is the name of your Cloud Foundry environment.</p>
+
+<p>If you do not see any <code>consul_etcd</code> VMs listed, the feature was
+successfully applied. </p>
+
+<p>It is necessary to keep the <code>migrate-1.3-without-consul</code> feature until
+the v1.5 update is released. Genesis Cloud Foundry Kit v1.5 will
+remind you to remove the feature, as it will no longer be needed.</p>
+
+<h1>Help &amp; Support</h1>
+
+<p>If you have concerns about the impact of this migration process, or
+need assistance running through it, please don't hesitate to <a href="./community#slack">find us
+in #help on Slack</a>.</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="g">
+      <div class="x3">
+        <img src="./swlogo.png?0b567bdcee59ac95e3eaf667ec543ebc1631d6c0">
+
+        <p>Genesis is maintained by Stark &amp; Wayne,
+        a leading Cloud-Native consulting firm.</p>
+      </div>
+
+      <div class="x3">
+        <nav>
+          <li><a href="./">Home</a></li>
+          <li><a href="./download/">Download</a></li>
+          <li><a href="./community/">Community</a></li>
+          <li><a href="./docs/">Docs</a></li>
+        </nav>
+      </div>
+
+      <div class="x3">
+      </div>
+    </div>
+
+    <div class="copyright">
+      <p>Copyright &copy; 2021 The Genesis Authors.  All rights reserved.</p>
+    </div>
+  </footer>
+  <script type="text/javascript" src="./site.js?d2112e355882784cf7f38561cf3ccb0bd5da3111"></script>
+</body>
+</html>

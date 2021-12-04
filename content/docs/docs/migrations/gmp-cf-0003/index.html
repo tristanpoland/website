@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+<link rel="apple-touch-icon" sizes="57x57" href="./favicon/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="./favicon/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="./favicon/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="./favicon/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="./favicon/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="./favicon/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="./favicon/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="./favicon/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="./favicon/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="./favicon/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon/favicon-16x16.png">
+<link rel="manifest" href="./favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="./favicon/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+
+<title>Genesis</title>
+
+
+<link rel="stylesheet" href="./site.css?36b8443d934f1beca13af53179c1289057cf340c">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="./feed.xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-50822525-8"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','UA-50822525-8');</script>
+</head>
+<body>
+  <header class="top">
+    <img src="./logo.png?ff43466a0e4d90211659736aeee333c9b4d0fa77">
+    <nav>
+      <li><a href="./">Home</a></li>
+      <li><a href="./download/">Download</a></li>
+      <li><a href="./community/">Community</a></li>
+      <li><a href="./docs/">Docs</a></li>
+    </nav>
+  </header>
+
+    <div class="header">
+    <div>
+      <h1>GMP-CF-0003 - TLS Certificate Refactor in v1.8.0</h1>
+      
+    </div>
+  </div>
+
+  <div class="content">
+    <div>
+      
+    </div>
+
+    <div>
+      <h1>Overview</h1>
+
+<p>Cloud Foundry has recently improved support for secure inter-process
+communications, which has been reflected in the cf-deployment release.  This
+change in v1.8.0 is to better approximate the certificate tree with regards
+to the CA used to sign each certificate, as well as CN and SANs used.  This
+version also contains future-looking configuration to support extended key
+usage that is supported but not validated currently in Cloud Foundry.</p>
+
+<h1>Impact</h1>
+
+<p>The impact of this feature is minimal to the runtime and stability of
+your Cloud Foundry deployment. It requires rotating the certificates and
+associated CA certificates.  Genesis provides the tooling to do this.</p>
+
+<p>There is no downtime incurred by applying this feature.</p>
+
+<h1>The Process</h1>
+
+<p>Once you update your environment to use the v1.8.0 kit, you will need to update
+your certificates.  There are two ways to do this:</p>
+
+<h2>The Quick and Dirty Method</h2>
+
+<p>The fastest way to proceed is to regenerate all your secrets using the
+<code>genesis rotate-secrets &lt;env&gt; -f</code> command for your target environment after
+you update its kit version.  The <code>-f</code> option is needed to force the
+regeneration of the CA certs, which are otherwise left unrotated.</p>
+
+<p>However, this has the side effect of rotating <strong>ALL</strong> your secrets, including
+the credentials used for passwords.  <span title='This is erroneous - see update below' id='warning' style="text-decoration: line-through;">
+This generally has no impact because these
+are used internally, but</span> If you have external tools or users that use these
+credentials to interact with your deployment, you will need to propagate these
+updates to your users and tools.</p>
+
+<h4  style='color: red'>IMPORTANT UPDATE/WARNING</h4>
+
+<p>There are a handful of secrets that CF cannot handle being changed.  These are
+the following:</p>
+
+<ul>
+<li><code>cc:directory_key</code></li>
+<li><code>cc:db_encryption_key</code></li>
+<li><code>diego/encryption_key:value</code></li>
+<li><code>uaa/encryption_key:current</code></li>
+<li><code>uaa/jwt_signing_key:private</code></li>
+<li><code>uaa/jwt_signing_key:public</code></li>
+</ul>
+
+<p>If you want to perform the Quick and Dirty method, ensure you have a copy of
+these secrets and manually restore them after rotating.  These will be found
+in save under the path <code>secret/&lt;env-slug&gt;/cf/</code> - see <a
+href='#env-slug'>below</a> for definition of <code>env-slug</code>.</p>
+
+<h2>The In-depth Method</h2>
+
+<p>If you'd rather keep your credentials, you can surgically remove just the
+certificates used and add them back in using <code>genesis add-secrets &lt;env&gt;</code>.</p>
+
+<p>All certificates generated by the <code>cf-genesis-kit</code> are stored under the
+following path:<span id='env-slug'></span></p>
+
+<pre><code>secret/&lt;env-slug&gt;/cf/&lt;signator&gt;/certs/&lt;certificate&gt;
+</code></pre>
+
+<p>The <code>&lt;env-slug&gt;</code> is your environment file name, but with hyphens converted to
+slashes.  For example, if your environment file was
+<code>mycorp-aws-uswest1-staging.yml</code>, the path root for this kit would be</p>
+
+<pre><code>secret/mycorp/aws/uswest1/staging/cf/
+</code></pre>
+
+<p>Using this information, find the certificates using <code>safe</code> and remove them:</p>
+
+<pre><code>path_root='secret/&lt;env-slug&gt;/cf/' # as described above
+for s in $(safe paths $path_root | grep '.*\/certs\/.*') ; do echo "removing $s"; safe rm -f "$s" ; done
+</code></pre>
+
+<p><strong>Warning:</strong> Ctrl-C will not stop that command, so ensure you've correctly
+entered your <code>path_root</code>.</p>
+
+<p>Once that is complete, update the kit version in your environment file and
+run <code>genesis add-secrets &lt;env&gt;</code> to build the required certificates.  This
+method is preferred as it clears out all the old defunct certificates that
+are no longer used, but it doesn't hurt to leave them in.</p>
+
+<h2>Verification</h2>
+
+<p>As always, you can use <code>genesis check-secrets &lt;env&gt;</code> to verify your secrets
+have been created.</p>
+
+<h1>One Final Note</h1>
+
+<p>Genesis currently does not have the ability to have a CA certificate signed
+by another CA certificate, but this is needed for the
+<code>diego_instance_identity_ca</code>.  To that end, when you first run a command that
+looks at building a manifest (<code>manifest</code>, <code>deploy</code>, <code>lookup</code>, <code>yamls</code>,
+etc...), the blueprint hook script with check that the CA is signed
+correctly, and if not, will renew it with the correct signatory CA.  If this
+happens in a pipeline, it will lack the required permissions to change the
+secret, so make sure you run <code>genesis manifest &lt;env&gt;</code> prior to triggering
+your pipeline run.</p>
+
+<h1>Help &amp; Support</h1>
+
+<p>If you have concerns about the impact of this migration process, or
+need assistance running through it, please don't hesitate to <a href="./community#slack">find us
+in #help on Slack</a>.</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="g">
+      <div class="x3">
+        <img src="./swlogo.png?0b567bdcee59ac95e3eaf667ec543ebc1631d6c0">
+
+        <p>Genesis is maintained by Stark &amp; Wayne,
+        a leading Cloud-Native consulting firm.</p>
+      </div>
+
+      <div class="x3">
+        <nav>
+          <li><a href="./">Home</a></li>
+          <li><a href="./download/">Download</a></li>
+          <li><a href="./community/">Community</a></li>
+          <li><a href="./docs/">Docs</a></li>
+        </nav>
+      </div>
+
+      <div class="x3">
+      </div>
+    </div>
+
+    <div class="copyright">
+      <p>Copyright &copy; 2021 The Genesis Authors.  All rights reserved.</p>
+    </div>
+  </footer>
+  <script type="text/javascript" src="./site.js?d2112e355882784cf7f38561cf3ccb0bd5da3111"></script>
+</body>
+</html>

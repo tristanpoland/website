@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,target-densitydpi=device-dpi">
+<meta name="generator" content="verse">
+<meta name="X-UA-Compatible" content="IE=edge">
+
+<link rel="apple-touch-icon" sizes="57x57" href="./favicon/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="./favicon/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="./favicon/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="./favicon/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="./favicon/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="./favicon/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="./favicon/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="./favicon/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="./favicon/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="./favicon/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon/favicon-16x16.png">
+<link rel="manifest" href="./favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="./favicon/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+
+<title>Genesis</title>
+
+
+<link rel="stylesheet" href="./site.css?36b8443d934f1beca13af53179c1289057cf340c">
+<link rel="alternate home" type="application/rss+xml" title="Genesis - RSS feed" href="./feed.xml">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-50822525-8"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','UA-50822525-8');</script>
+</head>
+<body>
+  <header class="top">
+    <img src="./logo.png?ff43466a0e4d90211659736aeee333c9b4d0fa77">
+    <nav>
+      <li><a href="./">Home</a></li>
+      <li><a href="./download/">Download</a></li>
+      <li><a href="./community/">Community</a></li>
+      <li><a href="./docs/">Docs</a></li>
+    </nav>
+  </header>
+
+    <div class="header">
+    <div>
+      <h1>GMP-GEN-0001 - Environment File genesis Block Required</h1>
+      
+    </div>
+  </div>
+
+  <div class="content">
+    <div>
+      
+    </div>
+
+    <div>
+      <h1>Overview</h1>
+
+<p>The end-user's primary interface for deployments is the various environment
+YAML files in the deployment repository.  Since pretty much the beginning of
+Genesis 2, it has been composed of two top-level components: <code>kit</code> and
+<code>params</code>.  The <code>kit</code> section identified the kit to be used and the features
+to include, and the <code>params</code> block was for providing values for the kit to
+use in building its manifest, with the name derived from the spruce <code>((
+param ))</code> operator.  Anything outside these two blocks was merged overtop of
+the manifest, allowing users to explicitly override any section of the
+generate manifest.</p>
+
+<p>As Genesis has evolved, we have seen the need to separate the areas of
+concern from what Genesis needs to do its job (deployment, secrets
+management, etc) from what the kit needs to build its manifest.  To that
+end, the <code>genesis</code> block was added in v2.6.x, and values that are
+Genesis-centric have been migrated there.</p>
+
+<p>As of v2.7.7, continued use of the <code>params</code> versions of values that should
+be found under <code>genesis</code> will generate a warning.  In prior version of the
+2.7.x line, it would actually error out, and we found users were not clear
+on the action needed, so we have moved to a warning and this document to
+explain the impact and resolution.  It will once again become required in a
+later version ov the 2.7.x line.</p>
+
+<h1>Impact</h1>
+
+<p>The following <code>params</code> entries have been moved under <code>genesis</code>:</p>
+
+<ul>
+<li><code>params.env</code> becomes <code>genesis.env</code></li>
+<li><code>params.bosh</code> becomes <code>genesis.bosh_env</code></li>
+<li><code>params.vault_prefix</code> (and the legacy <code>params.vault</code>) become <code>genesis.secrets_path</code></li>
+</ul>
+
+<h1>The Process</h1>
+
+<p>Simply edit your environment files, create a top-level <code>genesis</code> block, and
+move any of the <code>params</code> entries above to the associated <code>genesis</code>
+entries.</p>
+
+<p>As an optional step, instead of moving, you can remove <code>params.vault_prefix</code>
+or <code>params.vault</code> entries that contain the default vault path for the
+environment.  This will be the environment name with all hyphens (<code>-</code>)
+changed to slashes (<code>/</code>), followed by a <code>/&lt;kit-type&gt;</code>. For example, if my
+cf-genesis-kit environment file "c-aws-dev-1.yml" had a
+<code>params.vault_prefix</code> of <code>c/aws/dev/1/cf</code>, it would be safe to remove.  This
+is not required, but such entries are redundant.</p>
+
+<p>As always, if using pipelines, make sure you embed the new version of
+Genesis in your deployment repos every time you upgrade Gensis.  This can be
+done by simply running <code>genesis embed</code> inside each of your repos. </p>
+
+<h1>Help &amp; Support</h1>
+
+<p>If you have concerns about the impact of this migration process, or need
+assistance running through it, please don't hesitate to <a href="./community#slack">find us in #help on
+Slack</a>.</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="g">
+      <div class="x3">
+        <img src="./swlogo.png?0b567bdcee59ac95e3eaf667ec543ebc1631d6c0">
+
+        <p>Genesis is maintained by Stark &amp; Wayne,
+        a leading Cloud-Native consulting firm.</p>
+      </div>
+
+      <div class="x3">
+        <nav>
+          <li><a href="./">Home</a></li>
+          <li><a href="./download/">Download</a></li>
+          <li><a href="./community/">Community</a></li>
+          <li><a href="./docs/">Docs</a></li>
+        </nav>
+      </div>
+
+      <div class="x3">
+      </div>
+    </div>
+
+    <div class="copyright">
+      <p>Copyright &copy; 2021 The Genesis Authors.  All rights reserved.</p>
+    </div>
+  </footer>
+  <script type="text/javascript" src="./site.js?d2112e355882784cf7f38561cf3ccb0bd5da3111"></script>
+</body>
+</html>

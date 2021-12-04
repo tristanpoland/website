@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html><head>
+<html>
+
+<head>
   <link href="https://fonts.googleapis.com/css?family=Amarante:regular|Comfortaa:300,regular,500,600,700" rel="stylesheet" type="text/css">
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <link rel="icon" type="image/x-icon" href="https://gameplex-software.github.io/genesis-docs/favicon.ico">
@@ -411,6 +413,22 @@
       left: 31px;
       top: 2220px;
     }
+    .gwd-img-vf8r {
+      position: absolute;
+      left: 0px;
+      width: 199px;
+      height: 47.98px;
+      top: 87.21%;
+    }
+    .gwd-span-sl5r {
+      position: absolute;
+      color: rgb(255, 255, 255);
+      font-family: Arial;
+      width: 185px;
+      height: 57.67px;
+      top: 92.79%;
+      left: 3.52%;
+    }
   </style>
   <script>
     $(document).ready(function() {
@@ -426,6 +444,7 @@
     <div class="modal-content">
       <span class="close">×</span>
       <h1>Genesis Topology</h1>
+      <p>Click to interact</p>
       <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
       <script type="text/javascript">
         $(function() {
@@ -1541,14 +1560,14 @@
           </g>
         </g>
       </svg><br>
-     
+      
       <p>
         us-east-1-sandbox - A (small) environment where operations staff play.<br>
          us-east-1-dev - A (usually quite large) production-like environment for platform.<br>
          consumers (i.e. developers) to test out their wild ideas.<br>
          us-east-1-qa - A production-like environment for integration tests, quality control, and pre-production deployment of platform and applications.<br>
          us-east-1-prod - Production. The thing that shall not go offline. Where the real money is made.<br>
-       
+        
       </p>
     </div>
   </div>
@@ -1565,7 +1584,7 @@
       <br>
       <br>
       <br>
-     
+      
       <span class="gwd-span-p2rj">Vault</span><br>
       <br>
        Before you can deploy things for real, you're going to need a place to store all of those sensitive passwords, encryption keys, X.509 certificates, CA signing keys, etc. For that, we use a small, 3-node Consul-backed Vault.<br>
@@ -1577,7 +1596,7 @@
       <br>
       <br>
       <br>
-     
+      
       <span class="gwd-span-1ew1">Concourse</span><br>
       <br>
        Scaling Cloud Foundry, BOSH, and the rest of our deployments across a multitude of environments eventually leads you to automate the easy (and often mundane) tasks of managing updates and keeping everything humming along smoothly.<br>
@@ -1589,7 +1608,7 @@
       <br>
       <br>
       <br>
-     
+      
       <span class="gwd-span-km3v">BOSH</span><br>
       <br>
        BOSH is the backbone of the Genesis deployment story. It is single-handedly responsible for translating our requests for environments into commands for the chosen IaaS (AWS, vSphere, Azure, GCP, etc.) to carry out. The upshot: you get virtual machines, for next to no work.<br>
@@ -1601,7 +1620,7 @@
       <br>
       <br>
       <br>
-     
+      
       <span class="gwd-span-189h">SHIELD</span><br>
       <br>
        You're going to want to protect the data that all these systems start creating. For that, Genesis provides SHIELD, a Data Protection solution that will schedule your backups, encrypting each of them with randomized key material, and provides a simple and easy-to-follow process for restoring systems when you do eventually lose data.<br>
@@ -1613,7 +1632,7 @@
       <br>
       <br>
       <br>
-     
+      
       <span class="gwd-span-11bw">Monitoring</span><br>
       <br>
        To monitor the health and well-being of all the running components of Cloud Foundry, both internal pieces like Diego cell capacity and Cloud Controller API response times, and external bits like disk availability on your blobstore solutions. Each environment gets its own Prometheus instance, chock full of helpful data visualization dashboards to keep you apprised of how things look.<br>
@@ -1625,7 +1644,7 @@
       <br>
       <br>
       <br>
-     
+      
       <span class="gwd-span-hufj">Minio</span><br>
       <br>
        With Cloud Foundry, you have the option to use an external storage system for application and package blobs. If you want, you can run your own S3-like system on-premise; we use Minio.<br>
@@ -1637,12 +1656,12 @@
       <br>
       <br>
       <br>
-     
+      
       <span class="gwd-span-13bj">Blacksmith</span><br>
       <br>
        An application without any data is not much of an application. Whether you want to store your important information in a relational SQL database like MariaDB or PostgreSQL, or if you prefer a key-value (like Redis) or an object database (i.e. MongoDB), Blacksmith has you covered.</div>
     <div class="gwd-div-xyk9"><br>
-     
+      
     </div>
     <div class="gwd-div-xyk9">Leveraging BOSH, Blacksmith is able to offer isolated, dedicated service instances that are less prone to disruption from noisy neighbors.<br>
       <br>
@@ -1653,7 +1672,7 @@
       <br>
       <br>
       <br>
-     
+      
       <span class="gwd-span-fnm9">Cloud Foundery</span><br>
       <br>
        This is it. THE platform for your agile application development transformation. Each Genesis environment almost inevitably culminates in one of these, surrounded by other services that outfit, extend and complement.</div>
@@ -1662,7 +1681,7 @@
       </div>
     </div>
     <div class="gwd-div-1dgm"><br>
-     
+      
     </div>
     </span>
   </div>
@@ -1671,281 +1690,275 @@
     <div class="gwd-div-84l6"><span class="gwd-span-stnq">Table of contents</span></div>
     <div class="gwd-div-84l6 gwd-div-1i2t gwd-div-11wf"><span class="gwd-span-stnq gwd-span-2mgv gwd-span-1yw4">About Genesis</span></div>
     <div class="gwd-div-84l6 gwd-div-1i2t gwd-div-1fx0 gwd-div-f9dj"><span class="gwd-span-stnq gwd-span-2mgv gwd-span-1txc">Use cases for Genesis</span></div>
-  </div>
+    <img src="assets/cooltext383988475180358.png" id="cooltext383988475180358" class="gwd-img-vf8r"><span class="gwd-span-sl5r">Documentation maintained by: Gameplex</span></div>
   <div class="gwd-div-qhut" id="headerloader">
-
-
-
-  <meta charset="utf-8">
-  <title>header CDN Gameplex Docs Main</title>
-  <meta name="generator" content="Google Web Designer 14.0.4.1108">
-  <style type="text/css" id="gwd-text-style">
-    p {
-      margin: 0px;
-    }
-    h1 {
-      margin: 0px;
-    }
-    h2 {
-      margin: 0px;
-    }
-    h3 {
-      margin: 0px;
-    }
-  </style>
-  <style type="text/css">
-    .gwd-div-zzdx::-webkit-scrollbar {
-      display: none;
-    }
-    .gwd-div-23hi {
-      height: 50px;
-      left: 0px;
-      position: absolute;
-      top: 0px;
-      width: 100.02%;
-      background-image: none;
-      background-color: rgb(0, 0, 0);
-    }
-    .gwd-div-1wnw {
-      box-sizing: border-box;
-      color: rgb(255, 255, 255);
-      height: 80%;
-      left: 63.84%;
-      position: absolute;
-      top: 10%;
-      width: 35%;
-    }
-    .gwd-form-pxwk {
-      color: rgb(255, 255, 255);
-      height: 100%;
-      width: 100%;
-    }
-    .gwd-input-1a8c {
-      appearance: none;
-      background-color: rgb(74, 67, 68);
-      background-position: 10px 12px;
-      background-repeat: no-repeat;
-      border-color: rgb(221, 221, 221);
-      border-radius: 50px;
-      border-style: solid;
-      border-width: 1px;
-      box-sizing: border-box;
-      font-size: 16px;
-      height: 100%;
-      margin-block-end: 12px;
-      margin-bottom: 12px;
-      padding-block: 12px;
-      padding: 12px 20px 12px 40px;
-      padding-inline: 40px 20px;
-      width: 100%;
-    }
-    .gwd-img-48vy {
-      display: block;
-      height: 50px;
-      left: 0px;
-      position: absolute;
-      top: 0px;
-      width: 312.5px;
-      -webkit-text-decorations-in-effect: none;
-    }
-    .gwd-div-zzdx {
-      border-radius: 10px;
-      height: 400%;
-      left: 49.79%;
-      overflow: scroll;
-      position: absolute;
-      top: 50px;
-      width: 50%;
-    }
-    .gwd-ul-1ii0 {
-      border-radius: 10px;
-      box-sizing: border-box;
-      font-family: Arial;
-      height: 100%;
-      left: 0px;
-      list-style-type: none;
-      margin-block: 0px;
-      margin-bottom: 0px;
-      margin-top: 0px;
-      padding-inline-start: 0px;
-      padding-left: 0px;
-      top: 0px;
-      width: 100%;
-    }
-    .gwd-li-js4j {
-      box-sizing: border-box;
-      font-family: Arial;
-      list-style-type: none;
-    }
-    .gwd-a-ze3g {
-      background-color: rgb(246, 246, 246);
-      border-color: rgb(221, 221, 221);
-      border-style: solid;
-      border-width: 1px;
-      box-sizing: border-box;
-      color: rgb(0, 0, 0);
-      display: block;
-      font-family: Arial;
-      font-size: 18px;
-      list-style-type: none;
-      margin-block-start: -1px;
-      margin-top: -1px;
-      padding-block: 12px;
-      padding: 12px;
-      padding-inline: 12px;
-      text-decoration-line: none;
-      -webkit-text-decorations-in-effect: none;
-    }
-    .gwd-h4-1f18 {
-      box-sizing: border-box;
-      color: rgb(0, 0, 0);
-      font-family: Arial;
-      font-size: 18px;
-      list-style-type: none;
-      margin-block: 23.94px;
-      margin-bottom: 23.94px;
-      margin-top: 23.94px;
-      -webkit-text-decorations-in-effect: none;
-    }
-    .gwd-p-shpk {
-      box-sizing: border-box;
-      color: rgb(0, 0, 0);
-      font-family: Arial;
-      font-size: 18px;
-      list-style-type: none;
-      -webkit-text-decorations-in-effect: none;
-    }
-    .gwd-li-pgqg {
-      box-sizing: border-box;
-      font-family: Arial;
-      list-style-type: none;
-    }
-    .gwd-a-1qo7 {
-      background-color: rgb(246, 246, 246);
-      border-color: rgb(221, 221, 221);
-      border-style: solid;
-      border-width: 1px;
-      box-sizing: border-box;
-      color: rgb(0, 0, 0);
-      display: block;
-      font-family: Arial;
-      font-size: 18px;
-      list-style-type: none;
-      margin-block-start: -1px;
-      margin-top: -1px;
-      padding-block: 12px;
-      padding: 12px;
-      padding-inline: 12px;
-      text-decoration-line: none;
-      -webkit-text-decorations-in-effect: none;
-    }
-    .gwd-img-18mq {
-      position: absolute;
-      left: 0px;
-      top: 1px;
-      height: 50px;
-      width: 173.95px;
-    }
-    .gwd-a-1oyd {
-      width: 174px;
-      height: 50px;
-    }
-  </style>
-  <script>
-    //document.getElementById("myinput").addEventListener("click", search);
-    function myFunction() {
-      var input, filter, ul, li, a, i, txtValue;
-      input = document.getElementById("myInput");
-      filter = input.value.toUpperCase();
-      ul = document.getElementById("myUL");
-      li = ul.getElementsByTagName("li");
-      for (i = 0; i < li.length; i++) {
-        a = li[i].getElementsByTagName("a")[0];
-        txtValue = a.textContent || a.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          li[i].style.display = "";
-        } else {
-          li[i].style.display = "none";
+    <meta charset="utf-8">
+    <title>header CDN Gameplex Docs Main</title>
+    <meta name="generator" content="Google Web Designer 14.0.4.1108">
+    <style type="text/css" id="gwd-text-style">
+      p {
+        margin: 0px;
+      }
+      h1 {
+        margin: 0px;
+      }
+      h2 {
+        margin: 0px;
+      }
+      h3 {
+        margin: 0px;
+      }
+    </style>
+    <style type="text/css">
+      .gwd-div-zzdx::-webkit-scrollbar {
+        display: none;
+      }
+      .gwd-div-23hi {
+        height: 50px;
+        left: 0px;
+        position: absolute;
+        top: 0px;
+        width: 100.02%;
+        background-image: none;
+        background-color: rgb(0, 0, 0);
+      }
+      .gwd-div-1wnw {
+        box-sizing: border-box;
+        color: rgb(255, 255, 255);
+        height: 80%;
+        left: 63.84%;
+        position: absolute;
+        top: 10%;
+        width: 35%;
+      }
+      .gwd-form-pxwk {
+        color: rgb(255, 255, 255);
+        height: 100%;
+        width: 100%;
+      }
+      .gwd-input-1a8c {
+        appearance: none;
+        background-color: rgb(74, 67, 68);
+        background-position: 10px 12px;
+        background-repeat: no-repeat;
+        border-color: rgb(221, 221, 221);
+        border-radius: 50px;
+        border-style: solid;
+        border-width: 1px;
+        box-sizing: border-box;
+        font-size: 16px;
+        height: 100%;
+        margin-block-end: 12px;
+        margin-bottom: 12px;
+        padding-block: 12px;
+        padding: 12px 20px 12px 40px;
+        padding-inline: 40px 20px;
+        width: 100%;
+      }
+      .gwd-img-48vy {
+        display: block;
+        height: 50px;
+        left: 0px;
+        position: absolute;
+        top: 0px;
+        width: 312.5px;
+        -webkit-text-decorations-in-effect: none;
+      }
+      .gwd-div-zzdx {
+        border-radius: 10px;
+        height: 400%;
+        left: 49.79%;
+        overflow: scroll;
+        position: absolute;
+        top: 50px;
+        width: 50%;
+      }
+      .gwd-ul-1ii0 {
+        border-radius: 10px;
+        box-sizing: border-box;
+        font-family: Arial;
+        height: 100%;
+        left: 0px;
+        list-style-type: none;
+        margin-block: 0px;
+        margin-bottom: 0px;
+        margin-top: 0px;
+        padding-inline-start: 0px;
+        padding-left: 0px;
+        top: 0px;
+        width: 100%;
+      }
+      .gwd-li-js4j {
+        box-sizing: border-box;
+        font-family: Arial;
+        list-style-type: none;
+      }
+      .gwd-a-ze3g {
+        background-color: rgb(246, 246, 246);
+        border-color: rgb(221, 221, 221);
+        border-style: solid;
+        border-width: 1px;
+        box-sizing: border-box;
+        color: rgb(0, 0, 0);
+        display: block;
+        font-family: Arial;
+        font-size: 18px;
+        list-style-type: none;
+        margin-block-start: -1px;
+        margin-top: -1px;
+        padding-block: 12px;
+        padding: 12px;
+        padding-inline: 12px;
+        text-decoration-line: none;
+        -webkit-text-decorations-in-effect: none;
+      }
+      .gwd-h4-1f18 {
+        box-sizing: border-box;
+        color: rgb(0, 0, 0);
+        font-family: Arial;
+        font-size: 18px;
+        list-style-type: none;
+        margin-block: 23.94px;
+        margin-bottom: 23.94px;
+        margin-top: 23.94px;
+        -webkit-text-decorations-in-effect: none;
+      }
+      .gwd-p-shpk {
+        box-sizing: border-box;
+        color: rgb(0, 0, 0);
+        font-family: Arial;
+        font-size: 18px;
+        list-style-type: none;
+        -webkit-text-decorations-in-effect: none;
+      }
+      .gwd-li-pgqg {
+        box-sizing: border-box;
+        font-family: Arial;
+        list-style-type: none;
+      }
+      .gwd-a-1qo7 {
+        background-color: rgb(246, 246, 246);
+        border-color: rgb(221, 221, 221);
+        border-style: solid;
+        border-width: 1px;
+        box-sizing: border-box;
+        color: rgb(0, 0, 0);
+        display: block;
+        font-family: Arial;
+        font-size: 18px;
+        list-style-type: none;
+        margin-block-start: -1px;
+        margin-top: -1px;
+        padding-block: 12px;
+        padding: 12px;
+        padding-inline: 12px;
+        text-decoration-line: none;
+        -webkit-text-decorations-in-effect: none;
+      }
+      .gwd-img-18mq {
+        position: absolute;
+        left: 0px;
+        top: 1px;
+        height: 50px;
+        width: 173.95px;
+      }
+      .gwd-a-1oyd {
+        width: 174px;
+        height: 50px;
+      }
+    </style>
+    <script>
+      //document.getElementById("myinput").addEventListener("click", search);
+      function myFunction() {
+        var input, filter, ul, li, a, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("myUL");
+        li = ul.getElementsByTagName("li");
+        for (i = 0; i < li.length; i++) {
+          a = li[i].getElementsByTagName("a")[0];
+          txtValue = a.textContent || a.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+          } else {
+            li[i].style.display = "none";
+          }
         }
-      }
-      if (document.forms['search'].myInput.value === "") {
-        document.getElementById("myUL").style.display = "none";
-      } else {
-        document.getElementById("myUL").style.display = "block";
-      }
-    };
-
-    function myFunction2() {
-      var input, filter, ul, li, a, i, txtValue;
-      input = document.getElementById("myInput2");
-      filter = input.value.toUpperCase();
-      ul = document.getElementById("myUL2");
-      li = ul.getElementsByTagName("li");
-      for (i = 0; i < li.length; i++) {
-        a = li[i].getElementsByTagName("a")[0];
-        txtValue = a.textContent || a.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          li[i].style.display = "";
+        if (document.forms['search'].myInput.value === "") {
+          document.getElementById("myUL").style.display = "none";
         } else {
-          li[i].style.display = "none";
+          document.getElementById("myUL").style.display = "block";
         }
-      }
-    };
-  </script>
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script>
-    $(document).ready(function() {
-      $("#myUL").load("./searchindex.html");
-    });
-  </script>
+      };
 
-
-
-  <div class="gwd-div-23hi">
-    <div class="gwd-div-1wnw">
-      <form name="search" class="gwd-form-pxwk" autocomplete="false">
-        <input type="text" id="myInput" placeholder="Search Documentation" title="Search Documented Projects" class="gwd-input-1a8c" autocomplete="false" onkeyup="myFunction()" onclick="search()">
-      </form>
+      function myFunction2() {
+        var input, filter, ul, li, a, i, txtValue;
+        input = document.getElementById("myInput2");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("myUL2");
+        li = ul.getElementsByTagName("li");
+        for (i = 0; i < li.length; i++) {
+          a = li[i].getElementsByTagName("a")[0];
+          txtValue = a.textContent || a.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+          } else {
+            li[i].style.display = "none";
+          }
+        }
+      };
+    </script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $("#myUL").load("./searchindex.html");
+      });
+    </script>
+    <div class="gwd-div-23hi">
+      <div class="gwd-div-1wnw">
+        <form name="search" class="gwd-form-pxwk" autocomplete="false">
+          <input type="text" id="myInput" placeholder="Search Documentation" title="Search Documented Projects" class="gwd-input-1a8c" autocomplete="false" onclick="search()" onkeyup="myFunction()">
+        </form>
+      </div>
+      <div class="gwd-div-zzdx" id="results">
+        <ul id="myUL" class="gwd-ul-1ii0" style="display: none;">
+          <li class="gwd-li-js4j gwd-li-13le">
+            <a href="./index.html" class="gwd-a-ze3g gwd-a-qd1o">
+              <h4 class="gwd-h4-1f18">About</h4>
+              <p class="gwd-p-shpk">What is Genesis, why use Genesis</p>
+            </a>
+          </li>
+          <li class="gwd-li-js4j gwd-li-13le gwd-li-1twh">
+            <a href="./migration.html" class="gwd-a-ze3g gwd-a-qd1o">
+              <h4 class="gwd-h4-1f18">Migration</h4>
+              <p class="gwd-p-shpk">Migrating to using Genesis</p>
+            </a>
+          </li>
+          <li class="gwd-li-js4j gwd-li-1rio gwd-li-13le">
+            <a href="#" class="gwd-a-ze3g gwd-a-cv4q">
+              <h4 class="gwd-h4-1f18">Page 3</h4>
+              <p class="gwd-p-shpk">information page 3</p>
+            </a>
+          </li>
+          <li class="gwd-li-js4j gwd-li-1rio gwd-li-13le">
+            <a href="#" class="gwd-a-ze3g gwd-a-cv4q">
+              <h4 class="gwd-h4-1f18">Page 4</h4>
+              <p class="gwd-p-shpk">information page 4</p>
+            </a>
+          </li>
+          <li class="gwd-li-js4j gwd-li-1rio gwd-li-13le">
+            <a href="#" class="gwd-a-ze3g gwd-a-cv4q">
+              <h4 class="gwd-h4-1f18">Page 5</h4>
+              <p class="gwd-p-shpk">information page 5</p>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <a href="/" class="gwd-a-1oyd">
+        <img src="assets/logo.png" id="logo" class="gwd-img-18mq">
+      </a>
     </div>
-    <div class="gwd-div-zzdx" id="results">
-      <ul id="myUL" class="gwd-ul-1ii0" style="display: none;"><li class="gwd-li-js4j gwd-li-13le">
-  <a href="./index.html" class="gwd-a-ze3g gwd-a-qd1o">
-    <h4 class="gwd-h4-1f18">About</h4>
-    <p class="gwd-p-shpk">What is Genesis, why use Genesis</p>
-  </a>
-</li>
-<li class="gwd-li-js4j gwd-li-13le gwd-li-1twh">
-  <a href="./migration.html" class="gwd-a-ze3g gwd-a-qd1o">
-    <h4 class="gwd-h4-1f18">Migration</h4>
-    <p class="gwd-p-shpk">Migrating to using Genesis</p>
-  </a>
-</li>
-<li class="gwd-li-js4j gwd-li-1rio gwd-li-13le">
-  <a href="#" class="gwd-a-ze3g gwd-a-cv4q">
-    <h4 class="gwd-h4-1f18">Page 3</h4>
-    <p class="gwd-p-shpk">information page 3</p>
-  </a>
-</li>
-<li class="gwd-li-js4j gwd-li-1rio gwd-li-13le">
-  <a href="#" class="gwd-a-ze3g gwd-a-cv4q">
-    <h4 class="gwd-h4-1f18">Page 4</h4>
-    <p class="gwd-p-shpk">information page 4</p>
-  </a>
-</li>
-<li class="gwd-li-js4j gwd-li-1rio gwd-li-13le">
-  <a href="#" class="gwd-a-ze3g gwd-a-cv4q">
-    <h4 class="gwd-h4-1f18">Page 5</h4>
-    <p class="gwd-p-shpk">information page 5</p>
-  </a>
-</li></ul>
-    </div>
-    <a href="/" class="gwd-a-1oyd">
-      <img src="assets/logo.png" id="logo" class="gwd-img-18mq">
-    </a>
   </div>
-
-
-</div>
   <script>
     // Get the modal
     var modal = document.getElementById("myModal");
@@ -1973,7 +1986,6 @@
       }
     }
   </script>
-
-
 </body>
+
 </html>

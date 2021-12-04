@@ -385,7 +385,7 @@ footer {
   div.hero {
     padding-top: 60px; }
     div.hero > div {
-      border-radius: 32px;
+      border-radius: 32px 0px 32px 0px;
       position: absolute;
       left: 10vw;
       bottom: 10vw; }
